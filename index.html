@@ -127,14 +127,14 @@ tr:hover td{background:#fafaf8}
     <div class="fg"><label>Date</label><input type="date" id="e-date" tabindex="1"></div>
     <div class="fg"><label>Product name</label>
       <div class="ac-wrap">
-        <input type="text" id="e-product" placeholder="e.g. Fortified Maize Flour" tabindex="2" autocomplete="off"
+        <input type="text" id="e-product" placeholder="e.g. White Acrylic" tabindex="2" autocomplete="off"
           oninput="acFilter('e-product','ac-product','products')" onfocus="acFilter('e-product','ac-product','products')" onblur="acClose('ac-product')">
         <div class="ac-drop" id="ac-product"></div>
       </div>
     </div>
     <div class="fg"><label>SKU / code</label>
       <div class="ac-wrap">
-        <input type="text" id="e-sku" placeholder="e.g. MF-500G-001" tabindex="3" autocomplete="off"
+        <input type="text" id="e-sku" placeholder="e.g. White AC - 1Ltr" tabindex="3" autocomplete="off"
           oninput="acFilter('e-sku','ac-sku','skus');autoFillPackRef()" onfocus="acFilter('e-sku','ac-sku','skus')" onblur="acClose('ac-sku')">
         <div class="ac-drop" id="ac-sku"></div>
       </div>
@@ -318,7 +318,7 @@ tr:hover td{background:#fafaf8}
     <div class="card">
       <div class="card-title">SKU / product list</div>
       <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input type="text" id="new-sku" placeholder="e.g. MF-500G-001" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('skus','new-sku','sku-list')}">
+        <input type="text" id="new-sku" placeholder="e.g. White AC - 1Ltr" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('skus','new-sku','sku-list')}">
         <button class="btn-primary" onclick="addListItem('skus','new-sku','sku-list')">Add</button>
       </div>
       <div id="sku-list"></div>
@@ -327,7 +327,7 @@ tr:hover td{background:#fafaf8}
     <div class="card">
       <div class="card-title">Product names list</div>
       <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input type="text" id="new-product" placeholder="e.g. Fortified Maize Flour" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('products','new-product','product-list')}">
+        <input type="text" id="new-product" placeholder="e.g. White Acrylic" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('products','new-product','product-list')}">
         <button class="btn-primary" onclick="addListItem('products','new-product','product-list')">Add</button>
       </div>
       <div id="product-list"></div>
@@ -356,8 +356,7 @@ tr:hover td{background:#fafaf8}
       4. Scroll down &rarr; click <strong>"Commit changes"</strong> &rarr; your site updates in 1&ndash;2 minutes<br><br>
 
       <strong>To add items permanently to your lists (optional — the Settings tab is easier):</strong><br>
-      In the file, near the bottom, find this line: <code>var LISTS = {personnel:[], packaging:[], skus:[], products:[]};</code><br>
-      Add names inside the square brackets like this: <code>personnel: ["Apio Sarah", "Okello James", "Namutebi Ruth"]</code><br><br>
+      In the file, find the <code>DEFAULT_LISTS</code> object near the top of the script and add names inside the square brackets, e.g.: <code>personnel: ["Apio Sarah", "Okello James"]</code><br><br>
 
       <strong>To add a new field to the entry form:</strong><br>
       1. Find a similar field in the HTML and copy its block<br>
@@ -376,11 +375,103 @@ tr:hover td{background:#fafaf8}
 </div>
 
 <script>
+// ─── MASTER DEFAULT LISTS ────────────────────────
+// These load automatically on first visit (or whenever localStorage has no saved lists).
+// Edit these arrays to change the built-in defaults permanently.
+var DEFAULT_LISTS = {
+  personnel: [
+    "Achuki David","Agwanda George","Akiyo Stella","Amachar Scovia Beatrice","Amandi Robert",
+    "Lukungu Jonathan","Angiro Breani","Ankunda Bright","Busingye Christopher","Bwire Joshua",
+    "Jangweni Yokolamu","Kasambeko Cynthia","Kasango Middu","Katusabe Rechel","Kizza Allan",
+    "Lubega Idirisa","Musisi Kibule","Mutoni Mary","Nabaka Shadia","Nalujja Zaitun",
+    "Namawanda Agnes","Nambale Joel","Namukwaya Resty","Nsamba Herbert","Obilo Habib",
+    "Obilo Moshen","Obuka Michael","Ochieng James","Odhiambo Boi","Odhiambo Brian",
+    "Oduki Lillian","Odwori Joseph","Ogando Kevin","Okello Ken","Olwa Gabriel",
+    "Onyait Emmanuel","Osiale Patrick Sewe","Otieno Elvis","Otieno Lenox","Otieno Moses",
+    "Otieno Stephen","Otisi Alfoss","Ouma David","Ouma Jackson","Owino Robert",
+    "Ssadu Morgan","Ssenteza James","Tamale William","Wandera Kennedy","Wandera Sowali",
+    "Wanyama Farouk","William Ouma"
+  ],
+  packaging: [
+    "Super Gloss Tins x 4Litres","Super Gloss Tins x 1Litre","Super Gloss Tins x 500ml","Super Gloss Tins x 250ml",
+    "Nitrocellulose Tins x 4Litres","Nitrocellulose Tins x 1Litre","Nitrocellulose Tins x 500ml",
+    "Fast Dry Tins x 4Litres","Fast Dry Tins x 1Litre","Fast Dry Tins x 500ml",
+    "Acrylic Tins x 4Litres","Acrylic Tins x 1Litre","Acrylic Tins x 500ml",
+    "Wood Finish Tins x 4Litres","Wood Finish Tins x 1Litre","Wood Finish Tins x 500ml",
+    "Jerrycans x 20Litres","Jerrycans x 4Litres",
+    "Top Handle x 1Litre",
+    "Natural Bottles - 250ml","Natural Bottles - 60ml",
+    "Buckets x 20Litres","Buckets x 4Litres",
+    "Round Jars x 1Litre","Round Jars x 500ml","Round Jars x 250ml",
+    "Boxes 8 x 4Litres","Boxes 4 x 4Litres",
+    "Boxes 24 x 1Litre","Boxes 24 x 500ml","Boxes 24 x 250ml"
+  ],
+  skus: [
+    "2 Pack Primer AC - 1/2Ltr","2 Pack Primer AC -1Ltr","2 Pack Primer AC - 4Ltr",
+    "Black AC - 1/2Ltr","Black AC - 1Ltr","Black AC - 4Ltr","Black AC - 5Ltr","Black AC - 20Ltr",
+    "Clear AC - 1/2Ltr","Clear AC - 1Ltr","Clear AC - 4Ltr","Clear AC - 5Ltr","Clear AC - 20Ltr",
+    "Fast Maroon AC - 4Ltr","Fast Maroon AC - 5Ltr","Fast Maroon AC - 20Ltr",
+    "Hardener - 1Ltr","Hardener - 20Ltr",
+    "White AC - 1/2Ltr","White AC - 1Ltr","White AC - 4Ltr","White AC - 20Ltr",
+    "Raptor-1ltr","Fibre Resin - 1 Ltr","Fibre Resin - 20 Ltr",
+    "Super Autofouling Black - 4Ltr","Super Autofouling White - 4Ltr",
+    "Black NC - 1Ltr","Black NC - 4Ltr","Clear NC - 1Ltr","Clear NC - 4Ltr",
+    "White NC - 1Ltr","White NC - 4Ltr",
+    "2Pack Clear - 1Ltr","2Pack Clear - 4Ltr",
+    "Sanding Sealer - 1Ltr","Sanding Sealer - 4Ltr",
+    "Wood Glue - 1Ltr","Wood Glue - 4Ltr"
+  ],
+  products: [
+    "White Acrylic","Black Acrylic","Clear AC","Fast Maroon Acrylic","Hardener",
+    "Lemon Yellow Acrylic","Matt Black Acrylic","Mid Chrome Yellow Acrylic",
+    "Maroon Acrylic","Orange Acrylic","Permanent Blue Acrylic","Permanent Green Acrylic",
+    "Post Red Acrylic","Red Oxide Acrylic","Smoke Grey Acrylic","Violet Acrylic",
+    "Yellow Oxide Acrylic","Covermatt White","Covermatt Cream","Covermatt Soft White",
+    "SilkVinyl White","SilkVinyl Cream","Undercoat White","Vinylmatt White",
+    "Weatherguard White","Black NC","Clear NC","White NC","Red Oxide NC",
+    "Permanent Blue QAD","White QAD",
+    "2Pack Thinner","High Gloss Thinner","Standard Thinner","White Spirit",
+    "2Pack Clear","Clear Vanish","Matt Vanish","NC Lacquer",
+    "Sanding Sealer","Wood Glue","Wood Seal","Fibre Resin","Marine Paint"
+  ]
+};
+
 // ─── STORAGE ────────────────────────────────────
 var DB = [];
 var LISTS = {personnel:[], packaging:[], skus:[], products:[]};
-try{ var _d=localStorage.getItem('pt_db'); if(_d) DB=JSON.parse(_d); }catch(e){}
-try{ var _l=localStorage.getItem('pt_lists'); if(_l) LISTS=Object.assign({personnel:[],packaging:[],skus:[],products:[]},JSON.parse(_l)); }catch(e){}
+
+// Load production records
+try { var _d = localStorage.getItem('pt_db'); if(_d) DB = JSON.parse(_d); } catch(e){}
+
+// Load lists: use saved data if it exists and has items, otherwise load defaults
+try {
+  var _l = localStorage.getItem('pt_lists');
+  if(_l) {
+    var saved = JSON.parse(_l);
+    LISTS.personnel = (saved.personnel && saved.personnel.length) ? saved.personnel : DEFAULT_LISTS.personnel.slice();
+    LISTS.packaging = (saved.packaging && saved.packaging.length) ? saved.packaging : DEFAULT_LISTS.packaging.slice();
+    LISTS.skus      = (saved.skus      && saved.skus.length)      ? saved.skus      : DEFAULT_LISTS.skus.slice();
+    LISTS.products  = (saved.products  && saved.products.length)  ? saved.products  : DEFAULT_LISTS.products.slice();
+  } else {
+    // First visit — seed localStorage with the master defaults
+    LISTS = {
+      personnel: DEFAULT_LISTS.personnel.slice(),
+      packaging: DEFAULT_LISTS.packaging.slice(),
+      skus:      DEFAULT_LISTS.skus.slice(),
+      products:  DEFAULT_LISTS.products.slice()
+    };
+    localStorage.setItem('pt_lists', JSON.stringify(LISTS));
+  }
+} catch(e) {
+  // Fallback if anything goes wrong
+  LISTS = {
+    personnel: DEFAULT_LISTS.personnel.slice(),
+    packaging: DEFAULT_LISTS.packaging.slice(),
+    skus:      DEFAULT_LISTS.skus.slice(),
+    products:  DEFAULT_LISTS.products.slice()
+  };
+}
+
 function persist(){ try{localStorage.setItem('pt_db',JSON.stringify(DB));}catch(e){} }
 function persistLists(){ try{localStorage.setItem('pt_lists',JSON.stringify(LISTS));}catch(e){} }
 
@@ -740,79 +831,17 @@ function importData(){
     var reader=new FileReader();
     reader.onload=function(e){
       try {
-  var p = JSON.parse(e.target.result);
-
-  if (p.DB) DB = p.DB;
-
-  // ===== DEFAULT MASTER LISTS =====
-  var DEFAULT_LISTS = {
-    personnel: [
-      "Achuki David","Agwanda George","Akiyo Stella","Amachar Scovia Beatrice","Amandi Robert","Lukungu Jonathan","Angiro Breani","Ankunda Bright","Busingye Christopher","Bwire Joshua","Jangweni Yokolamu","Kasambeko Cynthia","Kasango Middu","Katusabe Rechel","Kizza Allan","Lubega Idirisa","Musisi Kibule","Mutoni Mary","Nabaka Shadia","Nalujja Zaitun","Namawanda Agnes","Nambale Joel","Namukwaya Resty","Nsamba Herbert","Obilo Habib","Obilo Moshen","Obuka Michael","Ochieng James","Odhiambo Boi","Odhiambo Brian","Oduki Lillian","Odwori Joseph","Ogando Kevin","Okello Ken","Olwa Gabriel","Onyait Emmanuel","Osiale Patrick Sewe","Otieno Elvis","Otieno Lenox","Otieno Moses","Otieno Stephen","Otisi Alfoss","Ouma David","Ouma Jackson","Owino Robert","Ssadu Morgan","Ssenteza James","Tamale William","Wandera Kennedy","Wandera Sowali","Wanyama Farouk","William Ouma"
-    ],
-
-    packaging: [
-      "Super Gloss Tins x 4Litres","Super Gloss Tins x 1Litre","Super Gloss Tins x 500ml","Super Gloss Tins x 250ml",
-      "Nitrocellulose Tins x 4Litres","Nitrocellulose Tins x 1Litre","Nitrocellulose Tins x 500ml",
-      "Fast Dry Tins x 4Litres","Fast Dry Tins x 1Litre","Fast Dry Tins x 500ml",
-      "Acrylic Tins x 4Litres","Acrylic Tins x 1Litre","Acrylic Tins x 500ml",
-      "Wood Finish Tins x 4Litres","Wood Finish Tins x 1Litre","Wood Finish Tins x 500ml",
-      "Jerrycans x 20Litres","Jerrycans x 4Litres",
-      "Top Handle x 1Litre",
-      "Natural Bottles - 250ml","Natural Bottles - 60ml",
-      "Buckets x 20Litres","Buckets x 4Litres",
-      "Round Jars x 1Litre","Round Jars x 500ml","Round Jars x 250ml",
-      "Boxes 8 x 4Litres","Boxes 4 x 4Litres",
-      "Boxes 24 x 1Litre","Boxes 24 x 500ml","Boxes 24 x 250ml"
-    ],
-
-    skus: [
-      "2 Pack Primer AC - 1/2Ltr","2 Pack Primer AC -1Ltr","2 Pack Primer AC - 4Ltr",
-      "Black AC - 1/2Ltr","Black AC - 1Ltr","Black AC - 4Ltr","Black AC - 5Ltr","Black AC - 20Ltr",
-      "Clear AC - 1/2Ltr","Clear AC - 1Ltr","Clear AC - 4Ltr","Clear AC - 5Ltr","Clear AC - 20Ltr",
-      "Fast Maroon AC - 4Ltr","Fast Maroon AC - 5Ltr","Fast Maroon AC - 20Ltr",
-      "Hardener - 1Ltr","Hardener - 20Ltr",
-      "White AC - 1/2Ltr","White AC - 1Ltr","White AC - 4Ltr","White AC - 20Ltr",
-      "Raptor-1ltr","Fibre Resin - 1 Ltr","Fibre Resin - 20 Ltr",
-      "Super Autofouling Black - 4Ltr","Super Autofouling White - 4Ltr",
-      "Black NC - 1Ltr","Black NC - 4Ltr","Clear NC - 1Ltr","Clear NC - 4Ltr",
-      "White NC - 1Ltr","White NC - 4Ltr",
-      "2Pack Clear - 1Ltr","2Pack Clear - 4Ltr",
-      "Sanding Sealer - 1Ltr","Sanding Sealer - 4Ltr",
-      "Wood Glue - 1Ltr","Wood Glue - 4Ltr"
-    ],
-
-    products: [
-      "White Acrylic","Black Acrylic","Clear AC","Fast Maroon Acrylic","Hardener",
-      "Lemon Yellow Acrylic","Matt Black Acrylic","Mid Chrome Yellow Acrylic",
-      "Maroon Acrylic","Orange Acrylic","Permanent Blue Acrylic","Permanent Green Acrylic",
-      "Post Red Acrylic","Red Oxide Acrylic","Smoke Grey Acrylic","Violet Acrylic",
-      "Yellow Oxide Acrylic","Covermatt White","Covermatt Cream","Covermatt Soft White",
-      "SilkVinyl White","SilkVinyl Cream","Undercoat White","Vinylmatt White",
-      "Weatherguard White","Black NC","Clear NC","White NC","Red Oxide NC",
-      "Permanent Blue QAD","White QAD",
-      "2Pack Thinner","High Gloss Thinner","Standard Thinner","White Spirit",
-      "2Pack Clear","Clear Vanish","Matt Vanish","NC Lacquer",
-      "Sanding Sealer","Wood Glue","Wood Seal","Fibre Resin","Marine Paint"
-    ]
-  };
-
-  // ===== SAFE MERGE (NO OVERWRITING WITH EMPTY DATA) =====
-  LISTS = {
-    personnel: (p.LISTS && p.LISTS.personnel && p.LISTS.personnel.length) ? p.LISTS.personnel : DEFAULT_LISTS.personnel,
-    packaging: (p.LISTS && p.LISTS.packaging && p.LISTS.packaging.length) ? p.LISTS.packaging : DEFAULT_LISTS.packaging,
-    skus: (p.LISTS && p.LISTS.skus && p.LISTS.skus.length) ? p.LISTS.skus : DEFAULT_LISTS.skus,
-    products: (p.LISTS && p.LISTS.products && p.LISTS.products.length) ? p.LISTS.products : DEFAULT_LISTS.products
-  };
-
-  persist();
-  persistLists();
-  renderLists();
-  toast('Data imported successfully.');
-
-} catch (ex) {
-  console.error(ex);
-  toast('Error reading file.');
-}
+        var p=JSON.parse(e.target.result);
+        if(p.DB) DB=p.DB;
+        LISTS = {
+          personnel: (p.LISTS&&p.LISTS.personnel&&p.LISTS.personnel.length) ? p.LISTS.personnel : DEFAULT_LISTS.personnel.slice(),
+          packaging: (p.LISTS&&p.LISTS.packaging&&p.LISTS.packaging.length) ? p.LISTS.packaging : DEFAULT_LISTS.packaging.slice(),
+          skus:      (p.LISTS&&p.LISTS.skus&&p.LISTS.skus.length)           ? p.LISTS.skus      : DEFAULT_LISTS.skus.slice(),
+          products:  (p.LISTS&&p.LISTS.products&&p.LISTS.products.length)   ? p.LISTS.products  : DEFAULT_LISTS.products.slice()
+        };
+        persist(); persistLists(); renderLists();
+        toast('Data imported successfully.');
+      } catch(ex) { console.error(ex); toast('Error reading file.'); }
     };
     reader.readAsText(file);
   };
