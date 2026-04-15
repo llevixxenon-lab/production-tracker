@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:14px;background:#f5f5f3;color:#1a1a18;min-height:100vh}
+a,button,input,select,textarea{font-family:inherit}
+.shell{max-width:1140px;margin:0 auto;padding:1.5rem 1rem}
+.app-header{margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.app-header h1{font-size:19px;font-weight:700;margin-bottom:2px}
+.app-header p{font-size:12px;color:#5f5e5a}
+.nav{display:flex;gap:4px;border-bottom:1px solid #ddd;margin-bottom:1.5rem;flex-wrap:wrap}
+.nav button{padding:9px 16px;font-size:13px;cursor:pointer;border:none;background:none;color:#5f5e5a;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+.nav button.on{color:#0f6e56;border-bottom-color:#1d9e75}
+.nav button:hover{color:#1a1a18}
+.pg{display:none}.pg.on{display:block}
+.card{background:#fff;border:1px solid #e0e0db;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:10px}
+.row5{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:12px;margin-bottom:10px}
+@media(max-width:700px){.row2,.row3,.row4,.row5{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.row2,.row3,.row4,.row5{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:3px;position:relative}
+.fg label{font-size:11px;color:#5f5e5a;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.fg input,.fg select,.fg textarea{padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1a1a18;outline:none;transition:border-color .15s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#1d9e75;box-shadow:0 0 0 3px rgba(29,158,117,.08)}
+.fg textarea{height:56px;resize:vertical}
+.fg .hint{font-size:11px;color:#888;margin-top:2px}
+hr{border:none;border-top:1px solid #eee;margin:14px 0}
+.sec{font-size:12px;font-weight:700;color:#0f6e56;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;margin-top:2px;padding-bottom:5px;border-bottom:1px solid #e1f5ee}
+.btn-primary{background:#1d9e75;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;cursor:pointer;font-weight:700}
+.btn-primary:hover{background:#0f6e56}
+.btn-outline{background:#fff;border:1px solid #ccc;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;color:#1a1a18}
+.btn-outline:hover{background:#f5f5f3}
+.btn-sm{font-size:12px;padding:3px 9px;border-radius:6px;cursor:pointer;background:none;border:1px solid #ccc;color:#5f5e5a}
+.btn-sm:hover{background:#f5f5f3}
+.btn-danger{font-size:12px;padding:3px 9px;border-radius:6px;cursor:pointer;background:none;border:1px solid #f09595;color:#a32d2d}
+.btn-danger:hover{background:#fcebeb}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
+@media(max-width:600px){.metrics{grid-template-columns:1fr 1fr}}
+.met{background:#fff;border:1px solid #e0e0db;border-radius:10px;padding:.85rem 1rem}
+.met .lbl{font-size:11px;color:#5f5e5a;margin-bottom:3px;font-weight:600}
+.met .val{font-size:22px;font-weight:700}
+.met .sub{font-size:11px;color:#5f5e5a;margin-top:2px}
+.badge{font-size:11px;padding:2px 9px;border-radius:6px;font-weight:700;white-space:nowrap;display:inline-block}
+.badge-ok{background:#e1f5ee;color:#0f6e56}
+.badge-warn{background:#faeeda;color:#854f0b}
+.badge-bad{background:#fcebeb;color:#a32d2d}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;font-size:12px;border-collapse:collapse;min-width:700px}
+th{text-align:left;color:#5f5e5a;font-weight:700;padding:7px 8px;border-bottom:1px solid #eee;white-space:nowrap;background:#fafaf8}
+td{padding:7px 8px;border-bottom:1px solid #f0f0ec;color:#1a1a18;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.filter-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-bar input,.filter-bar select{padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1a1a18;outline:none}
+.filter-bar input:focus,.filter-bar select:focus{border-color:#1d9e75}
+#toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1d9e75;color:#fff;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;display:none;z-index:9999;box-shadow:0 2px 14px rgba(0,0,0,.18)}
+.empty{text-align:center;padding:2.5rem;color:#888;font-size:13px}
+.vcard{background:#fff;border:1px solid #e0e0db;border-radius:12px;padding:1rem 1.25rem;margin-bottom:.85rem}
+.vcard-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.vcard-name{font-weight:700;font-size:14px}
+.vcard-meta{font-size:12px;color:#5f5e5a;margin-top:2px}
+.vcard-pills{display:flex;gap:6px;flex-wrap:wrap}
+.vpill{font-size:12px;padding:3px 10px;background:#f5f5f3;border-radius:6px;color:#5f5e5a}
+.vgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:540px){.vgrid{grid-template-columns:1fr}}
+.vbox{background:#fafaf8;border-radius:8px;padding:10px 12px}
+.vbox-lbl{font-size:11px;color:#5f5e5a;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.ac-wrap{position:relative}
+.ac-drop{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #1d9e75;border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;z-index:300;box-shadow:0 4px 12px rgba(0,0,0,.1);display:none}
+.ac-drop.open{display:block}
+.ac-item{padding:8px 10px;font-size:13px;cursor:pointer;color:#1a1a18}
+.ac-item:hover{background:#e1f5ee;color:#0f6e56}
+.tag{display:inline-flex;align-items:center;gap:5px;background:#e1f5ee;color:#0f6e56;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:600;margin:2px}
+.tag-x{cursor:pointer;font-weight:900;line-height:1}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.settings-grid{grid-template-columns:1fr}}
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#fafaf8;border-radius:7px;margin-bottom:5px;font-size:13px}
+.rep-types{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.rep-type{padding:7px 16px;border:1px solid #ddd;border-radius:20px;font-size:13px;cursor:pointer;background:#fff;color:#5f5e5a;font-weight:500}
+.rep-type.on{background:#1d9e75;color:#fff;border-color:#1d9e75;font-weight:700}
+.rep-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem}
+@media(max-width:600px){.rep-sum{grid-template-columns:1fr 1fr}}
+.rep-met{background:#f5f5f3;border-radius:10px;padding:.85rem 1rem}
+.rep-met .lbl{font-size:11px;color:#5f5e5a;margin-bottom:3px;font-weight:600}
+.rep-met .val{font-size:20px;font-weight:700}
+.rep-met .sub{font-size:11px;color:#5f5e5a;margin-top:2px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.info-box{background:#e6f1fb;border:1px solid #b5d4f4;border-radius:8px;padding:10px 14px;font-size:12px;color:#185fa5;margin-bottom:12px;line-height:1.6}
+.warn-box{background:#faeeda;border:1px solid #fac775;border-radius:8px;padding:10px 14px;font-size:12px;color:#854f0b;margin-bottom:12px;line-height:1.6}
+.howto{font-size:13px;line-height:1.9;color:#1a1a18}
+.howto code{background:#f1efe8;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:12px}
+.howto strong{font-weight:700}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="app-header">
+  <div>
+    <h1>Production tracker</h1>
+    <p>Stamps &nbsp;·&nbsp; Packaging &nbsp;·&nbsp; Personnel &nbsp;·&nbsp; Variance analysis</p>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="on" onclick="go('entry')">New entry</button>
+  <button onclick="go('records')">Records</button>
+  <button onclick="go('variance')">Variance</button>
+  <button onclick="go('reports')">Reports</button>
+  <button onclick="go('settings')">Settings / Lists</button>
+</div>
+
+<div id="toast"></div>
+
+<!-- ========== NEW ENTRY ========== -->
+<div class="pg on" id="pg-entry">
+<div class="card">
+  <div class="sec">Product &amp; batch</div>
+  <div class="row3">
+    <div class="fg"><label>Date</label><input type="date" id="e-date" tabindex="1"></div>
+    <div class="fg"><label>Product name</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-product" placeholder="e.g. White Acrylic" tabindex="2" autocomplete="off"
+          oninput="acFilter('e-product','ac-product','products')" onfocus="acFilter('e-product','ac-product','products')" onblur="acClose('ac-product')">
+        <div class="ac-drop" id="ac-product"></div>
+      </div>
+    </div>
+    <div class="fg"><label>SKU / code</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-sku" placeholder="e.g. White AC - 1Ltr" tabindex="3" autocomplete="off"
+          oninput="acFilter('e-sku','ac-sku','skus');autoFillPackRef()" onfocus="acFilter('e-sku','ac-sku','skus')" onblur="acClose('ac-sku')">
+        <div class="ac-drop" id="ac-sku"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="fg"><label>Batch / lot number</label><input type="text" id="e-batch" placeholder="e.g. BT-2025-088" tabindex="4" autocomplete="off" oninput="autoFillPackRef()"></div>
+    <div class="fg"><label>Production quantity (units)</label><input type="number" id="e-prodqty" placeholder="0" min="0" tabindex="5"></div>
+  </div>
+
+  <hr>
+  <div class="sec">Stamps</div>
+  <div class="row5">
+    <div class="fg">
+      <label>Stamps reel number</label>
+      <input type="text" id="e-reelno" placeholder="e.g. REEL-2025-A" tabindex="6" autocomplete="off">
+      <span class="hint">Enter once per new reel — leave blank to continue same reel</span>
+    </div>
+    <div class="fg"><label>Stamps issued 1</label><input type="number" id="e-stamps" placeholder="0" min="0" tabindex="7"></div>
+    <div class="fg">
+      <label>Stamps issued 2 <span style="font-weight:400;font-size:10px;text-transform:none">(from returns stock)</span></label>
+      <input type="number" id="e-stamps2" placeholder="0" min="0" tabindex="8">
+      <span class="hint">Leave blank if none from stock</span>
+    </div>
+    <div class="fg">
+      <label>Stamps returned</label>
+      <input type="number" id="e-stamps-ret" placeholder="0" min="0" tabindex="9">
+      <span class="hint">Unused stamps back to store</span>
+    </div>
+    <div class="fg"><label>Stamps issued by</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-stampby" placeholder="Name or ID" tabindex="10" autocomplete="off"
+          oninput="acFilter('e-stampby','ac-stampby','personnel')" onfocus="acFilter('e-stampby','ac-stampby','personnel')" onblur="acClose('ac-stampby')">
+        <div class="ac-drop" id="ac-stampby"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec">Packaging (from packaging store)</div>
+  <div class="row4">
+    <div class="fg"><label>Packaging units issued</label><input type="number" id="e-pack" placeholder="0" min="0" tabindex="11"></div>
+    <div class="fg"><label>Packaging material</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-packmat" placeholder="Type to search..." tabindex="12" autocomplete="off"
+          oninput="acFilter('e-packmat','ac-packmat','packaging')" onfocus="acFilter('e-packmat','ac-packmat','packaging')" onblur="acClose('ac-packmat')">
+        <div class="ac-drop" id="ac-packmat"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Store issue reference</label>
+      <input type="text" id="e-packref" placeholder="Auto-filled from batch + SKU" tabindex="13" autocomplete="off">
+      <span class="hint">Auto-fills when you enter batch &amp; SKU</span>
+    </div>
+    <div class="fg"><label>Packaging issued by (store)</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-packby" placeholder="Name or ID" tabindex="14" autocomplete="off"
+          oninput="acFilter('e-packby','ac-packby','personnel')" onfocus="acFilter('e-packby','ac-packby','personnel')" onblur="acClose('ac-packby')">
+        <div class="ac-drop" id="ac-packby"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec">Personnel on this production run</div>
+  <div class="row2">
+    <div class="fg">
+      <label>Personnel (type name and press Enter to add)</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-personnel-input" placeholder="Type name, select or press Enter..." tabindex="15" autocomplete="off"
+          oninput="acFilter('e-personnel-input','ac-personnel','personnel')" onfocus="acFilter('e-personnel-input','ac-personnel','personnel')" onblur="acClose('ac-personnel')" onkeydown="personnelKeydown(event)">
+        <div class="ac-drop" id="ac-personnel"></div>
+      </div>
+      <div id="personnel-tags" style="margin-top:6px;min-height:10px"></div>
+      <input type="hidden" id="e-personnel">
+    </div>
+    <div class="fg"><label>Supervisor</label>
+      <div class="ac-wrap">
+        <input type="text" id="e-supervisor" placeholder="Name or ID" tabindex="16" autocomplete="off"
+          oninput="acFilter('e-supervisor','ac-supervisor','personnel')" onfocus="acFilter('e-supervisor','ac-supervisor','personnel')" onblur="acClose('ac-supervisor')">
+        <div class="ac-drop" id="ac-supervisor"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fg" style="margin-bottom:14px">
+    <label>Notes (optional)</label>
+    <textarea id="e-notes" placeholder="Any remarks for this run..." tabindex="17"></textarea>
+  </div>
+  <button class="btn-primary" onclick="saveEntry()" tabindex="18">Save production entry</button>
+</div>
+</div>
+
+<!-- ========== RECORDS ========== -->
+<div class="pg" id="pg-records">
+  <div class="filter-bar">
+    <input type="text" id="r-search" placeholder="Search product, SKU or batch..." oninput="renderRecords()" style="flex:1;min-width:160px">
+    <input type="date" id="r-from" onchange="renderRecords()">
+    <input type="date" id="r-to" onchange="renderRecords()">
+    <button class="btn-outline" onclick="clearFilters()">Clear</button>
+  </div>
+  <div class="metrics">
+    <div class="met"><div class="lbl">Total entries</div><div class="val" id="rm-entries">0</div></div>
+    <div class="met"><div class="lbl">Total produced</div><div class="val" id="rm-prod">0</div></div>
+    <div class="met"><div class="lbl">Net stamps issued</div><div class="val" id="rm-stamps">0</div><div class="sub" id="rm-stamps-sub"></div></div>
+    <div class="met"><div class="lbl">Packaging issued</div><div class="val" id="rm-pack">0</div></div>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap" id="records-tbl"><div class="empty">No entries yet.</div></div>
+  </div>
+</div>
+
+<!-- ========== VARIANCE ========== -->
+<div class="pg" id="pg-variance">
+  <div class="info-box">
+    <strong>Net stamps</strong> = Stamps issued 1 + Stamps issued 2 &minus; Stamps returned.
+    Variance = Net stamps (or packaging) minus production quantity.
+    Positive = more issued than produced &nbsp;·&nbsp; Negative = less issued &nbsp;·&nbsp; Zero = perfect match.
+    Record a reason for any gap using the field below each entry.
+  </div>
+  <div class="filter-bar">
+    <select id="v-filter" onchange="renderVariance()">
+      <option value="">All entries</option>
+      <option value="var">Variance entries only</option>
+    </select>
+    <input type="text" id="v-sku" placeholder="Filter by SKU or product..." oninput="renderVariance()" style="flex:1;min-width:160px">
+  </div>
+  <div id="variance-list"></div>
+</div>
+
+<!-- ========== REPORTS ========== -->
+<div class="pg" id="pg-reports">
+  <div class="card">
+    <div class="card-title">Report settings</div>
+    <div class="row3">
+      <div class="fg"><label>From date</label><input type="date" id="rp-from"></div>
+      <div class="fg"><label>To date</label><input type="date" id="rp-to"></div>
+      <div class="fg"><label>SKU / product filter (optional)</label><input type="text" id="rp-sku" placeholder="Leave blank for all"></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:#5f5e5a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Report type</div>
+      <div class="rep-types">
+        <button class="rep-type on" data-rt="full" onclick="setRT(this)">Full report</button>
+        <button class="rep-type" data-rt="stamps" onclick="setRT(this)">Stamps only</button>
+        <button class="rep-type" data-rt="packaging" onclick="setRT(this)">Packaging only</button>
+        <button class="rep-type" data-rt="production" onclick="setRT(this)">Production only</button>
+        <button class="rep-type" data-rt="variance" onclick="setRT(this)">Variance only</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="buildReport()">Generate report</button>
+      <button class="btn-outline" onclick="exportCSV()">Export as CSV (Excel)</button>
+      <button class="btn-outline" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+  <div id="report-out"></div>
+</div>
+
+<!-- ========== SETTINGS ========== -->
+<div class="pg" id="pg-settings">
+  <div class="info-box">Add your lists here. They will auto-suggest as you type in the entry form. You can add or remove items at any time.</div>
+  <div class="settings-grid">
+
+    <div class="card">
+      <div class="card-title">Personnel list</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="new-person" placeholder="Full name or ID" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('personnel','new-person','person-list')}">
+        <button class="btn-primary" onclick="addListItem('personnel','new-person','person-list')">Add</button>
+      </div>
+      <div id="person-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Packaging materials list</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="new-pack" placeholder="e.g. 500g stand-up pouch" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('packaging','new-pack','pack-list')}">
+        <button class="btn-primary" onclick="addListItem('packaging','new-pack','pack-list')">Add</button>
+      </div>
+      <div id="pack-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">SKU / product list</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="new-sku" placeholder="e.g. White AC - 1Ltr" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('skus','new-sku','sku-list')}">
+        <button class="btn-primary" onclick="addListItem('skus','new-sku','sku-list')">Add</button>
+      </div>
+      <div id="sku-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Product names list</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="new-product" placeholder="e.g. White Acrylic" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;outline:none" onkeydown="if(event.key==='Enter'){addListItem('products','new-product','product-list')}">
+        <button class="btn-primary" onclick="addListItem('products','new-product','product-list')">Add</button>
+      </div>
+      <div id="product-list"></div>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top:.5rem">
+    <div class="card-title">Data backup &amp; management</div>
+    <div class="warn-box">Your data is stored in this browser only. Export regularly as a backup. Clearing browser storage will delete all records.</div>
+    <div class="btn-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <button class="btn-outline" onclick="exportAllCSV()">Export ALL records to CSV</button>
+      <button class="btn-outline" onclick="exportJSON()">Export backup file (JSON)</button>
+      <button class="btn-outline" onclick="importData()">Restore from backup (JSON)</button>
+      <button class="btn-danger" style="padding:8px 16px;font-size:13px;margin-top:6px" onclick="clearAll()">Clear all production data</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:.5rem">
+    <div class="card-title">How to edit this software on GitHub</div>
+    <div class="howto">
+      <strong>To update your live web app after any change:</strong><br>
+      1. Go to your GitHub repository &rarr; click <code>index.html</code><br>
+      2. Click the <strong>pencil icon</strong> (Edit this file) at the top right<br>
+      3. Make your changes in the editor<br>
+      4. Scroll down &rarr; click <strong>"Commit changes"</strong> &rarr; your site updates in 1&ndash;2 minutes<br><br>
+
+      <strong>To add items permanently to your lists (optional — the Settings tab is easier):</strong><br>
+      In the file, find the <code>DEFAULT_LISTS</code> object near the top of the script and add names inside the square brackets, e.g.: <code>personnel: ["Apio Sarah", "Okello James"]</code><br><br>
+
+      <strong>To add a new field to the entry form:</strong><br>
+      1. Find a similar field in the HTML and copy its block<br>
+      2. Give it a new unique <code>id</code> (e.g. <code>id="e-myfield"</code>)<br>
+      3. In the <code>saveEntry()</code> function in the script, add: <code>myfield: gv('e-myfield'),</code><br>
+      4. Add it to the table headers and row in <code>renderRecords()</code> and the CSV export functions<br><br>
+
+      <strong>To change the app title:</strong> Find <code>&lt;title&gt;Production Tracker&lt;/title&gt;</code> and the <code>&lt;h1&gt;</code> tag and edit the text.<br><br>
+
+      <strong>To share the app with your team:</strong> Give them your GitHub Pages link. Each person's data stays on their own device. Use "Export all records to CSV" from each device and merge in Excel to combine records.
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+// ─── MASTER DEFAULT LISTS ────────────────────────
+// These load automatically on first visit (or whenever localStorage has no saved lists).
+// Edit these arrays to change the built-in defaults permanently.
+var DEFAULT_LISTS = {
+  personnel: [
+    "Achuki David","Agwanda George","Akiyo Stella","Amachar Scovia Beatrice","Amandi Robert",
+    "Lukungu Jonathan","Angiro Breani","Ankunda Bright","Busingye Christopher","Bwire Joshua",
+    "Jangweni Yokolamu","Kasambeko Cynthia","Kasango Middu","Katusabe Rechel","Kizza Allan",
+    "Lubega Idirisa","Musisi Kibule","Mutoni Mary","Nabaka Shadia","Nalujja Zaitun",
+    "Namawanda Agnes","Nambale Joel","Namukwaya Resty","Nsamba Herbert","Obilo Habib",
+    "Obilo Moshen","Obuka Michael","Ochieng James","Odhiambo Boi","Odhiambo Brian",
+    "Oduki Lillian","Odwori Joseph","Ogando Kevin","Okello Ken","Olwa Gabriel",
+    "Onyait Emmanuel","Osiale Patrick Sewe","Otieno Elvis","Otieno Lenox","Otieno Moses",
+    "Otieno Stephen","Otisi Alfoss","Ouma David","Ouma Jackson","Owino Robert",
+    "Ssadu Morgan","Ssenteza James","Tamale William","Wandera Kennedy","Wandera Sowali",
+    "Wanyama Farouk","William Ouma"
+  ],
+  packaging: [
+    "Super Gloss Tins x 4Litres","Super Gloss Tins x 1Litre","Super Gloss Tins x 500ml","Super Gloss Tins x 250ml",
+    "Nitrocellulose Tins x 4Litres","Nitrocellulose Tins x 1Litre","Nitrocellulose Tins x 500ml",
+    "Fast Dry Tins x 4Litres","Fast Dry Tins x 1Litre","Fast Dry Tins x 500ml",
+    "Acrylic Tins x 4Litres","Acrylic Tins x 1Litre","Acrylic Tins x 500ml",
+    "Wood Finish Tins x 4Litres","Wood Finish Tins x 1Litre","Wood Finish Tins x 500ml",
+    "Jerrycans x 20Litres","Jerrycans x 4Litres",
+    "Top Handle x 1Litre",
+    "Natural Bottles - 250ml","Natural Bottles - 60ml",
+    "Buckets x 20Litres","Buckets x 4Litres",
+    "Round Jars x 1Litre","Round Jars x 500ml","Round Jars x 250ml",
+    "Boxes 8 x 4Litres","Boxes 4 x 4Litres",
+    "Boxes 24 x 1Litre","Boxes 24 x 500ml","Boxes 24 x 250ml"
+  ],
+  skus: [
+    "2 Pack Primer AC - 1/2Ltr","2 Pack Primer AC -1Ltr","2 Pack Primer AC - 4Ltr",
+    "Black AC - 1/2Ltr","Black AC - 1Ltr","Black AC - 4Ltr","Black AC - 5Ltr","Black AC - 20Ltr",
+    "Clear AC - 1/2Ltr","Clear AC - 1Ltr","Clear AC - 4Ltr","Clear AC - 5Ltr","Clear AC - 20Ltr",
+    "Fast Maroon AC - 4Ltr","Fast Maroon AC - 5Ltr","Fast Maroon AC - 20Ltr",
+    "Hardener - 1Ltr","Hardener - 20Ltr",
+    "White AC - 1/2Ltr","White AC - 1Ltr","White AC - 4Ltr","White AC - 20Ltr",
+    "Raptor-1ltr","Fibre Resin - 1 Ltr","Fibre Resin - 20 Ltr",
+    "Super Autofouling Black - 4Ltr","Super Autofouling White - 4Ltr",
+    "Black NC - 1Ltr","Black NC - 4Ltr","Clear NC - 1Ltr","Clear NC - 4Ltr",
+    "White NC - 1Ltr","White NC - 4Ltr",
+    "2Pack Clear - 1Ltr","2Pack Clear - 4Ltr",
+    "Sanding Sealer - 1Ltr","Sanding Sealer - 4Ltr",
+    "Wood Glue - 1Ltr","Wood Glue - 4Ltr"
+  ],
+  products: [
+    "White Acrylic","Black Acrylic","Clear AC","Fast Maroon Acrylic","Hardener",
+    "Lemon Yellow Acrylic","Matt Black Acrylic","Mid Chrome Yellow Acrylic",
+    "Maroon Acrylic","Orange Acrylic","Permanent Blue Acrylic","Permanent Green Acrylic",
+    "Post Red Acrylic","Red Oxide Acrylic","Smoke Grey Acrylic","Violet Acrylic",
+    "Yellow Oxide Acrylic","Covermatt White","Covermatt Cream","Covermatt Soft White",
+    "SilkVinyl White","SilkVinyl Cream","Undercoat White","Vinylmatt White",
+    "Weatherguard White","Black NC","Clear NC","White NC","Red Oxide NC",
+    "Permanent Blue QAD","White QAD",
+    "2Pack Thinner","High Gloss Thinner","Standard Thinner","White Spirit",
+    "2Pack Clear","Clear Vanish","Matt Vanish","NC Lacquer",
+    "Sanding Sealer","Wood Glue","Wood Seal","Fibre Resin","Marine Paint"
+  ]
+};
+
+// ─── STORAGE ────────────────────────────────────
+var DB = [];
+var LISTS = {personnel:[], packaging:[], skus:[], products:[]};
+
+// Load production records
+try { var _d = localStorage.getItem('pt_db'); if(_d) DB = JSON.parse(_d); } catch(e){}
+
+// Load lists: use saved data if it exists and has items, otherwise load defaults
+try {
+  var _l = localStorage.getItem('pt_lists');
+  if(_l) {
+    var saved = JSON.parse(_l);
+    LISTS.personnel = (saved.personnel && saved.personnel.length) ? saved.personnel : DEFAULT_LISTS.personnel.slice();
+    LISTS.packaging = (saved.packaging && saved.packaging.length) ? saved.packaging : DEFAULT_LISTS.packaging.slice();
+    LISTS.skus      = (saved.skus      && saved.skus.length)      ? saved.skus      : DEFAULT_LISTS.skus.slice();
+    LISTS.products  = (saved.products  && saved.products.length)  ? saved.products  : DEFAULT_LISTS.products.slice();
+  } else {
+    // First visit — seed localStorage with the master defaults
+    LISTS = {
+      personnel: DEFAULT_LISTS.personnel.slice(),
+      packaging: DEFAULT_LISTS.packaging.slice(),
+      skus:      DEFAULT_LISTS.skus.slice(),
+      products:  DEFAULT_LISTS.products.slice()
+    };
+    localStorage.setItem('pt_lists', JSON.stringify(LISTS));
+  }
+} catch(e) {
+  // Fallback if anything goes wrong
+  LISTS = {
+    personnel: DEFAULT_LISTS.personnel.slice(),
+    packaging: DEFAULT_LISTS.packaging.slice(),
+    skus:      DEFAULT_LISTS.skus.slice(),
+    products:  DEFAULT_LISTS.products.slice()
+  };
+}
+
+function persist(){ try{localStorage.setItem('pt_db',JSON.stringify(DB));}catch(e){} }
+function persistLists(){ try{localStorage.setItem('pt_lists',JSON.stringify(LISTS));}catch(e){} }
+
+// ─── TOAST ──────────────────────────────────────
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(t._t); t._t=setTimeout(function(){t.style.display='none';},2500);
+}
+
+// ─── NAVIGATION ─────────────────────────────────
+var PAGES=['entry','records','variance','reports','settings'];
+function go(name){
+  PAGES.forEach(function(p){ document.getElementById('pg-'+p).classList.toggle('on',p===name); });
+  document.querySelectorAll('.nav button').forEach(function(b,i){ b.classList.toggle('on',PAGES[i]===name); });
+  if(name==='records') renderRecords();
+  if(name==='variance') renderVariance();
+  if(name==='reports') document.getElementById('report-out').innerHTML='';
+  if(name==='settings') renderLists();
+}
+
+// ─── AUTOCOMPLETE ────────────────────────────────
+function acFilter(inputId, dropId, listKey){
+  var inp=document.getElementById(inputId);
+  var drop=document.getElementById(dropId);
+  if(!inp||!drop) return;
+  var q=inp.value.toLowerCase();
+  var src=LISTS[listKey]||[];
+  var items=src.filter(function(x){ return !q||x.toLowerCase().includes(q); });
+  if(!items.length){ drop.classList.remove('open'); return; }
+  drop.innerHTML=items.map(function(x){
+    return '<div class="ac-item" onmousedown="acPick(\''+inputId+'\',\''+dropId+'\',\''+esc(x)+'\')">'+esc(x)+'</div>';
+  }).join('');
+  drop.classList.add('open');
+}
+function acPick(inputId, dropId, val){
+  if(inputId==='e-personnel-input'){
+    addPersonnelTag(val);
+    document.getElementById('e-personnel-input').value='';
+  } else {
+    document.getElementById(inputId).value=val;
+    if(inputId==='e-batch'||inputId==='e-sku') autoFillPackRef();
+  }
+  document.getElementById(dropId).classList.remove('open');
+}
+function acClose(dropId){ setTimeout(function(){ var d=document.getElementById(dropId); if(d) d.classList.remove('open'); },180); }
+
+// ─── PERSONNEL TAGS ──────────────────────────────
+var personnelTags=[];
+function addPersonnelTag(name){
+  name=name.trim(); if(!name||personnelTags.includes(name)) return;
+  personnelTags.push(name); renderPersonnelTags();
+}
+function removePersonnelTag(name){
+  personnelTags=personnelTags.filter(function(x){return x!==name;});
+  renderPersonnelTags();
+}
+function renderPersonnelTags(){
+  var el=document.getElementById('personnel-tags');
+  el.innerHTML=personnelTags.map(function(n){
+    return '<span class="tag">'+esc(n)+'<span class="tag-x" onmousedown="removePersonnelTag(\''+esc(n)+'\')">&#x2715;</span></span>';
+  }).join('');
+  document.getElementById('e-personnel').value=personnelTags.join(', ');
+}
+function personnelKeydown(e){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    var v=document.getElementById('e-personnel-input').value.trim();
+    if(v){ addPersonnelTag(v); document.getElementById('e-personnel-input').value=''; acClose('ac-personnel'); }
+  }
+}
+
+// ─── AUTO-FILL PACK REF ──────────────────────────
+function autoFillPackRef(){
+  var batch=document.getElementById('e-batch').value.trim();
+  var sku=document.getElementById('e-sku').value.trim();
+  var ref='';
+  if(batch&&sku) ref=batch+'/'+sku;
+  else if(batch) ref=batch;
+  else if(sku) ref=sku;
+  document.getElementById('e-packref').value=ref;
+}
+
+// ─── SAVE ENTRY ──────────────────────────────────
+function gv(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+
+function saveEntry(){
+  var product=gv('e-product'), sku=gv('e-sku'), batch=gv('e-batch');
+  if(!product||!sku||!batch){ toast('Please fill in product name, SKU and batch number.'); return; }
+  var prodqty=parseInt(gv('e-prodqty'))||0;
+  var s1=parseInt(gv('e-stamps'))||0;
+  var s2=parseInt(gv('e-stamps2'))||0;
+  var sr=parseInt(gv('e-stamps-ret'))||0;
+  var snet=s1+s2-sr;
+  var pack=parseInt(gv('e-pack'))||0;
+  var entry={
+    id:Date.now(), date:gv('e-date'),
+    product:product, sku:sku, batch:batch, prodqty:prodqty,
+    reelno:gv('e-reelno'),
+    stamps1:s1, stamps2:s2, stampsRet:sr, stampsNet:snet,
+    stampby:gv('e-stampby'),
+    pack:pack, packmat:gv('e-packmat'), packref:gv('e-packref'), packby:gv('e-packby'),
+    personnel:gv('e-personnel'), supervisor:gv('e-supervisor'),
+    notes:gv('e-notes'),
+    var_stamp:snet-prodqty, var_pack:pack-prodqty, var_reason:''
+  };
+  DB.push(entry); persist();
+  if(sku&&!LISTS.skus.includes(sku)){ LISTS.skus.push(sku); persistLists(); }
+  if(product&&!LISTS.products.includes(product)){ LISTS.products.push(product); persistLists(); }
+  toast('Entry saved.');
+  ['e-product','e-sku','e-batch','e-prodqty','e-stamps','e-stamps2','e-stamps-ret',
+   'e-reelno','e-stampby','e-pack','e-packmat','e-packref','e-packby','e-supervisor','e-notes']
+  .forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  personnelTags=[]; renderPersonnelTags();
+  document.getElementById('e-personnel-input').value='';
+  document.getElementById('e-date').value=today();
+}
+
+// ─── RECORDS ─────────────────────────────────────
+function getFiltered(){
+  var from=gv('r-from'), to=gv('r-to'), q=gv('r-search').toLowerCase();
+  return DB.filter(function(e){
+    var dOk=(!from||e.date>=from)&&(!to||e.date<=to);
+    var qOk=!q||e.product.toLowerCase().includes(q)||e.sku.toLowerCase().includes(q)||(e.batch||'').toLowerCase().includes(q);
+    return dOk&&qOk;
+  });
+}
+function clearFilters(){ ['r-search','r-from','r-to'].forEach(function(id){document.getElementById(id).value='';}); renderRecords(); }
+
+function renderRecords(){
+  var items=getFiltered();
+  document.getElementById('rm-entries').textContent=items.length;
+  document.getElementById('rm-prod').textContent=items.reduce(function(s,e){return s+e.prodqty;},0).toLocaleString();
+  var tn=items.reduce(function(s,e){return s+e.stampsNet;},0);
+  var t1=items.reduce(function(s,e){return s+(e.stamps1||0);},0);
+  var t2=items.reduce(function(s,e){return s+(e.stamps2||0);},0);
+  var tr=items.reduce(function(s,e){return s+(e.stampsRet||0);},0);
+  document.getElementById('rm-stamps').textContent=tn.toLocaleString();
+  document.getElementById('rm-stamps-sub').textContent='Iss1:'+t1+' Iss2:'+t2+' Ret:'+tr;
+  document.getElementById('rm-pack').textContent=items.reduce(function(s,e){return s+e.pack;},0).toLocaleString();
+  var el=document.getElementById('records-tbl');
+  if(!items.length){el.innerHTML='<div class="empty">No records match.</div>';return;}
+  var rows=[...items].reverse().map(function(e){
+    return '<tr><td>'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td>'
+      +'<td style="font-family:monospace">'+esc(e.sku)+'</td>'
+      +'<td style="font-family:monospace">'+esc(e.batch)+'</td>'
+      +'<td>'+e.prodqty+'</td>'
+      +'<td>'+esc(e.reelno||'—')+'</td>'
+      +'<td>'+(e.stamps1||0)+'</td><td>'+(e.stamps2||0)+'</td><td>'+(e.stampsRet||0)+'</td>'
+      +'<td><strong>'+(e.stampsNet)+'</strong></td>'
+      +'<td>'+e.pack+'</td><td>'+esc(e.packmat||'—')+'</td>'
+      +'<td>'+esc(e.supervisor||'—')+'</td>'
+      +'<td>'+vBadge(e.var_stamp)+'</td><td>'+vBadge(e.var_pack)+'</td>'
+      +'<td><button class="btn-danger" onclick="delEntry('+e.id+')">Del</button></td></tr>';
+  }).join('');
+  el.innerHTML='<table><thead><tr>'
+    +'<th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Produced</th>'
+    +'<th>Reel no.</th><th>Stamps 1</th><th>Stamps 2</th><th>Returned</th><th>Net stamps</th>'
+    +'<th>Packaging</th><th>Pack material</th><th>Supervisor</th>'
+    +'<th>Stamp var.</th><th>Pack var.</th><th></th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+}
+function delEntry(id){
+  if(!confirm('Delete this entry?')) return;
+  DB=DB.filter(function(e){return e.id!==id;}); persist(); renderRecords(); toast('Deleted.');
+}
+
+// ─── VARIANCE ────────────────────────────────────
+function vBadge(v){
+  if(v===0) return '<span class="badge badge-ok">No variance</span>';
+  if(Math.abs(v)<=5) return '<span class="badge badge-warn">'+(v>0?'+':'')+v+'</span>';
+  return '<span class="badge badge-bad">'+(v>0?'+':'')+v+'</span>';
+}
+function vDesc(v,type){
+  var w=type==='stamp'?'stamps':'packs';
+  if(v===0) return w+' match production exactly';
+  return v>0? v+' more '+w+' than produced' : Math.abs(v)+' fewer '+w+' than produced';
+}
+function renderVariance(){
+  var vf=document.getElementById('v-filter').value;
+  var vsku=document.getElementById('v-sku').value.toLowerCase();
+  var items=DB.filter(function(e){
+    var hasVar=e.var_stamp!==0||e.var_pack!==0;
+    var skuOk=!vsku||e.sku.toLowerCase().includes(vsku)||e.product.toLowerCase().includes(vsku);
+    return(vf===''||hasVar)&&skuOk;
+  });
+  var el=document.getElementById('variance-list');
+  if(!items.length){el.innerHTML='<div class="empty">No entries found.</div>';return;}
+  el.innerHTML=[...items].reverse().map(function(e){
+    var hasVar=e.var_stamp!==0||e.var_pack!==0;
+    return '<div class="vcard">'
+      +'<div class="vcard-top"><div>'
+      +'<div class="vcard-name">'+esc(e.product)+' <span style="font-family:monospace;font-size:12px;color:#5f5e5a">'+esc(e.sku)+'</span></div>'
+      +'<div class="vcard-meta">'+esc(e.date||'—')+' · Batch: '+esc(e.batch)+' · Supervisor: '+esc(e.supervisor||'—')+'</div>'
+      +'</div>'
+      +'<div class="vcard-pills">'
+      +'<span class="vpill">Produced: '+e.prodqty+'</span>'
+      +'<span class="vpill">Net stamps: '+e.stampsNet+'</span>'
+      +'<span class="vpill">Packaging: '+e.pack+'</span>'
+      +'</div></div>'
+      +'<div class="vgrid">'
+      +'<div class="vbox"><div class="vbox-lbl">Stamps breakdown</div>'
+      +'<div style="font-size:12px;color:#5f5e5a">Iss 1: <strong>'+(e.stamps1||0)+'</strong> &nbsp;·&nbsp; Iss 2: <strong>'+(e.stamps2||0)+'</strong> &nbsp;·&nbsp; Returned: <strong>'+(e.stampsRet||0)+'</strong> &nbsp;·&nbsp; Net: <strong>'+e.stampsNet+'</strong></div></div>'
+      +'<div class="vbox"><div class="vbox-lbl">Stamp variance</div>'+vBadge(e.var_stamp)+' <span style="font-size:12px;color:#5f5e5a">'+vDesc(e.var_stamp,'stamp')+'</span></div>'
+      +'<div class="vbox"><div class="vbox-lbl">Pack variance</div>'+vBadge(e.var_pack)+' <span style="font-size:12px;color:#5f5e5a">'+vDesc(e.var_pack,'pack')+'</span></div>'
+      +'</div>'
+      +(hasVar?'<div class="fg" style="margin-top:8px"><label>Reason for variance</label>'
+        +'<input type="text" value="'+esc(e.var_reason||'')+'" placeholder="e.g. 3 stamps damaged, machine wastage, 5 packs returned to store..." '
+        +'onchange="saveReason('+e.id+',this.value)"></div>':'')
+      +(e.personnel?'<div style="font-size:12px;color:#5f5e5a;margin-top:8px">Personnel: '+esc(e.personnel)+'</div>':'')
+      +'</div>';
+  }).join('');
+}
+function saveReason(id,reason){
+  var e=DB.find(function(x){return x.id===id;});
+  if(e){e.var_reason=reason;persist();toast('Reason saved.');}
+}
+
+// ─── REPORTS ─────────────────────────────────────
+var currentRT='full';
+function setRT(btn){
+  document.querySelectorAll('.rep-type').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on'); currentRT=btn.getAttribute('data-rt');
+}
+function getRepItems(){
+  var from=gv('rp-from'), to=gv('rp-to'), sku=gv('rp-sku').toLowerCase();
+  return DB.filter(function(e){
+    var dOk=(!from||e.date>=from)&&(!to||e.date<=to);
+    var sOk=!sku||e.sku.toLowerCase().includes(sku)||e.product.toLowerCase().includes(sku);
+    return dOk&&sOk;
+  });
+}
+function buildReport(){
+  var items=getRepItems();
+  var el=document.getElementById('report-out');
+  if(!items.length){el.innerHTML='<div class="empty">No records match the filters.</div>';return;}
+  var from=gv('rp-from'),to=gv('rp-to'),sku=gv('rp-sku');
+  var rtLabel={full:'Full',stamps:'Stamps',packaging:'Packaging',production:'Production',variance:'Variance'};
+  var heading='<div style="font-size:16px;font-weight:700;margin-bottom:3px">'+rtLabel[currentRT]+' report</div>'
+    +'<div style="font-size:12px;color:#5f5e5a;margin-bottom:16px">'+(from?from:'All dates')+(to?' to '+to:'')+(sku?' · '+sku:'')+' · '+items.length+' entries</div>';
+  var html='<div class="card">'+heading;
+
+  if(currentRT==='stamps'||currentRT==='full'){
+    var t1=items.reduce(function(s,e){return s+(e.stamps1||0);},0);
+    var t2=items.reduce(function(s,e){return s+(e.stamps2||0);},0);
+    var tr=items.reduce(function(s,e){return s+(e.stampsRet||0);},0);
+    var tn=items.reduce(function(s,e){return s+e.stampsNet;},0);
+    var sv=items.reduce(function(s,e){return s+e.var_stamp;},0);
+    html+='<div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#0f6e56">Stamps summary</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:1rem">'
+      +'<div class="rep-met"><div class="lbl">Stamps issued 1</div><div class="val">'+t1+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Stamps issued 2</div><div class="val">'+t2+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Stamps returned</div><div class="val">'+tr+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Net stamps</div><div class="val">'+tn+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Net stamp variance</div><div class="val">'+(sv>0?'+':'')+sv+'</div></div>'
+      +'</div>';
+    if(currentRT==='stamps'){ html+=stampTbl(items)+'</div>'; el.innerHTML=html; return; }
+  }
+  if(currentRT==='packaging'||currentRT==='full'){
+    var tp=items.reduce(function(s,e){return s+e.pack;},0);
+    var pv=items.reduce(function(s,e){return s+e.var_pack;},0);
+    html+='<div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#0f6e56">Packaging summary</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:1rem">'
+      +'<div class="rep-met"><div class="lbl">Total packaging issued</div><div class="val">'+tp+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Net pack variance</div><div class="val">'+(pv>0?'+':'')+pv+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Entries with pack variance</div><div class="val">'+items.filter(function(e){return e.var_pack!==0;}).length+'</div></div>'
+      +'</div>';
+    if(currentRT==='packaging'){ html+=packTbl(items)+'</div>'; el.innerHTML=html; return; }
+  }
+  if(currentRT==='production'){
+    var tprod=items.reduce(function(s,e){return s+e.prodqty;},0);
+    html+='<div class="rep-sum" style="grid-template-columns:1fr 1fr;margin-bottom:1rem">'
+      +'<div class="rep-met"><div class="lbl">Total produced</div><div class="val">'+tprod+'</div></div>'
+      +'<div class="rep-met"><div class="lbl">Entries</div><div class="val">'+items.length+'</div></div>'
+      +'</div>';
+    html+=prodTbl(items)+'</div>'; el.innerHTML=html; return;
+  }
+  if(currentRT==='variance'){
+    var vi=items.filter(function(e){return e.var_stamp!==0||e.var_pack!==0;});
+    html+='<div class="rep-sum" style="grid-template-columns:1fr 1fr;margin-bottom:1rem">'
+      +'<div class="rep-met"><div class="lbl">Entries with variance</div><div class="val">'+vi.length+'</div><div class="sub">of '+items.length+' total</div></div>'
+      +'<div class="rep-met"><div class="lbl">Without reason recorded</div><div class="val">'+vi.filter(function(e){return !e.var_reason;}).length+'</div></div>'
+      +'</div>';
+    html+=varTbl(vi)+'</div>'; el.innerHTML=html; return;
+  }
+  // full
+  var totP=items.reduce(function(s,e){return s+e.prodqty;},0);
+  html+='<div class="rep-sum" style="margin-bottom:1rem">'
+    +'<div class="rep-met"><div class="lbl">Total produced</div><div class="val">'+totP+'</div></div>'
+    +'<div class="rep-met"><div class="lbl">Net stamps</div><div class="val">'+items.reduce(function(s,e){return s+e.stampsNet;},0)+'</div></div>'
+    +'<div class="rep-met"><div class="lbl">Packaging issued</div><div class="val">'+items.reduce(function(s,e){return s+e.pack;},0)+'</div></div>'
+    +'<div class="rep-met"><div class="lbl">Entries with variance</div><div class="val">'+items.filter(function(e){return e.var_stamp!==0||e.var_pack!==0;}).length+'</div></div>'
+    +'</div>';
+  html+=fullTbl(items)+'</div>'; el.innerHTML=html;
+}
+function stampTbl(items){
+  var r=items.map(function(e){return '<tr><td>'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td style="font-family:monospace">'+esc(e.sku)+'</td><td>'+esc(e.batch)+'</td><td>'+esc(e.reelno||'—')+'</td><td>'+(e.stamps1||0)+'</td><td>'+(e.stamps2||0)+'</td><td>'+(e.stampsRet||0)+'</td><td><strong>'+e.stampsNet+'</strong></td><td>'+vBadge(e.var_stamp)+'</td><td style="font-size:11px;color:#5f5e5a">'+esc(e.var_reason||'—')+'</td></tr>';}).join('');
+  return '<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Reel no.</th><th>Stamps 1</th><th>Stamps 2</th><th>Returned</th><th>Net</th><th>Variance</th><th>Reason</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+function packTbl(items){
+  var r=items.map(function(e){return '<tr><td>'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td style="font-family:monospace">'+esc(e.sku)+'</td><td>'+esc(e.batch)+'</td><td>'+e.pack+'</td><td>'+esc(e.packmat||'—')+'</td><td>'+esc(e.packref||'—')+'</td><td>'+esc(e.packby||'—')+'</td><td>'+vBadge(e.var_pack)+'</td><td style="font-size:11px;color:#5f5e5a">'+esc(e.var_reason||'—')+'</td></tr>';}).join('');
+  return '<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Pack qty</th><th>Material</th><th>Store ref</th><th>Issued by</th><th>Variance</th><th>Reason</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+function prodTbl(items){
+  var r=items.map(function(e){return '<tr><td>'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td style="font-family:monospace">'+esc(e.sku)+'</td><td>'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td>'+esc(e.personnel||'—')+'</td><td>'+esc(e.supervisor||'—')+'</td><td>'+esc(e.notes||'—')+'</td></tr>';}).join('');
+  return '<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Produced</th><th>Personnel</th><th>Supervisor</th><th>Notes</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+function varTbl(items){
+  var r=items.map(function(e){return '<tr><td>'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td style="font-family:monospace">'+esc(e.sku)+'</td><td>'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td>'+vBadge(e.var_stamp)+'</td><td>'+vBadge(e.var_pack)+'</td><td style="color:#5f5e5a;font-size:11px">'+esc(e.var_reason||'—')+'</td></tr>';}).join('');
+  return '<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Produced</th><th>Stamp var.</th><th>Pack var.</th><th>Reason</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+function fullTbl(items){
+  var r=items.map(function(e){return '<tr><td>'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td style="font-family:monospace">'+esc(e.sku)+'</td><td style="font-family:monospace">'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td>'+(e.stamps1||0)+'</td><td>'+(e.stamps2||0)+'</td><td>'+(e.stampsRet||0)+'</td><td><strong>'+e.stampsNet+'</strong></td><td>'+e.pack+'</td><td>'+esc(e.packmat||'—')+'</td><td>'+vBadge(e.var_stamp)+'</td><td>'+vBadge(e.var_pack)+'</td><td>'+esc(e.supervisor||'—')+'</td><td style="font-size:11px;color:#5f5e5a">'+esc(e.var_reason||'—')+'</td></tr>';}).join('');
+  return '<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Produced</th><th>Stamps 1</th><th>Stamps 2</th><th>Returned</th><th>Net stamps</th><th>Packaging</th><th>Pack material</th><th>Stamp var.</th><th>Pack var.</th><th>Supervisor</th><th>Variance reason</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+
+// ─── CSV EXPORT ──────────────────────────────────
+function cr(arr){return arr.map(function(v){return '"'+String(v===undefined||v===null?'':v).replace(/"/g,'""')+'"';}).join(',');}
+function dl(csv,fname){var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=fname;a.click();toast('CSV downloaded.');}
+function exportCSV(){
+  var items=getRepItems();
+  if(!items.length){toast('No records to export.');return;}
+  var hdr,rows;
+  if(currentRT==='stamps'){
+    hdr=['Date','Product','SKU','Batch','Reel no.','Stamps 1','Stamps 2','Stamps returned','Net stamps','Stamps issued by','Stamp variance','Variance reason'];
+    rows=items.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.reelno,e.stamps1,e.stamps2,e.stampsRet,e.stampsNet,e.stampby,e.var_stamp,e.var_reason]);});
+  } else if(currentRT==='packaging'){
+    hdr=['Date','Product','SKU','Batch','Pack qty','Pack material','Store ref','Pack issued by','Pack variance','Variance reason'];
+    rows=items.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.pack,e.packmat,e.packref,e.packby,e.var_pack,e.var_reason]);});
+  } else if(currentRT==='production'){
+    hdr=['Date','Product','SKU','Batch','Produced','Personnel','Supervisor','Notes'];
+    rows=items.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.personnel,e.supervisor,e.notes]);});
+  } else if(currentRT==='variance'){
+    hdr=['Date','Product','SKU','Batch','Produced','Net stamps','Stamp variance','Pack qty','Pack variance','Variance reason'];
+    rows=items.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stampsNet,e.var_stamp,e.pack,e.var_pack,e.var_reason]);});
+  } else {
+    hdr=['Date','Product','SKU','Batch','Produced','Stamps 1','Stamps 2','Stamps returned','Net stamps','Reel no.','Stamps issued by','Stamp variance','Pack qty','Pack material','Pack store ref','Pack issued by','Pack variance','Personnel','Supervisor','Notes','Variance reason'];
+    rows=items.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stamps1,e.stamps2,e.stampsRet,e.stampsNet,e.reelno,e.stampby,e.var_stamp,e.pack,e.packmat,e.packref,e.packby,e.var_pack,e.personnel,e.supervisor,e.notes,e.var_reason]);});
+  }
+  dl([hdr.join(',')].concat(rows).join('\n'),'report_'+currentRT+'_'+today()+'.csv');
+}
+function exportAllCSV(){
+  if(!DB.length){toast('No data.');return;}
+  var hdr=['Date','Product','SKU','Batch','Produced','Stamps 1','Stamps 2','Stamps returned','Net stamps','Reel no.','Stamps issued by','Stamp variance','Pack qty','Pack material','Pack store ref','Pack issued by','Pack variance','Personnel','Supervisor','Notes','Variance reason'];
+  var rows=DB.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stamps1||0,e.stamps2||0,e.stampsRet||0,e.stampsNet,e.reelno,e.stampby,e.var_stamp,e.pack,e.packmat,e.packref,e.packby,e.var_pack,e.personnel,e.supervisor,e.notes,e.var_reason]);});
+  dl([hdr.join(',')].concat(rows).join('\n'),'all_records_'+today()+'.csv');
+}
+function exportJSON(){
+  var a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({DB:DB,LISTS:LISTS},null,2));
+  a.download='backup_'+today()+'.json'; a.click(); toast('Backup downloaded.');
+}
+function importData(){
+  var inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+  inp.onchange=function(ev){
+    var file=ev.target.files[0]; if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try {
+        var p=JSON.parse(e.target.result);
+        if(p.DB) DB=p.DB;
+        LISTS = {
+          personnel: (p.LISTS&&p.LISTS.personnel&&p.LISTS.personnel.length) ? p.LISTS.personnel : DEFAULT_LISTS.personnel.slice(),
+          packaging: (p.LISTS&&p.LISTS.packaging&&p.LISTS.packaging.length) ? p.LISTS.packaging : DEFAULT_LISTS.packaging.slice(),
+          skus:      (p.LISTS&&p.LISTS.skus&&p.LISTS.skus.length)           ? p.LISTS.skus      : DEFAULT_LISTS.skus.slice(),
+          products:  (p.LISTS&&p.LISTS.products&&p.LISTS.products.length)   ? p.LISTS.products  : DEFAULT_LISTS.products.slice()
+        };
+        persist(); persistLists(); renderLists();
+        toast('Data imported successfully.');
+      } catch(ex) { console.error(ex); toast('Error reading file.'); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+function clearAll(){
+  if(!confirm('Delete ALL production data? This cannot be undone.')) return;
+  DB=[]; persist(); toast('All data cleared.');
+}
+
+// ─── SETTINGS ────────────────────────────────────
+function addListItem(key,inputId,listElId){
+  var val=document.getElementById(inputId).value.trim();
+  if(!val) return;
+  if(LISTS[key].includes(val)){toast('Already in list.');return;}
+  LISTS[key].push(val); persistLists();
+  document.getElementById(inputId).value='';
+  renderLists(); toast('Added to list.');
+}
+function removeListItem(key,val){
+  LISTS[key]=LISTS[key].filter(function(x){return x!==val;});
+  persistLists(); renderLists(); toast('Removed.');
+}
+function renderLists(){
+  renderOneList('personnel','person-list');
+  renderOneList('packaging','pack-list');
+  renderOneList('skus','sku-list');
+  renderOneList('products','product-list');
+}
+function renderOneList(key,elId){
+  var el=document.getElementById(elId); if(!el) return;
+  if(!LISTS[key].length){el.innerHTML='<div style="color:#888;font-size:13px;padding:8px 0">No items yet.</div>';return;}
+  el.innerHTML=LISTS[key].map(function(x){
+    return '<div class="list-item"><span>'+esc(x)+'</span>'
+      +'<button class="btn-danger" onclick="removeListItem(\''+key+'\',\''+esc(x)+'\')">Remove</button></div>';
+  }).join('');
+}
+
+// ─── HELPERS ─────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function today(){return new Date().toISOString().slice(0,10);}
+
+// ─── ENTER KEY → NEXT FIELD ──────────────────────
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter') return;
+  if(document.activeElement.tagName.toLowerCase()==='textarea') return;
+  if(document.activeElement.tagName.toLowerCase()==='button') return;
+  if(document.activeElement.closest('#pg-entry')){
+    e.preventDefault();
+    var allInputs=Array.from(document.getElementById('pg-entry').querySelectorAll('input[tabindex],select[tabindex]'))
+      .filter(function(el){return el.tabIndex>0&&el.offsetParent!==null;})
+      .sort(function(a,b){return a.tabIndex-b.tabIndex;});
+    var idx=allInputs.indexOf(document.activeElement);
+    if(idx>=0&&idx<allInputs.length-1) allInputs[idx+1].focus();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────
+document.getElementById('e-date').value=today();
+renderLists();
+</script>
+</body>
+</html>
