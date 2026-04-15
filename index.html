@@ -739,12 +739,80 @@ function importData(){
     var file=ev.target.files[0]; if(!file) return;
     var reader=new FileReader();
     reader.onload=function(e){
-      try{
-        var p=JSON.parse(e.target.result);
-        if(p.DB) DB=p.DB;
-        if(p.LISTS) LISTS=Object.assign({personnel:["Achuki David","Agwanda George","Akiyo Stella","Amachar Scovia Beatrice","Amandi Robert","Lukungu Jonathan","Angiro Breani","Ankunda Bright","Busingye Christopher","Bwire Joshua","Jangweni Yokolamu","Kasambeko Cynthia","Kasango Middu","Katusabe Rechel","Kizza Allan","Lubega Idirisa","Musisi Kibule","Mutoni Mary","Nabaka Shadia","Nalujja Zaitun","Namawanda Agnes","Nambale Joel","Namukwaya Resty","Nsamba Herbert","Obilo Habib","Obilo Moshen","Obuka Michael","Ochieng James","Odhiambo Boi","Odhiambo Brian","Oduki Lillian","Odwori Joseph","Ogando Kevin","Okello Ken","Olwa Gabriel","Onyait Emmanuel","Osiale Patrick Sewe","Otieno Elvis","Otieno Lenox","Otieno Moses","Otieno Stephen","Otisi Alfoss","Ouma David","Ouma Jackson","Owino Robert","Ssadu Morgan","Ssenteza James","Tamale William","Wandera Kennedy","Wandera Sowali","Wanyama Farouk","William Ouma"],packaging:["Super Gloss Tins x 4Litres","Super Gloss Tins x 1Litre","Super Gloss Tins x 500ml","Super Gloss Tins x 250ml","Nitrocellulose Tins x 4Litres","Nitrocellulose Tins x 1Litre","Nitrocellulose Tins x 500ml","Fast Dry Tins x 4Litres","Fast Dry Tins x 1Litre","Fast Dry Tins x 500ml","Acrylic Tins x 4Litres","Acrylic Tins x 1Litre","Acrylic Tins x 500ml","Wood Finish Tins x 4Litres","Wood Finish Tins x 1Litre","Wood Finish Tins x 500ml","Jerrycans x 20Litres","Jerrycans x 4Litres","Top Handle x 1Litre","Natural Bottles - 250ml","Natural Bottles - 60ml","Buckets x 20Litres","Buckets x 4Litres","Round Jars x 1Litre","Round Jars x 500ml","Round Jars x 250ml","Boxes 8 x 4Litres","Boxes 4 x 4Litres","Boxes 24 x 1Litre","Boxes 24 x 500ml","Boxes 24 x 250ml"],skus:["2 Pack Primer AC - 1/2Ltr","2 Pack Primer AC -1Ltr","2 Pack Primer AC - 4Ltr","Black AC - 1/2Ltr","Black AC - 1Ltr","Black AC - 4Ltr","Black AC - 5Ltr","Black AC - 20Ltr","Clear AC - 1/2Ltr","Clear AC - 1Ltr","Clear AC - 4Ltr","Clear AC -  5Ltr","Clear AC - 20Ltr","Dead Black AC - 4Ltrs","Fast Maroon AC - 4Ltr","Fast Maroon AC - 5Ltr","Fast Maroon AC - 20Ltr","Hardener - 1/4Ltr","Hardener - 1Ltr","Hardener - 20Ltr","Lemon Yellow AC - 1Ltr","Lemon Yellow AC - 4Ltr","Lemon Yellow AC - 5Ltr","Lemon Yellow AC - 20Ltrs","Maroon AC - 4Ltr","Maroon AC - 5Ltr","Maroon AC - 20Ltr","Matt Black AC - 1Ltr","Matt Black AC - 5Ltr","Matt Black AC- 20Ltr","Mid Chrome Yellow AC- 4Ltr","Mid Chrome Yellow AC- 5Ltr","Mid Chrome Yellow AC- 20Ltr","Orange AC - 4Ltr","Orange AC -5Ltr","Orange AC - 20Ltr","Permanent Blue AC - 1Ltr","Permanent Blue AC - 4Ltr","Permanent Blue AC - 5Ltr","Permanent Blue AC- 20ltrs","Permanent Green AC - 4Ltr","Permanent Green AC - 5Ltr","Permanent Green AC - 20Ltr","Post Red AC - 4Ltr","Post Red AC -5Ltr","Post Red AC - 20Ltr","Red Oxide AC - 4Ltr","Red Oxide AC - 5Ltr","Red Oxide AC - 20Ltr","Smoke Grey AC - 4Ltrs","Violet AC - 4Ltr","Violet AC -5Ltr","Violet AC - 20Ltr","White 040 AC - 5 Ltr","White 040 AC - 20Ltr","White 045 AC - 5 Ltr","White 045 AC -20Ltr","White 056 AC -5 Ltr","White 056 AC -20 Ltr","White 058 AC - 5 Ltr","White 058 AC - 20 Ltr","White AC - 1/2Ltr","White AC - 4Ltr","White AC - 1Ltr","White AC - 20Ltr","Yellow Oxide AC - 4Ltr","Yellow Oxide AC - 5Ltr","Yellow Oxide AC -20Ltr","Raptor-1ltr","Raptor-1ltr  transparent","Rapitor 1/2ltr","AC APS - 4 Ltr","AC APS - 1 Ltr","AC APS -  1/2 Ltr","AC APS - 1/4 Ltr","Autocryl APS - 4 Ltr","Autocryl APS - 1 Ltr","Autocryl APS - 1/2 Ltr","Autocryl APS - 1/4 Ltr","2K APS - 4Ltr","2K APS - 1 Ltr","2K APS - 1/2 Ltr","2K APS - 1/4 Ltr","Fibre Resin - 1 Ltr","Fibre Resin - 20 Ltr","Fibre Resin - 5 Ltr","FIBRE GLASS FILTERS","2PACK WHITE PRIEMER AC 4 LTR","Super Autofouling Black  - 4Ltr","Super Autofouling White  - 4Ltr","Contact Adhesive Seweco-5Ltrs","C-EAGLE  185 KGHS","C-EAGLE copolymers"],products:[]},p.LISTS);
-        persist(); persistLists(); renderLists(); toast('Data imported.');
-      }catch(ex){toast('Error reading file.');}
+      try {
+  var p = JSON.parse(e.target.result);
+
+  if (p.DB) DB = p.DB;
+
+  // ===== DEFAULT MASTER LISTS =====
+  var DEFAULT_LISTS = {
+    personnel: [
+      "Achuki David","Agwanda George","Akiyo Stella","Amachar Scovia Beatrice","Amandi Robert","Lukungu Jonathan","Angiro Breani","Ankunda Bright","Busingye Christopher","Bwire Joshua","Jangweni Yokolamu","Kasambeko Cynthia","Kasango Middu","Katusabe Rechel","Kizza Allan","Lubega Idirisa","Musisi Kibule","Mutoni Mary","Nabaka Shadia","Nalujja Zaitun","Namawanda Agnes","Nambale Joel","Namukwaya Resty","Nsamba Herbert","Obilo Habib","Obilo Moshen","Obuka Michael","Ochieng James","Odhiambo Boi","Odhiambo Brian","Oduki Lillian","Odwori Joseph","Ogando Kevin","Okello Ken","Olwa Gabriel","Onyait Emmanuel","Osiale Patrick Sewe","Otieno Elvis","Otieno Lenox","Otieno Moses","Otieno Stephen","Otisi Alfoss","Ouma David","Ouma Jackson","Owino Robert","Ssadu Morgan","Ssenteza James","Tamale William","Wandera Kennedy","Wandera Sowali","Wanyama Farouk","William Ouma"
+    ],
+
+    packaging: [
+      "Super Gloss Tins x 4Litres","Super Gloss Tins x 1Litre","Super Gloss Tins x 500ml","Super Gloss Tins x 250ml",
+      "Nitrocellulose Tins x 4Litres","Nitrocellulose Tins x 1Litre","Nitrocellulose Tins x 500ml",
+      "Fast Dry Tins x 4Litres","Fast Dry Tins x 1Litre","Fast Dry Tins x 500ml",
+      "Acrylic Tins x 4Litres","Acrylic Tins x 1Litre","Acrylic Tins x 500ml",
+      "Wood Finish Tins x 4Litres","Wood Finish Tins x 1Litre","Wood Finish Tins x 500ml",
+      "Jerrycans x 20Litres","Jerrycans x 4Litres",
+      "Top Handle x 1Litre",
+      "Natural Bottles - 250ml","Natural Bottles - 60ml",
+      "Buckets x 20Litres","Buckets x 4Litres",
+      "Round Jars x 1Litre","Round Jars x 500ml","Round Jars x 250ml",
+      "Boxes 8 x 4Litres","Boxes 4 x 4Litres",
+      "Boxes 24 x 1Litre","Boxes 24 x 500ml","Boxes 24 x 250ml"
+    ],
+
+    skus: [
+      "2 Pack Primer AC - 1/2Ltr","2 Pack Primer AC -1Ltr","2 Pack Primer AC - 4Ltr",
+      "Black AC - 1/2Ltr","Black AC - 1Ltr","Black AC - 4Ltr","Black AC - 5Ltr","Black AC - 20Ltr",
+      "Clear AC - 1/2Ltr","Clear AC - 1Ltr","Clear AC - 4Ltr","Clear AC - 5Ltr","Clear AC - 20Ltr",
+      "Fast Maroon AC - 4Ltr","Fast Maroon AC - 5Ltr","Fast Maroon AC - 20Ltr",
+      "Hardener - 1Ltr","Hardener - 20Ltr",
+      "White AC - 1/2Ltr","White AC - 1Ltr","White AC - 4Ltr","White AC - 20Ltr",
+      "Raptor-1ltr","Fibre Resin - 1 Ltr","Fibre Resin - 20 Ltr",
+      "Super Autofouling Black - 4Ltr","Super Autofouling White - 4Ltr",
+      "Black NC - 1Ltr","Black NC - 4Ltr","Clear NC - 1Ltr","Clear NC - 4Ltr",
+      "White NC - 1Ltr","White NC - 4Ltr",
+      "2Pack Clear - 1Ltr","2Pack Clear - 4Ltr",
+      "Sanding Sealer - 1Ltr","Sanding Sealer - 4Ltr",
+      "Wood Glue - 1Ltr","Wood Glue - 4Ltr"
+    ],
+
+    products: [
+      "White Acrylic","Black Acrylic","Clear AC","Fast Maroon Acrylic","Hardener",
+      "Lemon Yellow Acrylic","Matt Black Acrylic","Mid Chrome Yellow Acrylic",
+      "Maroon Acrylic","Orange Acrylic","Permanent Blue Acrylic","Permanent Green Acrylic",
+      "Post Red Acrylic","Red Oxide Acrylic","Smoke Grey Acrylic","Violet Acrylic",
+      "Yellow Oxide Acrylic","Covermatt White","Covermatt Cream","Covermatt Soft White",
+      "SilkVinyl White","SilkVinyl Cream","Undercoat White","Vinylmatt White",
+      "Weatherguard White","Black NC","Clear NC","White NC","Red Oxide NC",
+      "Permanent Blue QAD","White QAD",
+      "2Pack Thinner","High Gloss Thinner","Standard Thinner","White Spirit",
+      "2Pack Clear","Clear Vanish","Matt Vanish","NC Lacquer",
+      "Sanding Sealer","Wood Glue","Wood Seal","Fibre Resin","Marine Paint"
+    ]
+  };
+
+  // ===== SAFE MERGE (NO OVERWRITING WITH EMPTY DATA) =====
+  LISTS = {
+    personnel: (p.LISTS && p.LISTS.personnel && p.LISTS.personnel.length) ? p.LISTS.personnel : DEFAULT_LISTS.personnel,
+    packaging: (p.LISTS && p.LISTS.packaging && p.LISTS.packaging.length) ? p.LISTS.packaging : DEFAULT_LISTS.packaging,
+    skus: (p.LISTS && p.LISTS.skus && p.LISTS.skus.length) ? p.LISTS.skus : DEFAULT_LISTS.skus,
+    products: (p.LISTS && p.LISTS.products && p.LISTS.products.length) ? p.LISTS.products : DEFAULT_LISTS.products
+  };
+
+  persist();
+  persistLists();
+  renderLists();
+  toast('Data imported successfully.');
+
+} catch (ex) {
+  console.error(ex);
+  toast('Error reading file.');
+}
     };
     reader.readAsText(file);
   };
