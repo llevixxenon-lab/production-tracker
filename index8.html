@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEWECO — Production Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --co:#1a56db;--co-d:#1341b0;--co-xl:#dbeafe;
+  --tl:#0d9488;--tl-d:#0a7a6e;--tl-xl:#ccfbf1;
+  --am:#d97706;--am-l:#f59e0b;--am-xl:#fef3c7;
+  --rd:#dc2626;--rd-xl:#fee2e2;
+  --gn:#16a34a;--gn-xl:#dcfce7;
+  --or:#ea580c;--or-xl:#ffedd5;
+  --pu:#7c3aed;--pu-xl:#ede9fe;
+  --ink:#0f172a;--ink2:#1e293b;--ink3:#334155;
+  --mu:#64748b;--mu2:#94a3b8;
+  --bd:#e2e8f0;--bd2:#cbd5e1;
+  --bg:#f8fafc;--bg2:#f1f5f9;--wh:#ffffff;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --sh2:0 2px 8px rgba(0,0,0,.1),0 8px 32px rgba(0,0,0,.08);
+  --r:12px;--rs:8px;--rx:5px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden}
+a,button,input,select,textarea{font-family:'DM Sans',sans-serif}
+::selection{background:var(--co);color:#fff}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px}
+
+/* ── BG PAINT ── */
+#bgc{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.pb{position:absolute;opacity:.065;animation:pbf linear infinite;transform-origin:center}
+.pd{position:absolute;opacity:.055;animation:pds ease-in-out infinite;transform-origin:top center}
+.pr{position:absolute;opacity:.05;border-radius:50%;animation:prp ease-in-out infinite}
+@keyframes pbf{0%,100%{transform:translateY(0) rotate(0deg) scale(1)}33%{transform:translateY(-16px) rotate(7deg) scale(1.04)}66%{transform:translateY(-8px) rotate(-4deg) scale(.97)}}
+@keyframes pds{0%,100%{transform:rotate(-4deg) scaleY(1)}50%{transform:rotate(4deg) scaleY(1.06)}}
+@keyframes prp{0%,100%{transform:scale(1);opacity:.05}50%{transform:scale(1.09);opacity:.09}}
+
+/* ── LAYOUT ── */
+.shell{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 1.25rem 3rem}
+
+/* ── LOGIN OVERLAY ── */
+#login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0f2c8a,var(--co),#1a6fdb);z-index:9000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
+#login-overlay.hidden{display:none}
+.login-box{background:#fff;border-radius:20px;padding:2.5rem 2.5rem 2rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+.login-logo{font-size:44px;margin-bottom:10px}
+.login-title{font-family:'Fraunces',serif;font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-.03em;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--mu);letter-spacing:.05em;text-transform:uppercase;margin-bottom:24px}
+.login-box input{width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:14px;color:var(--ink);background:var(--bg);outline:none;margin-bottom:12px;text-align:center;letter-spacing:.1em;font-family:'DM Mono',monospace}
+.login-box input:focus{border-color:var(--co);box-shadow:0 0 0 3px rgba(26,86,219,.1);background:#fafcff}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--co),var(--co-d));color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:700;font-family:'Fraunces',serif;cursor:pointer;letter-spacing:.03em;box-shadow:0 2px 10px rgba(26,86,219,.3);transition:all .18s}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(26,86,219,.4)}
+.login-err{color:var(--rd);font-size:12px;margin-top:8px;min-height:16px;font-weight:600}
+.login-hint{font-size:11px;color:var(--mu);margin-top:14px;line-height:1.6}
+.login-first{background:var(--gn-xl);border:1px solid rgba(22,163,74,.2);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--gn);margin-bottom:16px;line-height:1.6;text-align:left}
+
+/* ── EDIT MODAL ── */
+#edit-modal{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:8000;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+#edit-modal.open{display:flex}
+.modal-box{background:var(--wh);border-radius:var(--r);padding:1.5rem;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-title{font-family:'Fraunces',serif;font-size:18px;font-weight:800;color:var(--ink);margin-bottom:16px;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between}
+.modal-close{cursor:pointer;font-size:20px;color:var(--mu);line-height:1;padding:4px;border-radius:4px;transition:all .15s}
+.modal-close:hover{color:var(--rd);background:var(--rd-xl)}
+
+/* ── HEADER ── */
+.app-header{background:linear-gradient(135deg,#0f2c8a 0%,var(--co) 55%,#1a6fdb 100%);margin:0 -1.25rem 1.75rem;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 4px 24px rgba(26,86,219,.4);position:relative;overflow:hidden}
+.app-header::before{content:'';position:absolute;top:-60px;right:-40px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.05)}
+.brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.brand-logo{width:52px;height:52px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 16px rgba(0,0,0,.2)}
+.brand-text h1{font-family:'Fraunces',serif;font-size:21px;font-weight:900;color:#fff;letter-spacing:-.03em}
+.brand-text .co{font-size:12px;color:rgba(255,255,255,.8);letter-spacing:.04em;margin-top:1px}
+.brand-text .sub{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.hdr-pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 13px;font-size:11px;color:rgba(255,255,255,.9);font-family:'DM Mono',monospace}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.25);animation:lp 2s ease-in-out infinite;margin-right:3px;vertical-align:middle}
+@keyframes lp{0%,100%{box-shadow:0 0 0 3px rgba(74,222,128,.25)}50%{box-shadow:0 0 0 7px rgba(74,222,128,.08)}}
+.sv-pill{font-size:10px;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:600}
+.sv-l{background:rgba(217,119,6,.2);color:#fbbf24;border:1px solid rgba(217,119,6,.3)}
+.sv-s{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.hdr-logout{cursor:pointer;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.85);font-weight:600;transition:all .15s}
+.hdr-logout:hover{background:rgba(220,38,38,.3);border-color:rgba(220,38,38,.4)}
+
+/* ── NAV ── */
+.nav-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:5px;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:3px;box-shadow:var(--sh)}
+.nav-wrap button{padding:8px 15px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--mu);border-radius:var(--rs);letter-spacing:.03em;text-transform:uppercase;transition:all .18s;white-space:nowrap}
+.nav-wrap button.on{background:var(--co);color:#fff;box-shadow:0 2px 10px rgba(26,86,219,.3)}
+.nav-wrap button.on.nt{background:var(--tl)}
+.nav-wrap button:hover:not(.on){background:var(--bg2);color:var(--ink)}
+.nav-sep{width:1px;background:var(--bd);margin:4px 3px;align-self:stretch}
+
+/* ── PAGES ── */
+.pg{display:none}.pg.on{display:block;animation:pgin .2s ease}
+@keyframes pgin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FORM PAGE WRAP ── */
+.fpw{display:grid;grid-template-columns:54px 1fr 54px;gap:0;align-items:start}
+.fsd{display:flex;flex-direction:column;align-items:center;padding-top:20px;gap:16px;position:sticky;top:80px}
+.sdc{width:40px;height:40px;border-radius:50%;animation:sdf ease-in-out infinite;flex-shrink:0}
+@keyframes sdf{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-8px) rotate(6deg)}66%{transform:translateY(-4px) rotate(-4deg)}}
+@media(max-width:820px){.fpw{grid-template-columns:1fr}.fsd{display:none}}
+
+/* ── CARDS ── */
+.card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:1.4rem 1.5rem;margin-bottom:1rem;box-shadow:var(--sh)}
+.card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:14px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+
+/* ── FORM BANNERS ── */
+.fb-banner{border-radius:var(--r);padding:1.2rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2);position:relative;overflow:hidden}
+.fb-banner::after{content:'';position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.07)}
+.fba{background:linear-gradient(135deg,var(--co) 0%,var(--co-d) 100%)}
+.fbb{background:linear-gradient(135deg,var(--tl) 0%,var(--tl-d) 100%)}
+.fb-icon{width:50px;height:50px;background:rgba(255,255,255,.18);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0;border:2px solid rgba(255,255,255,.2);position:relative;z-index:1}
+.fb-txt{position:relative;z-index:1}
+.fb-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:3px}
+.fb-title{font-family:'Fraunces',serif;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.fb-sub{font-size:11px;color:rgba(255,255,255,.72);margin-top:4px;line-height:1.5}
+
+/* ── SECTION LABELS ── */
+.sec{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--co);margin-bottom:12px;margin-top:4px;padding-bottom:9px;border-bottom:2px solid var(--co-xl)}
+.sec.t{color:var(--tl);border-bottom-color:var(--tl-xl)}
+.sec.a{color:var(--am);border-bottom-color:var(--am-xl)}
+.sec.g{color:var(--gn);border-bottom-color:var(--gn-xl)}
+
+/* ── GRIDS ── */
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.r4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.r5{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.r6{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:12px}
+@media(max-width:900px){.r5,.r6{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:700px){.r2,.r3,.r4,.r5,.r6{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.r2,.r3,.r4,.r5,.r6{grid-template-columns:1fr}}
+
+/* ── FORM FIELDS ── */
+.fg{display:flex;flex-direction:column;gap:4px;position:relative}
+.fg label{font-size:10px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.fg label .ls{color:var(--co);font-size:11px}
+.fg label .lt{color:var(--tl);font-size:11px}
+.fg input,.fg select,.fg textarea{padding:9px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;background:var(--wh);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--mu2)}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--co);box-shadow:0 0 0 3px rgba(26,86,219,.1);background:#fafcff}
+.fg.tf input:focus,.fg.tf select:focus{border-color:var(--tl);box-shadow:0 0 0 3px rgba(13,148,136,.1);background:#f0fdfb}
+.fg input.calc{background:var(--tl-xl);border-color:var(--tl);color:var(--tl-d);font-weight:700;cursor:default}
+.fg textarea{height:58px;resize:vertical}
+.fg .hint{font-size:10px;color:var(--mu2);margin-top:2px;line-height:1.4}
+.fg .kh{font-size:10px;color:var(--mu2);margin-top:3px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.kbd{display:inline-block;background:var(--bg2);border:1px solid var(--bd2);border-radius:3px;padding:1px 5px;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+hr{border:none;border-top:1.5px solid var(--bd);margin:16px 0}
+
+/* ── AUTOCOMPLETE ── */
+.acw{position:relative}
+.acd{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--wh);border:1.5px solid var(--co);border-radius:var(--rs);max-height:210px;overflow-y:auto;z-index:600;box-shadow:0 8px 28px rgba(26,86,219,.2);display:none}
+.acd.open{display:block}
+.acd.tc{border-color:var(--tl);box-shadow:0 8px 28px rgba(13,148,136,.15)}
+.aci{padding:9px 13px;font-size:13px;cursor:pointer;color:var(--ink2);border-bottom:1px solid var(--bd);transition:background .1s;display:flex;align-items:center;gap:8px}
+.aci::before{content:'◦';color:var(--mu2);font-size:10px;flex-shrink:0}
+.aci:last-child{border-bottom:none}
+.aci:hover,.aci.hi{background:var(--co-xl);color:var(--co);font-weight:600}
+.aci.hi{border-left:3px solid var(--co)}
+.acd.tc .aci:hover,.acd.tc .aci.hi{background:var(--tl-xl);color:var(--tl)}
+.acd.tc .aci.hi{border-left-color:var(--tl)}
+
+/* ── TAGS ── */
+.tw{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;min-height:4px}
+.tag{display:inline-flex;align-items:center;gap:5px;background:var(--co-xl);color:var(--co);border:1px solid rgba(26,86,219,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
+.tag.t{background:var(--tl-xl);color:var(--tl);border-color:rgba(13,148,136,.2)}
+.tag-x{cursor:pointer;opacity:.6;font-size:13px;line-height:1;transition:opacity .1s}
+.tag-x:hover{opacity:1}
+
+/* ── BUTTONS ── */
+.btn{background:linear-gradient(135deg,var(--co) 0%,var(--co-d) 100%);color:#fff;border:none;border-radius:var(--rs);padding:11px 24px;font-size:13px;cursor:pointer;font-weight:700;font-family:'Fraunces',serif;letter-spacing:.02em;transition:all .18s;box-shadow:0 2px 10px rgba(26,86,219,.3)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(26,86,219,.4)}
+.btn.t{background:linear-gradient(135deg,var(--tl) 0%,var(--tl-d) 100%);box-shadow:0 2px 10px rgba(13,148,136,.3)}
+.btn.t:hover{box-shadow:0 4px 18px rgba(13,148,136,.4)}
+.btn.g{background:linear-gradient(135deg,var(--gn),#15803d);box-shadow:0 2px 10px rgba(22,163,74,.3)}
+.btn-ol{background:var(--wh);border:1.5px solid var(--bd2);border-radius:var(--rs);padding:10px 18px;font-size:13px;cursor:pointer;color:var(--ink2);transition:all .18s;font-weight:500}
+.btn-ol:hover{border-color:var(--co);color:var(--co)}
+.btn-d{font-size:11px;padding:4px 10px;border-radius:var(--rx);cursor:pointer;background:var(--rd-xl);border:1px solid rgba(220,38,38,.2);color:var(--rd);transition:all .15s}
+.btn-d:hover{background:rgba(220,38,38,.15);border-color:var(--rd)}
+.btn-amber{background:linear-gradient(135deg,var(--am),var(--am-l));color:#fff;border:none;border-radius:var(--rs);padding:10px 20px;font-size:13px;cursor:pointer;font-weight:700;font-family:'Fraunces',serif;transition:all .18s}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ── METRICS ── */
+.mets{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.5rem}
+@media(max-width:900px){.mets{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:600px){.mets{grid-template-columns:1fr 1fr}}
+.met{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:.9rem 1.1rem;box-shadow:var(--sh);border-top:3px solid var(--co)}
+.met.mt{border-top-color:var(--tl)}.met.ma{border-top-color:var(--am)}.met.mr{border-top-color:var(--rd)}.met.mg{border-top-color:var(--gn)}.met.mp{border-top-color:var(--pu)}.met.mo{border-top-color:var(--or)}
+.met .lbl{font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.met .val{font-size:24px;font-weight:800;font-family:'Fraunces',serif;color:var(--ink);letter-spacing:-.02em}
+.met .sub{font-size:10px;color:var(--mu);margin-top:3px;font-family:'DM Mono',monospace}
+
+/* ── BADGES ── */
+.b{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;white-space:nowrap;display:inline-block;font-family:'DM Mono',monospace}
+.bok{background:var(--gn-xl);color:var(--gn)}.bw{background:var(--or-xl);color:var(--or)}.bd2{background:var(--rd-xl);color:var(--rd)}.bbl{background:var(--co-xl);color:var(--co)}.btl{background:var(--tl-xl);color:var(--tl)}.bgr{background:var(--bg2);color:var(--mu)}
+
+/* ── TABLES ── */
+.tws{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--rs)}
+table{width:100%;font-size:12px;border-collapse:collapse;min-width:700px}
+th{text-align:left;color:var(--mu);font-weight:700;padding:9px 10px;border-bottom:2px solid var(--bd);white-space:nowrap;background:var(--bg);font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-family:'DM Mono',monospace}
+td{padding:9px 10px;border-bottom:1px solid var(--bd);color:var(--ink2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafcff}
+.mono{font-family:'DM Mono',monospace}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.fbar input,.fbar select{padding:8px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;background:var(--wh);color:var(--ink);outline:none}
+.fbar input:focus,.fbar select:focus{border-color:var(--co)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);padding:11px 26px;border-radius:var(--r);font-size:13px;font-weight:700;display:none;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);font-family:'Fraunces',serif;letter-spacing:.02em;white-space:nowrap}
+.tok{background:var(--co);color:#fff}.ttl{background:var(--tl);color:#fff}.ter{background:var(--rd);color:#fff}.twn{background:var(--am-l);color:#fff}.tgn{background:var(--gn);color:#fff}
+
+/* ── VARIANCE CARDS ── */
+.vc{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:1.1rem 1.4rem;margin-bottom:.85rem;box-shadow:var(--sh)}
+.vc-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.vc-name{font-weight:700;font-size:15px;font-family:'Fraunces',serif;color:var(--ink);letter-spacing:-.01em}
+.vc-meta{font-size:11px;color:var(--mu);margin-top:2px;font-family:'DM Mono',monospace}
+.vc-pills{display:flex;gap:6px;flex-wrap:wrap}
+.vpill{font-size:11px;padding:3px 10px;background:var(--bg2);border:1px solid var(--bd);border-radius:20px;color:var(--ink3);font-family:'DM Mono',monospace}
+.vg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:600px){.vg{grid-template-columns:1fr}}
+.vbox{background:var(--bg);border-radius:var(--rs);padding:10px 12px;border:1px solid var(--bd)}
+.vbox-lbl{font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.ri{width:100%;padding:8px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:12px;color:var(--ink);background:var(--wh);outline:none;margin-top:8px}
+.ri:focus{border-color:var(--am);box-shadow:0 0 0 3px rgba(217,119,6,.08)}
+
+/* ── TRIPLE ANALYSIS ── */
+.trip-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:1.2rem 1.4rem;margin-bottom:1rem;box-shadow:var(--sh);border-left:4px solid var(--co)}
+.trip-card.ok{border-left-color:var(--gn)}.trip-card.warn{border-left-color:var(--am)}.trip-card.bad{border-left-color:var(--rd)}
+.trip-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.trip-name{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:var(--ink)}
+.trip-batch{font-family:'DM Mono',monospace;font-size:11px;color:var(--mu);margin-top:2px}
+.trip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:600px){.trip-grid{grid-template-columns:1fr}}
+.trip-col{background:var(--bg);border-radius:var(--rs);padding:10px 12px;border:1px solid var(--bd)}
+.trip-col-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid}
+.trip-col-head.c{color:var(--co);border-bottom-color:var(--co-xl)}
+.trip-col-head.s{color:var(--am);border-bottom-color:var(--am-xl)}
+.trip-col-head.p{color:var(--tl);border-bottom-color:var(--tl-xl)}
+.trip-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--ink2)}
+.trip-row span:last-child{font-weight:700;font-family:'DM Mono',monospace}
+.trip-comment{background:var(--am-xl);border:1px solid rgba(217,119,6,.2);border-radius:var(--rs);padding:8px 12px;font-size:12px;color:var(--am);margin-top:8px;line-height:1.6}
+.trip-comment.good{background:var(--gn-xl);border-color:rgba(22,163,74,.2);color:var(--gn)}
+.trip-comment.bad{background:var(--rd-xl);border-color:rgba(220,38,38,.2);color:var(--rd)}
+
+/* ── DASHBOARD ── */
+.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+@media(max-width:900px){.dg{grid-template-columns:1fr 1fr}}
+.dc{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:1rem 1.2rem;box-shadow:var(--sh);position:relative;overflow:hidden}
+.dc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.dc1::before{background:linear-gradient(90deg,var(--co),var(--co-d))}.dc2::before{background:linear-gradient(90deg,var(--tl),var(--tl-d))}.dc3::before{background:linear-gradient(90deg,var(--am),var(--am-l))}.dc4::before{background:linear-gradient(90deg,var(--rd),#ef4444)}
+.dv{font-size:28px;font-weight:800;font-family:'Fraunces',serif;letter-spacing:-.03em;margin:6px 0 3px}
+.dl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mu)}
+.ds{font-size:11px;color:var(--mu);font-family:'DM Mono',monospace}
+.di{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.12}
+.chart-w{overflow-x:auto;margin-top:10px}
+
+/* ── SETTINGS ── */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:700px){.sg{grid-template-columns:1fr}}
+.li{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:var(--rx);margin-bottom:5px;font-size:12px;border:1px solid var(--bd)}
+.ls{max-height:220px;overflow-y:auto}
+.si{padding:8px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;outline:none;background:var(--wh);color:var(--ink)}
+.si:focus{border-color:var(--co)}
+
+/* ── INFO BOXES ── */
+.ib{background:var(--co-xl);border:1px solid rgba(26,86,219,.2);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--co-d);margin-bottom:12px;line-height:1.7}
+.ib.t{background:var(--tl-xl);border-color:rgba(13,148,136,.2);color:var(--tl-d)}
+.wb{background:var(--or-xl);border:1px solid rgba(234,88,12,.2);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--or);margin-bottom:12px;line-height:1.7}
+.sb{background:var(--gn-xl);border:1px solid rgba(22,163,74,.2);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--gn);margin-bottom:12px;line-height:1.7}
+
+/* ── REPORT ── */
+.rts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1rem}
+.rt{padding:7px 14px;border:1.5px solid var(--bd2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--wh);color:var(--mu);font-weight:600;transition:all .15s}
+.rt.on{background:var(--co);color:#fff;border-color:var(--co);box-shadow:0 2px 10px rgba(26,86,219,.25)}
+.rt:hover:not(.on){border-color:var(--co);color:var(--co)}
+.rm{background:var(--bg);border-radius:var(--rs);padding:.85rem 1rem;border:1px solid var(--bd)}
+.rm .lbl{font-size:10px;color:var(--mu);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.rm .val{font-size:22px;font-weight:800;font-family:'Fraunces',serif;color:var(--ink);letter-spacing:-.02em}
+.rsec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+
+/* ── LINK STATUS ── */
+.lkok{background:var(--tl-xl);color:var(--tl);border:1px solid rgba(13,148,136,.2);font-size:10px;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:700;white-space:nowrap}
+.lkno{background:var(--or-xl);color:var(--or);border:1px solid rgba(234,88,12,.2);font-size:10px;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:700;white-space:nowrap}
+
+/* ── IMPORT DROP ZONE ── */
+.dropzone{border:2.5px dashed var(--bd2);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.dropzone:hover,.dropzone.drag{border-color:var(--co);background:var(--co-xl)}
+.dropzone-icon{font-size:36px;margin-bottom:8px;opacity:.5}
+.dropzone-text{font-size:14px;color:var(--mu);font-weight:600}
+.dropzone-sub{font-size:12px;color:var(--mu2);margin-top:4px}
+
+/* ── STEP BLOCKS ── */
+.step{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.step-n{min-width:26px;height:26px;background:var(--co);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+.step-b{font-size:13px;line-height:1.7;color:var(--ink2)}
+.step-b strong{color:var(--ink);font-weight:700}
+.step-b code{background:var(--co-xl);padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;color:var(--co);border:1px solid rgba(26,86,219,.2)}
+.cmd{background:var(--ink2);color:#a5f3fc;border-radius:var(--rs);padding:10px 16px;font-family:'DM Mono',monospace;font-size:12px;margin:6px 0;border-left:3px solid var(--tl)}
+.howto{font-size:13px;line-height:1.9;color:var(--ink2)}
+.howto code{background:var(--bg2);padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;color:var(--co);border:1px solid var(--bd)}
+.howto strong{font-weight:700;color:var(--ink)}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:2.5rem;color:var(--mu);font-size:13px}
+.empty-icon{font-size:36px;margin-bottom:8px;opacity:.4;display:block}
+.print-sig{display:none}
+
+/* ══════════════════════════════════════
+   PRINT STYLES — complete overhaul
+   Both portrait and landscape supported
+   Only prints the active report + dashboard
+══════════════════════════════════════ */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box!important}
+  
+  /* Hide all chrome */
+  #bgc,#login-overlay,#edit-modal,#toast,
+  .app-header,.nav-wrap,.fsd,
+  .fb-bar,.fbar,.rts,.btn-row,.btn,.btn-ol,.btn-d,.btn-amber,
+  .print-hide,.hdr-logout,
+  .pg:not(#pg-reports):not(#pg-dashboard):not(#pg-litreage){display:none!important}
+  
+  /* Show report, dashboard and litreage pages */
+  #pg-reports.on,#pg-dashboard.on,#pg-litreage.on{display:block!important}
+  
+  /* Full width, no margin shell */
+  body{background:#fff!important;font-size:10pt!important;color:#000!important}
+  .shell{padding:0!important;max-width:100%!important;margin:0!important}
+  
+  /* Print header shown */
+  .print-hdr{display:block!important;margin-bottom:16px;padding-bottom:12px;border-bottom:2pt solid #1a56db}
+  .print-hdr h2{font-size:16pt;font-weight:900;color:#1a56db;font-family:'Fraunces',serif;letter-spacing:-.02em}
+  .print-hdr .ph-co{font-size:11pt;color:#334155;margin-top:2pt}
+  .print-hdr .ph-meta{font-size:8pt;color:#64748b;font-family:'DM Mono',monospace;margin-top:4pt}
+  
+  /* Cards become simple boxes */
+  .card,.vc,.trip-card,.dc{box-shadow:none!important;border:1pt solid #cbd5e1!important;margin-bottom:8pt!important;padding:8pt 10pt!important;border-radius:0!important;page-break-inside:avoid}
+  .card-title{font-size:11pt!important;margin-bottom:8pt!important}
+  
+  /* Tables — compact, readable */
+  table{min-width:unset!important;font-size:8pt!important;width:100%!important;border-collapse:collapse!important}
+  th{font-size:7pt!important;padding:4pt 6pt!important;background:#f1f5f9!important;border:1pt solid #cbd5e1!important;color:#334155!important}
+  td{padding:4pt 6pt!important;border:1pt solid #e2e8f0!important;font-size:8pt!important}
+  .tws,.tw-scroll{overflow:visible!important}
+  
+  /* Badges — simple borders */
+  .b,.bok,.bw,.bd2,.bbl,.btl,.bgr,.lkok,.lkno{font-size:7pt!important;padding:1pt 5pt!important;border:1pt solid #999!important;background:#f5f5f5!important;color:#000!important;border-radius:3pt!important}
+  
+  /* Metrics row */
+  .mets,.rm,.trip-grid,.vg{display:grid!important}
+  .mets{grid-template-columns:repeat(4,1fr)!important;gap:6pt!important}
+  .rm{padding:6pt 8pt!important}
+  .rm .val{font-size:14pt!important}
+  .met{padding:6pt 8pt!important;border-top-width:2pt!important}
+  
+  /* Dashboard grid */
+  .dg{grid-template-columns:repeat(4,1fr)!important;gap:6pt!important}
+  
+  /* Trip analysis */
+  .trip-grid{grid-template-columns:1fr 1fr 1fr!important;gap:6pt!important}
+  .trip-card{padding:8pt 10pt!important;border-left-width:3pt!important}
+  
+  /* Hide charts (SVGs can be unreliable in print) */
+  .chart-w,.print-chart-hide{display:none!important}
+  
+  /* Page settings */
+  @page{margin:1.2cm 1cm;size:A4 landscape}
+  @page portrait{size:A4 portrait;margin:1.2cm 1cm}
+
+  /* Force landscape for wide tables */
+  .force-landscape{page:landscape}
+  
+  /* Page breaks */
+  .page-break{page-break-before:always}
+  h2,h3,.card-title,.rsec{page-break-after:avoid}
+  tr{page-break-inside:avoid}
+  /* ── SIGNATURE FOOTER ── */
+  .print-sig{
+    display:flex!important;justify-content:space-between;align-items:flex-start;
+    margin-top:36pt;padding-top:14pt;border-top:1pt solid #cbd5e1;
+    page-break-inside:avoid;
+  }
+  .print-sig-side{width:46%}
+  .print-sig-label{font-size:9pt;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:.06em;margin-bottom:18pt;display:block}
+  .print-sig-line{border-bottom:1.5pt solid #334155;margin-bottom:5pt;width:100%;display:block;height:20pt}
+  .print-sig-name{font-size:8pt;color:#64748b;display:block}
+
+  /* ── COMPACT TRIPLE ANALYSIS PRINT ── */
+  .trip-card{
+    border:1pt solid #cbd5e1!important;border-radius:0!important;
+    border-left:3pt solid #1a56db!important;
+    margin-bottom:0!important;padding:4pt 6pt!important;
+    page-break-inside:avoid!important;
+  }
+  .trip-card.ok{border-left-color:#16a34a!important}
+  .trip-card.warn{border-left-color:#d97706!important}
+  .trip-card.bad{border-left-color:#dc2626!important}
+  .trip-card+.trip-card{border-top:none!important}
+  .trip-grid{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:3pt!important;margin-bottom:3pt!important}
+  .trip-col{padding:3pt 5pt!important;border:1pt solid #e2e8f0!important;border-radius:0!important}
+  .trip-col-head{font-size:7pt!important;padding-bottom:2pt!important;margin-bottom:2pt!important;border-bottom-width:1pt!important}
+  .trip-row{font-size:7pt!important;margin-bottom:1pt!important}
+  .trip-row span:last-child{font-size:7pt!important}
+  .trip-name{font-size:8.5pt!important;font-weight:700!important}
+  .trip-batch{font-size:6.5pt!important}
+  .trip-head{margin-bottom:3pt!important}
+  .trip-comment{font-size:6.5pt!important;padding:2pt 5pt!important;margin-top:2pt!important;line-height:1.3!important}
+}
+.print-hdr{display:none}
+</style>
+</head>
+<body>
+
+<!-- ─── BACKGROUND PAINT ─── -->
+<div id="bgc">
+  <svg class="pb" style="left:1%;top:6%;width:108px;animation-duration:9s" viewBox="0 0 100 100"><ellipse cx="50" cy="45" rx="38" ry="48" fill="#1a56db"/><ellipse cx="70" cy="65" rx="18" ry="22" fill="#1a56db"/></svg>
+  <svg class="pd" style="left:3%;top:22%;width:24px;animation-duration:6s;animation-delay:1s" viewBox="0 0 30 120"><rect x="10" y="0" width="10" height="80" rx="5" fill="#1a56db"/><ellipse cx="15" cy="88" rx="11" ry="14" fill="#1a56db"/></svg>
+  <svg class="pb" style="left:0%;top:44%;width:78px;animation-duration:11s;animation-delay:2s" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="45" ry="40" fill="#0d9488"/></svg>
+  <svg class="pr" style="left:2%;top:67%;width:86px;height:86px;border:13px solid #d97706;animation-duration:8s;animation-delay:.5s"></svg>
+  <svg class="pb" style="right:1%;top:10%;width:116px;animation-duration:10s;animation-delay:1.5s" viewBox="0 0 100 100"><ellipse cx="45" cy="50" rx="42" ry="46" fill="#d97706"/><ellipse cx="72" cy="30" rx="20" ry="24" fill="#d97706"/></svg>
+  <svg class="pd" style="right:3%;top:26%;width:26px;animation-duration:8s;animation-delay:.8s" viewBox="0 0 30 130"><rect x="10" y="0" width="10" height="90" rx="5" fill="#0d9488"/><ellipse cx="15" cy="100" rx="12" ry="15" fill="#0d9488"/></svg>
+  <svg class="pr" style="right:1%;top:49%;width:96px;height:96px;border:12px solid #1a56db;animation-duration:12s;animation-delay:2s"></svg>
+  <svg class="pb" style="right:0%;top:78%;width:76px;animation-duration:13s;animation-delay:3.5s" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="44" ry="38" fill="#16a34a"/></svg>
+</div>
+
+<!-- ─── LOGIN OVERLAY ─── -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">🎨</div>
+    <div class="login-title">SEWECO</div>
+    <div class="login-sub">Industrial Coatings Limited · Production Tracker</div>
+    <div id="login-first-msg" class="login-first" style="display:none">
+      No password set. Enter a new password below to secure the application. You will need this password every time you open the app.
+    </div>
+    <input type="password" id="pw-input" placeholder="Enter password" maxlength="50" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()" id="login-btn-text">Unlock Application</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">SEWECO Production Tracker v3.0<br>Contact your system administrator if you have forgotten the password.</div>
+  </div>
+</div>
+
+<!-- ─── EDIT MODAL ─── -->
+<div id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span id="modal-title-text">Edit Entry</span>
+      <span class="modal-close" onclick="closeModal()">✕</span>
+    </div>
+    <div id="modal-body"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn" id="modal-save-btn" onclick="saveModal()">💾 Save Changes</button>
+      <button class="btn-ol" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ─── HEADER ─── -->
+<div class="app-header">
+  <div class="brand">
+    <div class="brand-logo">🎨</div>
+    <div class="brand-text">
+      <h1>SEWECO</h1>
+      <div class="co">SEWECO Industrial Coatings Limited</div>
+      <div class="sub">Production Tracker · Stamps · Packaging · Variance</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="live-dot"></span>
+    <span class="hdr-pill" id="hdr-date"></span>
+    <span class="hdr-pill" id="hdr-counts"></span>
+    <span class="sv-pill sv-l" id="sv-status">● Local</span>
+    <span class="hdr-logout" onclick="doLogout()">🔒 Lock</span>
+  </div>
+</div>
+
+<!-- ─── NAV ─── -->
+<div class="nav-wrap">
+  <button data-pg="dashboard" onclick="go('dashboard')">📊 Dashboard</button>
+  <button data-pg="litreage" onclick="go('litreage')">🧪 Litreage</button>
+  <div class="nav-sep"></div>
+  <button data-pg="prod-entry" onclick="go('prod-entry')">⚡ Production Entry</button>
+  <button data-pg="pack-entry" class="nt" onclick="go('pack-entry')">📦 Packaging Entry</button>
+  <div class="nav-sep"></div>
+  <button data-pg="records" onclick="go('records')">📋 Records</button>
+  <button data-pg="variance" onclick="go('variance')">⚖ Variance</button>
+  <button data-pg="reports" onclick="go('reports')">📄 Reports</button>
+  <div class="nav-sep"></div>
+  <button data-pg="settings" onclick="go('settings')">⚙ Settings</button>
+</div>
+
+<div id="toast" class="tok"></div>
+
+<!-- ══════ DASHBOARD ══════ -->
+<div class="pg" id="pg-dashboard">
+  <!-- Print header for dashboard -->
+  <div class="print-hdr" id="ph-dash">
+    <h2>SEWECO Industrial Coatings Limited</h2>
+    <div class="ph-co">Production Dashboard</div>
+    <div class="ph-meta" id="ph-dash-meta"></div>
+  </div>
+  <div class="btn-row print-hide" style="margin-bottom:1rem;justify-content:flex-end">
+    <button class="btn-ol" onclick="printDash()">🖨 Print Dashboard</button>
+  </div>
+  <div class="dg">
+    <div class="dc dc1"><div class="dl">Production Entries</div><div class="dv" id="d-prod">0</div><div class="ds" id="d-prod-s"></div><div class="di">⚡</div></div>
+    <div class="dc dc2"><div class="dl">Packaging Entries</div><div class="dv" id="d-pack">0</div><div class="ds" id="d-pack-s"></div><div class="di">📦</div></div>
+    <div class="dc dc3"><div class="dl">Total Units Produced</div><div class="dv" id="d-units">0</div><div class="ds" id="d-units-s">all batches</div><div class="di">🏭</div></div>
+    <div class="dc dc4"><div class="dl">Unresolved Variances</div><div class="dv" id="d-var">0</div><div class="ds" id="d-var-s">need attention</div><div class="di">⚠</div></div>
+  </div>
+  <div class="r2">
+    <div class="card"><div class="card-title">📈 Monthly Production (units)</div><div class="chart-w" id="ch-monthly"></div></div>
+    <div class="card"><div class="card-title">📦 Pack Efficiency (this month)</div><div class="chart-w" id="ch-eff"></div></div>
+  </div>
+  <div class="r2">
+    <div class="card"><div class="card-title">⚖ Top Variance Batches</div><div id="d-varlist"></div></div>
+    <div class="card"><div class="card-title">🏢 Supplier Summary</div><div id="d-suplist"></div></div>
+  </div>
+  <div class="card"><div class="card-title">🔗 Production Entries Without Packaging Link</div><div id="d-unlinked"></div></div>
+</div>
+
+<!-- ══════ LITREAGE ANALYSIS ══════ -->
+<div class="pg" id="pg-litreage">
+  <!-- Print header -->
+  <div class="print-hdr" id="ph-litre">
+    <h2>SEWECO Industrial Coatings Limited</h2>
+    <div class="ph-co">Litreage Production Analysis</div>
+    <div class="ph-meta" id="ph-litre-meta"></div>
+  </div>
+  <div class="btn-row print-hide" style="margin-bottom:1rem;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div class="fbar" style="margin-bottom:0">
+      <input type="date" id="lt-from" onchange="renderLitre()" placeholder="From">
+      <input type="date" id="lt-to" onchange="renderLitre()" placeholder="To">
+      <input type="text" id="lt-q" placeholder="Filter SKU or product…" oninput="renderLitre()" style="min-width:160px">
+      <button class="btn-ol" onclick="clearLF()">Clear</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:0">
+      <button class="btn-ol" onclick="printLitre()">🖨 Print / PDF</button>
+      <button class="btn-ol" onclick="exportLitreCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- Summary metrics row -->
+  <div class="mets" id="lt-mets" style="grid-template-columns:repeat(4,1fr)"></div>
+
+  <!-- Category breakdown cards -->
+  <div id="lt-cats" class="r2"></div>
+
+  <!-- Monthly litreage chart -->
+  <div class="r2">
+    <div class="card">
+      <div class="card-title">📈 Monthly Litreage Output</div>
+      <div class="chart-w" id="lt-chart-monthly"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥧 Litreage by Category</div>
+      <div class="chart-w" id="lt-chart-cats"></div>
+    </div>
+  </div>
+
+  <!-- Full detail table -->
+  <div class="card">
+    <div class="card-title">📋 Litreage Detail — All Entries
+      <span style="font-size:11px;font-weight:500;color:var(--mu);text-transform:none;letter-spacing:0">Litres = Production Qty × SKU size multiplier</span>
+    </div>
+    <div id="lt-tbl-note" class="ib" style="margin-bottom:12px;font-size:11px"></div>
+    <div class="tws" id="lt-tbl"></div>
+  </div>
+
+  <!-- Category management -->
+  <div class="card" id="lt-cat-manage">
+    <div class="card-title">⚙ Category &amp; Multiplier Rules
+      <span style="font-size:11px;font-weight:500;color:var(--mu);text-transform:none;letter-spacing:0">Auto-detected from SKU name · You can override below</span>
+    </div>
+    <div class="ib" style="margin-bottom:12px">The system automatically reads the SKU name to extract the litre size (e.g. <strong>"4Ltr" → ×4</strong>, <strong>"1/2Ltr" → ×0.5</strong>, <strong>"20Ltr" → ×20</strong>) and assigns a product category (e.g. <strong>"AC"</strong> → Acrylics, <strong>"NC"</strong> → Nitrocellulose, <strong>"Thinner"</strong> → Thinners). Use the table below to add custom overrides for any SKU that needs a specific category or multiplier.</div>
+    <div class="r3" style="margin-bottom:12px">
+      <div class="fg"><label>SKU (or keyword to match)</label><input class="si" id="ov-sku" placeholder="e.g. Raptor-1ltr or exact SKU" style="width:100%"></div>
+      <div class="fg"><label>Category override</label>
+        <select class="si" id="ov-cat" style="width:100%">
+          <option value="">— Auto-detect —</option>
+          <option value="Acrylics">Acrylics</option>
+          <option value="Fast Drys">Fast Drys</option>
+          <option value="Glosses">Glosses</option>
+          <option value="Nitrocellulose">Nitrocellulose</option>
+          <option value="Wood Finishes">Wood Finishes</option>
+          <option value="Thinners">Thinners</option>
+          <option value="Marine">Marine</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Multiplier override (litres)</label><input class="si" id="ov-mult" type="number" placeholder="e.g. 1 or 4 or 0.5" min="0" step="0.01" style="width:100%"></div>
+    </div>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn" onclick="addOverride()">Add Override Rule</button>
+    </div>
+    <div id="ov-list"></div>
+  </div>
+</div>
+
+<!-- ══════ FORM A — PRODUCTION ══════ -->
+<div class="pg" id="pg-prod-entry">
+<div class="fpw">
+  <div class="fsd">
+    <svg class="sdc" style="animation-duration:8s" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#1a56db" opacity=".15"/><circle cx="20" cy="20" r="13" fill="#1a56db" opacity=".2"/></svg>
+    <svg class="sdc" style="animation-duration:11s;animation-delay:2s" viewBox="0 0 40 40"><ellipse cx="20" cy="20" rx="20" ry="14" fill="#d97706" opacity=".18"/></svg>
+    <svg class="sdc" style="animation-duration:9s;animation-delay:4s" viewBox="0 0 40 40"><rect x="3" y="3" width="34" height="34" rx="9" fill="#1a56db" opacity=".13"/></svg>
+    <svg class="sdc" style="animation-duration:7s;animation-delay:3s" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#d97706" stroke-width="5" opacity=".18"/></svg>
+  </div>
+  <div>
+    <div class="fb-banner fba"><div class="fb-icon">⚡</div><div class="fb-txt"><div class="fb-tag">Form A · Production Floor</div><div class="fb-title">Production Entry</div><div class="fb-sub">Stamps, quantities &amp; personnel — completed by production supervisor</div></div></div>
+    <div class="card">
+      <div class="sec">📦 Product &amp; Batch</div>
+      <div class="r3">
+        <div class="fg"><label>Date</label><input type="date" id="e-date" tabindex="1"></div>
+        <div class="fg"><label>Product Name <span class="ls">★</span></label><div class="acw"><input type="text" id="e-product" placeholder="e.g. White Acrylic" tabindex="2" autocomplete="off" oninput="acf('e-product','ac-ep','products')" onfocus="acf('e-product','ac-ep','products')" onblur="acc('ac-ep')" onkeydown="ack(event,'e-product','ac-ep','products')"><div class="acd" id="ac-ep"></div></div></div>
+        <div class="fg"><label>SKU / Code <span class="ls">★</span></label><div class="acw"><input type="text" id="e-sku" placeholder="e.g. White AC - 1Ltr" tabindex="3" autocomplete="off" oninput="acf('e-sku','ac-es','skus')" onfocus="acf('e-sku','ac-es','skus')" onblur="acc('ac-es')" onkeydown="ack(event,'e-sku','ac-es','skus')"><div class="acd" id="ac-es"></div></div></div>
+      </div>
+      <div class="r2">
+        <div class="fg"><label>Batch / Lot Number <span class="ls">★ LINKING KEY</span></label><input type="text" id="e-batch" placeholder="e.g. BT-2025-088" tabindex="4" autocomplete="off"><span class="hint">⚠ Must exactly match the Packaging Entry batch</span></div>
+        <div class="fg"><label>Production Quantity (units)</label><input type="number" id="e-prodqty" placeholder="0" min="0" tabindex="5"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec">🏷 Stamps</div>
+      <div class="r5">
+        <div class="fg"><label>Stamps Reel No.</label><input type="text" id="e-reelno" placeholder="REEL-2025-A" tabindex="6" autocomplete="off"></div>
+        <div class="fg"><label>Stamps Issued 1</label><input type="number" id="e-stamps" placeholder="0" min="0" tabindex="7"></div>
+        <div class="fg"><label>Stamps Issued 2</label><input type="number" id="e-stamps2" placeholder="0" min="0" tabindex="8"></div>
+        <div class="fg"><label>Stamps Returned</label><input type="number" id="e-stamps-ret" placeholder="0" min="0" tabindex="9"></div>
+        <div class="fg"><label>Stamps Issued By</label><div class="acw"><input type="text" id="e-stampby" placeholder="Name" tabindex="10" autocomplete="off" oninput="acf('e-stampby','ac-esb','personnel')" onfocus="acf('e-stampby','ac-esb','personnel')" onblur="acc('ac-esb')" onkeydown="ack(event,'e-stampby','ac-esb','personnel')"><div class="acd" id="ac-esb"></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec">👷 Personnel</div>
+      <div class="r2">
+        <div class="fg"><label>Personnel on This Run</label><div class="acw"><input type="text" id="e-pers-inp" placeholder="Type name then Enter" tabindex="11" autocomplete="off" oninput="acf('e-pers-inp','ac-epr','personnel')" onfocus="acf('e-pers-inp','ac-epr','personnel')" onblur="acc('ac-epr')" onkeydown="tagk(event,'e-pers-inp','ac-epr','personnel','apt')"><div class="acd" id="ac-epr"></div></div><div class="tw" id="e-ptags"></div><input type="hidden" id="e-personnel"><span class="kh"><span class="kbd">↑↓</span>navigate <span class="kbd">↵</span>select/add <span class="kbd">⌫</span>prev field</span></div>
+        <div class="fg"><label>Supervisor</label><div class="acw"><input type="text" id="e-supervisor" placeholder="Name" tabindex="12" autocomplete="off" oninput="acf('e-supervisor','ac-esup','personnel')" onfocus="acf('e-supervisor','ac-esup','personnel')" onblur="acc('ac-esup')" onkeydown="ack(event,'e-supervisor','ac-esup','personnel')"><div class="acd" id="ac-esup"></div></div></div>
+      </div>
+      <div class="fg" style="margin-bottom:16px"><label>Notes / Remarks</label><textarea id="e-notes" placeholder="Any remarks..." tabindex="13"></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="saveProd()" tabindex="14">✓ Save Production Entry</button></div>
+    </div>
+  </div>
+  <div class="fsd">
+    <svg class="sdc" style="animation-duration:10s;animation-delay:1s" viewBox="0 0 40 40"><path d="M20,2 Q36,8 38,26 Q36,40 20,40 Q4,40 2,26 Q4,8 20,2Z" fill="#d97706" opacity=".15"/></svg>
+    <svg class="sdc" style="animation-duration:8s;animation-delay:3s" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#1a56db" stroke-width="7" opacity=".15"/></svg>
+    <svg class="sdc" style="animation-duration:13s;animation-delay:.5s" viewBox="0 0 40 40"><ellipse cx="20" cy="20" rx="14" ry="20" fill="#ea580c" opacity=".12"/></svg>
+    <svg class="sdc" style="animation-duration:11s;animation-delay:2s" viewBox="0 0 40 40"><polygon points="20,3 38,33 2,33" fill="#0d9488" opacity=".12"/></svg>
+  </div>
+</div>
+</div>
+
+<!-- ══════ FORM B — PACKAGING ══════ -->
+<div class="pg" id="pg-pack-entry">
+<div class="fpw">
+  <div class="fsd">
+    <svg class="sdc" style="animation-duration:9s" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#0d9488" opacity=".15"/></svg>
+    <svg class="sdc" style="animation-duration:12s;animation-delay:2s" viewBox="0 0 40 40"><ellipse cx="20" cy="20" rx="20" ry="13" fill="#1a56db" opacity=".13"/></svg>
+    <svg class="sdc" style="animation-duration:7s;animation-delay:1s" viewBox="0 0 40 40"><rect x="3" y="3" width="34" height="34" rx="7" fill="#0d9488" opacity=".14"/></svg>
+    <svg class="sdc" style="animation-duration:8s;animation-delay:4s" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#0d9488" stroke-width="5" opacity=".18"/></svg>
+  </div>
+  <div>
+    <div class="fb-banner fbb"><div class="fb-icon">📦</div><div class="fb-txt"><div class="fb-tag">Form B · Packaging Store</div><div class="fb-title">Packaging Entry</div><div class="fb-sub">Materials issued, returned &amp; damaged — completed by packaging store personnel</div></div></div>
+    <div class="card" style="border-top:3px solid var(--tl)">
+      <div class="sec t">🔗 Batch Link</div>
+      <div class="ib t">Enter the same <strong>Batch Number</strong> and <strong>SKU</strong> as Form A to link these records.</div>
+      <div class="r3">
+        <div class="fg tf"><label>Batch / Lot Number <span class="lt">★ LINKING KEY</span></label><input type="text" id="p-batch" placeholder="e.g. BT-2025-088" tabindex="101" oninput="apkref()"><span class="hint">Must exactly match Form A batch</span></div>
+        <div class="fg tf"><label>Product SKU <span class="lt">★</span></label><div class="acw"><input type="text" id="p-sku" placeholder="e.g. White AC - 1Ltr" tabindex="102" autocomplete="off" oninput="acf('p-sku','ac-psk','skus');apkref()" onfocus="acf('p-sku','ac-psk','skus')" onblur="acc('ac-psk')" onkeydown="ack(event,'p-sku','ac-psk','skus',1)"><div class="acd tc" id="ac-psk"></div></div></div>
+        <div class="fg"><label>Date</label><input type="date" id="p-date" tabindex="103"></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--tl)">
+      <div class="sec t">🏭 Material &amp; Supplier — Primary</div>
+      <div class="r3">
+        <div class="fg tf"><label>Packaging Material</label><div class="acw"><input type="text" id="p-packmat" placeholder="e.g. Acrylic Tins x 1Litre" tabindex="104" autocomplete="off" oninput="acf('p-packmat','ac-pm','packaging')" onfocus="acf('p-packmat','ac-pm','packaging')" onblur="acc('ac-pm')" onkeydown="ack(event,'p-packmat','ac-pm','packaging',1)"><div class="acd tc" id="ac-pm"></div></div></div>
+        <div class="fg tf"><label>Supplier / Company</label><div class="acw"><input type="text" id="p-supplier" placeholder="e.g. Nampak Uganda Ltd" tabindex="105" autocomplete="off" oninput="acf('p-supplier','ac-psp','suppliers')" onfocus="acf('p-supplier','ac-psp','suppliers')" onblur="acc('ac-psp')" onkeydown="ack(event,'p-supplier','ac-psp','suppliers',1)"><div class="acd tc" id="ac-psp"></div></div></div>
+        <div class="fg"><label>Store Issue Reference</label><input type="text" id="p-packref" placeholder="Auto-fills from batch + SKU" tabindex="106"></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--tl-l)">
+      <div class="sec t">📦 Material &amp; Supplier — Secondary (e.g. Cartons / Labels)</div>
+      <div class="ib t" style="margin-bottom:10px;font-size:11px">Use this section for any accompanying packaging — cartons, labels, sleeves, wrapping film, etc. — issued from the same or a different supplier.</div>
+      <div class="r3">
+        <div class="fg tf"><label>Packaging Material 2</label><div class="acw"><input type="text" id="p-packmat2" placeholder="e.g. Boxes 24 x 1Litre" tabindex="115" autocomplete="off" oninput="acf('p-packmat2','ac-pm2','packaging')" onfocus="acf('p-packmat2','ac-pm2','packaging')" onblur="acc('ac-pm2')" onkeydown="ack(event,'p-packmat2','ac-pm2','packaging',1)"><div class="acd tc" id="ac-pm2"></div></div><span class="hint">Leave blank if no secondary material</span></div>
+        <div class="fg tf"><label>Supplier 2 / Company</label><div class="acw"><input type="text" id="p-supplier2" placeholder="e.g. East African Packaging" tabindex="116" autocomplete="off" oninput="acf('p-supplier2','ac-psp2','suppliers')" onfocus="acf('p-supplier2','ac-psp2','suppliers')" onblur="acc('ac-psp2')" onkeydown="ack(event,'p-supplier2','ac-psp2','suppliers',1)"><div class="acd tc" id="ac-psp2"></div></div></div>
+        <div class="fg tf"><label>Issued By (Store — Material 2)</label><div class="acw"><input type="text" id="p-packby2" placeholder="Name" tabindex="117" autocomplete="off" oninput="acf('p-packby2','ac-pby2','personnel')" onfocus="acf('p-packby2','ac-pby2','personnel')" onblur="acc('ac-pby2')" onkeydown="ack(event,'p-packby2','ac-pby2','personnel',1)"><div class="acd tc" id="ac-pby2"></div></div></div>
+      </div>
+      <div class="r3">
+        <div class="fg tf"><label>Units Issued (Mat 2)</label><input type="number" id="p-issued-m2" placeholder="0" min="0" tabindex="118"></div>
+        <div class="fg tf"><label>Units Returned (Mat 2)</label><input type="number" id="p-returned-m2" placeholder="0" min="0" tabindex="119"></div>
+        <div class="fg tf"><label>Units Damaged (Mat 2)</label><input type="number" id="p-damaged-m2" placeholder="0" min="0" tabindex="120"></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--tl)">
+      <div class="sec t">📊 Quantities</div>
+      <div class="r6">
+        <div class="fg tf"><label>Units Issued 1</label><input type="number" id="p-issued" placeholder="0" min="0" tabindex="107" oninput="calcNet()"><span class="hint">Initial from store</span></div>
+        <div class="fg tf"><label>Units Issued 2 <span style="font-weight:400;text-transform:none;font-size:9px">(additions)</span></label><input type="number" id="p-issued2" placeholder="0" min="0" tabindex="108" oninput="calcNet()"><span class="hint">Any top-up issued</span></div>
+        <div class="fg tf"><label>Units Returned</label><input type="number" id="p-returned" placeholder="0" min="0" tabindex="109" oninput="calcNet()"><span class="hint">Unused back to store</span></div>
+        <div class="fg tf"><label>Units Damaged</label><input type="number" id="p-damaged" placeholder="0" min="0" tabindex="110" oninput="calcNet()"><span class="hint">Damaged / rejected</span></div>
+        <div class="fg" style="grid-column:span 2"><label>Net Units Used <span style="font-weight:400;text-transform:none;font-size:9px">(auto)</span></label><input type="number" id="p-net" placeholder="0" readonly class="calc"><span class="hint">= (Issued 1 + Issued 2) − Returned − Damaged</span></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--tl)">
+      <div class="sec t">👷 Personnel</div>
+      <div class="r3">
+        <div class="fg"><label>Personnel Using Packaging</label><div class="acw"><input type="text" id="p-pers-inp" placeholder="Type name then Enter" tabindex="111" autocomplete="off" oninput="acf('p-pers-inp','ac-ppr','personnel')" onfocus="acf('p-pers-inp','ac-ppr','personnel')" onblur="acc('ac-ppr')" onkeydown="tagk(event,'p-pers-inp','ac-ppr','personnel','apkt')"><div class="acd tc" id="ac-ppr"></div></div><div class="tw" id="p-ptags"></div><input type="hidden" id="p-personnel"></div>
+        <div class="fg tf"><label>Issued By (Store Person)</label><div class="acw"><input type="text" id="p-packby" placeholder="Name" tabindex="112" autocomplete="off" oninput="acf('p-packby','ac-pby','personnel')" onfocus="acf('p-packby','ac-pby','personnel')" onblur="acc('ac-pby')" onkeydown="ack(event,'p-packby','ac-pby','personnel',1)"><div class="acd tc" id="ac-pby"></div></div></div>
+        <div class="fg"><label>Notes</label><textarea id="p-notes" placeholder="Any remarks..." tabindex="113" style="height:50px"></textarea></div>
+      </div>
+      <div class="btn-row"><button class="btn t" onclick="savePack()" tabindex="114">✓ Save Packaging Entry</button></div>
+    </div>
+  </div>
+  <div class="fsd">
+    <svg class="sdc" style="animation-duration:11s;animation-delay:1s" viewBox="0 0 40 40"><path d="M20,2 Q38,7 40,24 Q38,42 20,40 Q2,42 0,24 Q2,7 20,2Z" fill="#0d9488" opacity=".14"/></svg>
+    <svg class="sdc" style="animation-duration:8s;animation-delay:3s" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#0d9488" stroke-width="7" opacity=".15"/></svg>
+    <svg class="sdc" style="animation-duration:13s;animation-delay:.5s" viewBox="0 0 40 40"><ellipse cx="20" cy="20" rx="13" ry="20" fill="#d97706" opacity=".13"/></svg>
+    <svg class="sdc" style="animation-duration:10s;animation-delay:2s" viewBox="0 0 40 40"><polygon points="20,3 38,34 2,34" fill="#1a56db" opacity=".12"/></svg>
+  </div>
+</div>
+</div>
+
+<!-- ══════ RECORDS ══════ -->
+<div class="pg" id="pg-records">
+  <div class="fbar">
+    <input type="text" id="r-search" placeholder="Search product, SKU or batch…" oninput="renderRec()" style="flex:1;min-width:160px">
+    <input type="date" id="r-from" onchange="renderRec()">
+    <input type="date" id="r-to" onchange="renderRec()">
+    <button class="btn-ol" onclick="clearF()">Clear</button>
+  </div>
+  <div class="mets">
+    <div class="met"><div class="lbl">Total Entries</div><div class="val" id="rm-tot">0</div></div>
+    <div class="met mt"><div class="lbl">Total Produced</div><div class="val" id="rm-prod">0</div></div>
+    <div class="met ma"><div class="lbl">Net Stamps</div><div class="val" id="rm-stamps">0</div><div class="sub" id="rm-stamps-s"></div></div>
+    <div class="met mo"><div class="lbl">Pack Net Used</div><div class="val" id="rm-pack">0</div><div class="sub" id="rm-pack-s"></div></div>
+    <div class="met mr"><div class="lbl">Pack Damaged</div><div class="val" id="rm-dmg">0</div></div>
+  </div>
+  <div class="card" style="border-top:3px solid var(--co)">
+    <div class="card-title">⚡ Production Entries — Form A <span class="b bbl" id="rc-pc">0</span></div>
+    <div class="tws" id="rec-prod"></div>
+  </div>
+  <div class="card" style="border-top:3px solid var(--tl)">
+    <div class="card-title">📦 Packaging Entries — Form B <span class="b btl" id="rc-kc">0</span></div>
+    <div class="tws" id="rec-pack"></div>
+  </div>
+</div>
+
+<!-- ══════ VARIANCE ══════ -->
+<div class="pg" id="pg-variance">
+  <div class="ib"><strong>Stamp Variance</strong> = Net Stamps − Production Qty &nbsp;·&nbsp; <strong>Pack Variance</strong> = Net Pack Used − Production Qty &nbsp;·&nbsp; <strong>Net Pack</strong> = (Iss1 + Iss2) − Returned − Damaged. Positive = more issued · Negative = fewer · Zero = exact match.</div>
+  <div class="fbar">
+    <select id="v-filter" onchange="renderVar()">
+      <option value="">All entries</option>
+      <option value="var">Variance only</option>
+      <option value="nolink">Missing pack entry</option>
+      <option value="noreason">Variance without reason</option>
+    </select>
+    <input type="text" id="v-q" placeholder="Filter by SKU, product or batch…" oninput="renderVar()" style="flex:1;min-width:160px">
+  </div>
+  <div id="var-list"></div>
+</div>
+
+<!-- ══════ REPORTS ══════ -->
+<div class="pg" id="pg-reports">
+  <!-- Print header (hidden on screen, visible when printing) -->
+  <div class="print-hdr" id="ph-rep">
+    <h2>SEWECO Industrial Coatings Limited</h2>
+    <div class="ph-co" id="ph-rep-type">Production Tracker Report</div>
+    <div class="ph-meta" id="ph-rep-meta"></div>
+  </div>
+  <div class="card print-hide">
+    <div class="card-title">📄 Report Settings</div>
+    <div class="r3">
+      <div class="fg"><label>From Date</label><input type="date" id="rp-from"></div>
+      <div class="fg"><label>To Date</label><input type="date" id="rp-to"></div>
+      <div class="fg"><label>SKU / Product Filter</label><input type="text" id="rp-sku" placeholder="Leave blank for all"></div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Report Type</div>
+      <div class="rts">
+        <button class="rt on" data-rt="triple" onclick="setRT(this)">🔗 Triple Analysis</button>
+        <button class="rt" data-rt="full" onclick="setRT(this)">Full Report</button>
+        <button class="rt" data-rt="production" onclick="setRT(this)">Production</button>
+        <button class="rt" data-rt="stamps" onclick="setRT(this)">Stamps</button>
+        <button class="rt" data-rt="packaging" onclick="setRT(this)">Packaging</button>
+        <button class="rt" data-rt="variance" onclick="setRT(this)">Variance</button>
+        <button class="rt" data-rt="supplier" onclick="setRT(this)">By Supplier</button>
+        <button class="rt" data-rt="damage" onclick="setRT(this)">Damage Analysis</button>
+        <button class="rt" data-rt="litreage" onclick="setRT(this)">🧪 Litreage</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="buildReport()">Generate Report</button>
+      <button class="btn-ol" onclick="printRep()">🖨 Print / Save PDF</button>
+      <button class="btn-ol" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+  <div id="report-out"></div>
+</div>
+
+<!-- ══════ SETTINGS ══════ -->
+<div class="pg" id="pg-settings">
+  <!-- ── IMPORT SECTION (prominent at top) ── -->
+  <div class="card" style="border-top:3px solid var(--gn);margin-bottom:1rem">
+    <div class="card-title">📤 Import Data</div>
+    <div class="sb">Import a previously exported backup file (.json) to restore all production records, packaging records and lists. You can also import data collected on another device.</div>
+    <div class="dropzone" id="dropzone" onclick="importData()" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+      <div class="dropzone-icon">📁</div>
+      <div class="dropzone-text">Click to browse or drag &amp; drop your backup file here</div>
+      <div class="dropzone-sub">Accepts .json backup files exported from this application</div>
+    </div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn g" onclick="importData()">📤 Import Backup File (JSON)</button>
+      <button class="btn-ol" onclick="exportJSON()">💾 Export Backup (JSON)</button>
+      <button class="btn-ol" onclick="exportAll()">📥 Export All Records (CSV)</button>
+    </div>
+  </div>
+
+  <!-- ── PASSWORD ── -->
+  <div class="card" style="border-top:3px solid var(--rd)">
+    <div class="card-title">🔐 Password &amp; Security</div>
+    <div class="wb">Set a password to protect access to this application. Anyone opening this app will need to enter the password first.</div>
+    <div class="r3" style="margin-bottom:12px">
+      <div class="fg"><label>Current Password</label><input type="password" id="pw-current" placeholder="Leave blank if none set"></div>
+      <div class="fg"><label>New Password</label><input type="password" id="pw-new" placeholder="Enter new password"></div>
+      <div class="fg"><label>Confirm New Password</label><input type="password" id="pw-confirm" placeholder="Repeat new password"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="changePw()" style="background:linear-gradient(135deg,var(--rd),#b91c1c)">🔐 Set / Change Password</button>
+      <button class="btn-ol" onclick="removePw()">🔓 Remove Password</button>
+    </div>
+    <div id="pw-msg" style="font-size:12px;margin-top:8px;min-height:16px;font-weight:600"></div>
+  </div>
+
+  <div class="sg">
+    <div class="card"><div class="card-title">👷 Personnel</div><div style="display:flex;gap:8px;margin-bottom:10px"><input class="si" id="new-person" placeholder="Full name" style="flex:1" onkeydown="if(event.key==='Enter')addL('personnel','new-person','lst-person')"><button class="btn" onclick="addL('personnel','new-person','lst-person')">Add</button></div><div id="lst-person" class="ls"></div></div>
+    <div class="card"><div class="card-title">📦 Packaging Materials</div><div style="display:flex;gap:8px;margin-bottom:10px"><input class="si" id="new-pack" placeholder="e.g. Acrylic Tins x 1Litre" style="flex:1" onkeydown="if(event.key==='Enter')addL('packaging','new-pack','lst-pack')"><button class="btn" onclick="addL('packaging','new-pack','lst-pack')">Add</button></div><div id="lst-pack" class="ls"></div></div>
+    <div class="card"><div class="card-title">🏷 SKU / Product Codes</div><div style="display:flex;gap:8px;margin-bottom:10px"><input class="si" id="new-sku" placeholder="e.g. White AC - 1Ltr" style="flex:1" onkeydown="if(event.key==='Enter')addL('skus','new-sku','lst-sku')"><button class="btn" onclick="addL('skus','new-sku','lst-sku')">Add</button></div><div id="lst-sku" class="ls"></div></div>
+    <div class="card"><div class="card-title">🎨 Product Names</div><div style="display:flex;gap:8px;margin-bottom:10px"><input class="si" id="new-product" placeholder="e.g. White Acrylic" style="flex:1" onkeydown="if(event.key==='Enter')addL('products','new-product','lst-product')"><button class="btn" onclick="addL('products','new-product','lst-product')">Add</button></div><div id="lst-product" class="ls"></div></div>
+    <div class="card"><div class="card-title">🏢 Suppliers</div><div style="display:flex;gap:8px;margin-bottom:10px"><input class="si" id="new-supplier" placeholder="e.g. Nampak Uganda Ltd" style="flex:1" onkeydown="if(event.key==='Enter')addL('suppliers','new-supplier','lst-supplier')"><button class="btn" onclick="addL('suppliers','new-supplier','lst-supplier')">Add</button></div><div id="lst-supplier" class="ls"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💾 Data Management</div>
+    <div class="wb">Data is stored in <strong>this browser only</strong> in local mode. Export backups regularly.</div>
+    <div class="btn-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <button class="btn-ol" onclick="exportAll()">📥 Export ALL records to CSV</button>
+      <button class="btn-ol" onclick="exportJSON()">💾 Export full backup (JSON)</button>
+      <button class="btn-ol" onclick="importData()">📤 Import / Restore backup (JSON)</button>
+      <button class="btn-d" style="padding:9px 18px;font-size:13px;margin-top:4px" onclick="clearAll()">🗑 Clear ALL data</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🖥 Multi-User Server Setup</div>
+    <div class="sb">Run <code>server.js</code> on your computer and all staff connect via your IP address. Data stored in one shared <code>data.json</code> file.</div>
+    <div class="step"><div class="step-n">1</div><div class="step-b"><strong>Install Node.js</strong> from <code>https://nodejs.org</code> (LTS version) on the server computer.</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><strong>Place <code>index.html</code> and <code>server.js</code> in the same folder</strong>, e.g. <code>C:\SEWECO-Tracker\</code></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><strong>Open a terminal in that folder and run:</strong><div class="cmd">npm install express cors</div></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><strong>Start the server:</strong><div class="cmd">node server.js</div>Your network IP will be displayed. Keep this window open.</div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><strong>Connect all computers:</strong> Open a browser and go to <code>http://YOUR_IP:3000</code> on every device. All data is now shared in real time.</div></div>
+    <div style="margin-top:12px">
+      <div class="btn-row">
+        <button class="btn" id="sv-toggle-btn" onclick="toggleServer()">🔌 Connect to Server</button>
+        <input class="si" id="sv-url" value="http://localhost:3000" style="flex:1;max-width:280px;font-family:monospace;font-size:12px">
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--mu)">Status: <span id="sv-full-status">Using browser localStorage (local mode)</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  DEFAULT MASTER LISTS
+// ══════════════════════════════════════════════════════════
+var DL={
+  personnel:["Achuki David","Agwanda George","Akiyo Stella","Amachar Scovia Beatrice","Amandi Robert","Lukungu Jonathan","Angiro Breani","Ankunda Bright","Busingye Christopher","Bwire Joshua","Jangweni Yokolamu","Kasambeko Cynthia","Kasango Middu","Katusabe Rechel","Kizza Allan","Lubega Idirisa","Musisi Kibule","Mutoni Mary","Nabaka Shadia","Nalujja Zaitun","Namawanda Agnes","Nambale Joel","Namukwaya Resty","Nsamba Herbert","Obilo Habib","Obilo Moshen","Obuka Michael","Ochieng James","Odhiambo Boi","Odhiambo Brian","Oduki Lillian","Odwori Joseph","Ogando Kevin","Okello Ken","Olwa Gabriel","Onyait Emmanuel","Osiale Patrick Sewe","Otieno Elvis","Otieno Lenox","Otieno Moses","Otieno Stephen","Otisi Alfoss","Ouma David","Ouma Jackson","Owino Robert","Ssadu Morgan","Ssenteza James","Tamale William","Wandera Kennedy","Wandera Sowali","Wanyama Farouk","William Ouma"],
+  packaging:["Super Gloss Tins x 4Litres","Super Gloss Tins x 1Litre","Super Gloss Tins x 500ml","Super Gloss Tins x 250ml","Nitrocellulose Tins x 4Litres","Nitrocellulose Tins x 1Litre","Nitrocellulose Tins x 500ml","Fast Dry Tins x 4Litres","Fast Dry Tins x 1Litre","Fast Dry Tins x 500ml","Acrylic Tins x 4Litres","Acrylic Tins x 1Litre","Acrylic Tins x 500ml","Wood Finish Tins x 4Litres","Wood Finish Tins x 1Litre","Wood Finish Tins x 500ml","Jerrycans x 20Litres","Jerrycans x 4Litres","Top Handle x 1Litre","Natural Bottles - 250ml","Natural Bottles - 60ml","Buckets x 20Litres","Buckets x 4Litres","Round Jars x 1Litre","Round Jars x 500ml","Round Jars x 250ml","Boxes 8 x 4Litres","Boxes 4 x 4Litres","Boxes 24 x 1Litre","Boxes 24 x 500ml","Boxes 24 x 250ml"],
+  skus:["2 Pack Primer AC - 1/2Ltr","2 Pack Primer AC -1Ltr","2 Pack Primer AC - 4Ltr","Black AC - 1/2Ltr","Black AC - 1Ltr","Black AC - 4Ltr","Black AC - 5Ltr","Black AC - 20Ltr","Clear AC - 1/2Ltr","Clear AC - 1Ltr","Clear AC - 4Ltr","Clear AC - 5Ltr","Clear AC - 20Ltr","Fast Maroon AC - 4Ltr","Fast Maroon AC - 5Ltr","Fast Maroon AC - 20Ltr","Hardener - 1Ltr","Hardener - 20Ltr","White AC - 1/2Ltr","White AC - 1Ltr","White AC - 4Ltr","White AC - 20Ltr","Raptor-1ltr","Fibre Resin - 1 Ltr","Fibre Resin - 20 Ltr","Super Autofouling Black - 4Ltr","Super Autofouling White - 4Ltr","Black NC - 1Ltr","Black NC - 4Ltr","Clear NC - 1Ltr","Clear NC - 4Ltr","White NC - 1Ltr","White NC - 4Ltr","2Pack Clear - 1Ltr","2Pack Clear - 4Ltr","Sanding Sealer - 1Ltr","Sanding Sealer - 4Ltr","Wood Glue - 1Ltr","Wood Glue - 4Ltr"],
+  products:["White Acrylic","Black Acrylic","Clear AC","Fast Maroon Acrylic","Hardener","Lemon Yellow Acrylic","Matt Black Acrylic","Mid Chrome Yellow Acrylic","Maroon Acrylic","Orange Acrylic","Permanent Blue Acrylic","Permanent Green Acrylic","Post Red Acrylic","Red Oxide Acrylic","Smoke Grey Acrylic","Violet Acrylic","Yellow Oxide Acrylic","Covermatt White","Covermatt Cream","Covermatt Soft White","SilkVinyl White","SilkVinyl Cream","Undercoat White","Vinylmatt White","Weatherguard White","Black NC","Clear NC","White NC","Red Oxide NC","Permanent Blue QAD","White QAD","2Pack Thinner","High Gloss Thinner","Standard Thinner","White Spirit","2Pack Clear","Clear Vanish","Matt Vanish","NC Lacquer","Sanding Sealer","Wood Glue","Wood Seal","Fibre Resin","Marine Paint"],
+  suppliers:["Nampak Uganda Ltd","Crown Paints Uganda","Kampala Paint Industries","East African Packaging Industries","Uganda Packaging Ltd","Poly Products Uganda","Container Industries Ltd","Metal Box Uganda","Plastic Packaging Co. Uganda"]
+};
+
+// ══════════════════════════════════════════════════════════
+//  DATA STORES
+// ══════════════════════════════════════════════════════════
+var P=[],K=[],LISTS={personnel:[],packaging:[],skus:[],products:[],suppliers:[]};
+var SV_URL='',SV_MODE=false;
+
+try{var _p=localStorage.getItem('spt_prod');if(_p)P=JSON.parse(_p);}catch(e){}
+try{var _k=localStorage.getItem('spt_pack');if(_k)K=JSON.parse(_k);}catch(e){}
+try{var _u=localStorage.getItem('spt_svurl');if(_u){SV_URL=_u;SV_MODE=!!_u;}}catch(e){}
+try{var _l=localStorage.getItem('spt_lists');if(_l){var sl=JSON.parse(_l);['personnel','packaging','skus','products','suppliers'].forEach(function(k){LISTS[k]=(sl[k]&&sl[k].length)?sl[k]:DL[k].slice();});}else{['personnel','packaging','skus','products','suppliers'].forEach(function(k){LISTS[k]=DL[k].slice();});localStorage.setItem('spt_lists',JSON.stringify(LISTS));}}catch(e){['personnel','packaging','skus','products','suppliers'].forEach(function(k){LISTS[k]=DL[k].slice();});}
+
+function sprod(){if(!SV_MODE)try{localStorage.setItem('spt_prod',JSON.stringify(P));}catch(e){}}
+function spack(){if(!SV_MODE)try{localStorage.setItem('spt_pack',JSON.stringify(K));}catch(e){}}
+function slists(){try{localStorage.setItem('spt_lists',JSON.stringify(LISTS));}catch(e){}}
+
+// ══════════════════════════════════════════════════════════
+//  PASSWORD SYSTEM — simple hash stored in localStorage
+// ══════════════════════════════════════════════════════════
+function hashPw(s){var h=0;for(var i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0;}return h.toString(36)+'_'+s.length;}
+function getPwHash(){try{return localStorage.getItem('spt_pw')||'';}catch(e){return '';}}
+function setPwHash(h){try{localStorage.setItem('spt_pw',h);}catch(e){}}
+function removePwHash(){try{localStorage.removeItem('spt_pw');}catch(e){}}
+
+function doLogin(){
+  var pw=document.getElementById('pw-input').value;
+  var stored=getPwHash();
+  if(!stored){
+    // First time — set new password
+    if(!pw){document.getElementById('login-err').textContent='Please enter a password to set.';return;}
+    setPwHash(hashPw(pw));
+    hideLogin();
+    toast('✓ Password set. Application unlocked.','tgn');
+    return;
+  }
+  if(hashPw(pw)===stored){
+    hideLogin();
+  } else {
+    document.getElementById('login-err').textContent='Incorrect password. Please try again.';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+function hideLogin(){
+  document.getElementById('login-overlay').classList.add('hidden');
+  document.getElementById('pw-input').value='';
+  document.getElementById('login-err').textContent='';
+}
+function doLogout(){
+  document.getElementById('login-overlay').classList.remove('hidden');
+  document.getElementById('pw-input').value='';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('pw-input').focus();
+}
+function changePw(){
+  var cur=document.getElementById('pw-current').value;
+  var nw=document.getElementById('pw-new').value;
+  var cf=document.getElementById('pw-confirm').value;
+  var stored=getPwHash();
+  var msg=document.getElementById('pw-msg');
+  if(stored&&hashPw(cur)!==stored){msg.style.color='var(--rd)';msg.textContent='❌ Current password is incorrect.';return;}
+  if(!nw){msg.style.color='var(--rd)';msg.textContent='❌ New password cannot be empty.';return;}
+  if(nw!==cf){msg.style.color='var(--rd)';msg.textContent='❌ Passwords do not match.';return;}
+  setPwHash(hashPw(nw));
+  msg.style.color='var(--gn)';msg.textContent='✓ Password updated successfully.';
+  document.getElementById('pw-current').value='';document.getElementById('pw-new').value='';document.getElementById('pw-confirm').value='';
+  toast('Password changed.','tgn');
+}
+function removePw(){
+  if(!confirm('Remove password protection? The application will be accessible to anyone.'))return;
+  removePwHash();
+  document.getElementById('pw-msg').style.color='var(--am)';
+  document.getElementById('pw-msg').textContent='Password removed. Application is now unprotected.';
+  toast('Password removed.','twn');
+}
+
+// ══════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg,cls){var t=document.getElementById('toast');t.textContent=msg;t.className=cls||'tok';t.style.display='block';clearTimeout(t._t);t._t=setTimeout(function(){t.style.display='none';},2800);}
+
+// ══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════
+var PAGES=['dashboard','litreage','prod-entry','pack-entry','records','variance','reports','settings'];
+function go(name){PAGES.forEach(function(p){document.getElementById('pg-'+p).classList.toggle('on',p===name);});document.querySelectorAll('.nav-wrap button[data-pg]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-pg')===name);});if(name==='dashboard')renderDash();if(name==='litreage')renderLitre();if(name==='records')renderRec();if(name==='variance')renderVar();if(name==='reports')document.getElementById('report-out').innerHTML='';if(name==='settings')renderAllLists();}
+
+// ══════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════
+function gv(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+function sv2(id,v){var e=document.getElementById(id);if(e)e.value=v;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function today(){return new Date().toISOString().slice(0,10);}
+function ni(v){return parseInt(v)||0;}
+function vb(v){if(v===null||v===undefined)return'<span class="b bgr">—</span>';if(v===0)return'<span class="b bok">✓ Match</span>';if(Math.abs(v)<=5)return'<span class="b bw">'+(v>0?'+':'')+v+'</span>';return'<span class="b bd2">'+(v>0?'+':'')+v+'</span>';}
+
+// ══════════════════════════════════════════════════════════
+//  AUTOCOMPLETE
+// ══════════════════════════════════════════════════════════
+var ACI={};
+function acf(iid,did,lk){var inp=document.getElementById(iid),drop=document.getElementById(did);if(!inp||!drop)return;var q=inp.value.toLowerCase(),src=LISTS[lk]||[];var items=src.filter(function(x){return!q||x.toLowerCase().includes(q);});if(!items.length){drop.classList.remove('open');ACI[did]=-1;return;}ACI[did]=-1;drop.innerHTML=items.map(function(x,i){return'<div class="aci" data-v="'+esc(x)+'" data-i="'+i+'" onmousedown="acp(\''+iid+'\',\''+did+'\',\''+esc(x)+'\')">'+esc(x)+'</div>';}).join('');drop.classList.add('open');}
+function acp(iid,did,v){document.getElementById(iid).value=v;document.getElementById(did).classList.remove('open');ACI[did]=-1;if(iid==='p-sku'||iid==='p-batch')apkref();}
+function acc(did){setTimeout(function(){var d=document.getElementById(did);if(d)d.classList.remove('open');ACI[did]=-1;},170);}
+function ach(drop,idx){drop.querySelectorAll('.aci').forEach(function(el,i){el.classList.toggle('hi',i===idx);if(i===idx)el.scrollIntoView({block:'nearest'});});}
+function ack(event,iid,did,lk,tc){var drop=document.getElementById(did),isOpen=drop&&drop.classList.contains('open');var items=drop?drop.querySelectorAll('.aci'):[];var idx=ACI[did]!==undefined?ACI[did]:-1;if(event.key==='ArrowDown'){event.preventDefault();if(!isOpen){acf(iid,did,lk);return;}idx=Math.min(idx+1,items.length-1);ACI[did]=idx;ach(drop,idx);return;}if(event.key==='ArrowUp'){event.preventDefault();if(!isOpen)return;idx=Math.max(idx-1,0);ACI[did]=idx;ach(drop,idx);return;}if(event.key==='Enter'){event.preventDefault();if(isOpen&&idx>=0&&items[idx]){acp(iid,did,items[idx].getAttribute('data-v'));}else{acc(did);nxtF(event.target);}return;}if(event.key==='Backspace'){var inp=document.getElementById(iid);if(inp&&inp.value===''){event.preventDefault();acc(did);prvF(event.target);}return;}if(event.key==='Escape')acc(did);}
+function tagk(event,iid,did,lk,fn){var drop=document.getElementById(did),isOpen=drop&&drop.classList.contains('open');var items=drop?drop.querySelectorAll('.aci'):[];var idx=ACI[did]!==undefined?ACI[did]:-1;if(event.key==='ArrowDown'){event.preventDefault();if(!isOpen){acf(iid,did,lk);return;}idx=Math.min(idx+1,items.length-1);ACI[did]=idx;ach(drop,idx);return;}if(event.key==='ArrowUp'){event.preventDefault();if(!isOpen)return;idx=Math.max(idx-1,0);ACI[did]=idx;ach(drop,idx);return;}if(event.key==='Enter'){event.preventDefault();if(isOpen&&idx>=0&&items[idx]){window[fn](items[idx].getAttribute('data-v'));document.getElementById(iid).value='';drop.classList.remove('open');ACI[did]=-1;}else{var vv=document.getElementById(iid).value.trim();if(vv){window[fn](vv);document.getElementById(iid).value='';acc(did);}else{acc(did);nxtF(event.target);}}return;}if(event.key==='Backspace'){var ii=document.getElementById(iid);if(ii&&ii.value===''){event.preventDefault();acc(did);prvF(event.target);}return;}if(event.key==='Escape')acc(did);}
+
+// ══════════════════════════════════════════════════════════
+//  FIELD NAVIGATION
+// ══════════════════════════════════════════════════════════
+function getPgI(){var pg=document.querySelector('.pg.on');if(!pg)return[];return Array.from(pg.querySelectorAll('input[tabindex]:not([type=hidden]),select[tabindex],textarea[tabindex]')).filter(function(el){return el.tabIndex>0&&el.offsetParent!==null;}).sort(function(a,b){return a.tabIndex-b.tabIndex;});}
+function nxtF(el){var all=getPgI(),i=all.indexOf(el);if(i>=0&&i<all.length-1){all[i+1].focus();if(all[i+1].select)all[i+1].select();}}
+function prvF(el){var all=getPgI(),i=all.indexOf(el);if(i>0){all[i-1].focus();if(all[i-1].select)all[i-1].select();}}
+document.addEventListener('keydown',function(e){var el=document.activeElement;if(!el)return;var tag=el.tagName.toLowerCase();if(tag==='textarea'||tag==='button')return;if(!el.closest('.pg.on'))return;var hnd=el.getAttribute('onkeydown')||'';if(hnd.indexOf('ack')>-1||hnd.indexOf('tagk')>-1)return;if(e.key==='Enter'){e.preventDefault();nxtF(el);}else if(e.key==='Backspace'&&el.value===''){e.preventDefault();prvF(el);}});
+
+// ══════════════════════════════════════════════════════════
+//  TAGS
+// ══════════════════════════════════════════════════════════
+var PT=[];
+function apt(n){n=n.trim();if(!n||PT.includes(n))return;PT.push(n);rpt();}
+function rpt(){document.getElementById('e-ptags').innerHTML=PT.map(function(n){return'<span class="tag">'+esc(n)+'<span class="tag-x" onmousedown="PT=PT.filter(x=>x!==\''+esc(n)+'\');rpt()">✕</span></span>';}).join('');document.getElementById('e-personnel').value=PT.join(', ');}
+var KT=[];
+function apkt(n){n=n.trim();if(!n||KT.includes(n))return;KT.push(n);rkt();}
+function rkt(){document.getElementById('p-ptags').innerHTML=KT.map(function(n){return'<span class="tag t">'+esc(n)+'<span class="tag-x" onmousedown="KT=KT.filter(x=>x!==\''+esc(n)+'\');rkt()">✕</span></span>';}).join('');document.getElementById('p-personnel').value=KT.join(', ');}
+
+// ══════════════════════════════════════════════════════════
+//  PACKAGING CALC
+// ══════════════════════════════════════════════════════════
+function apkref(){var b=gv('p-batch'),s=gv('p-sku');sv2('p-packref',b&&s?b+'/'+s:(b||s||''));}
+function calcNet(){sv2('p-net',Math.max(0,ni(gv('p-issued'))+ni(gv('p-issued2'))-ni(gv('p-returned'))-ni(gv('p-damaged'))));}
+
+// ══════════════════════════════════════════════════════════
+//  SERVER
+// ══════════════════════════════════════════════════════════
+async function serverLoad(){try{var r=await fetch(SV_URL+'/api/data');if(!r.ok)throw'err';var d=await r.json();P=d.DB_PROD||[];K=d.DB_PACK||[];if(d.LISTS)['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];});slists();updateHdr();document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';document.getElementById('sv-full-status').textContent='Connected: '+SV_URL;return true;}catch(e){SV_MODE=false;SV_URL='';document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';return false;}}
+async function sPost(path,data){if(!SV_MODE)return null;try{var r=await fetch(SV_URL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return await r.json();}catch(e){return null;}}
+async function sDel(path){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'DELETE'});}catch(e){}}
+async function sPatch(path,data){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}}
+async function toggleServer(){var url=document.getElementById('sv-url').value.trim().replace(/\/$/,'');if(SV_MODE){SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';document.getElementById('sv-full-status').textContent='Using browser localStorage (local mode)';document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';toast('Disconnected — local mode');return;}SV_URL=url;SV_MODE=true;localStorage.setItem('spt_svurl',SV_URL);document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';var ok=await serverLoad();if(ok){toast('✓ Connected to server','ttl');renderAllLists();}else{toast('⚠ Cannot reach server','twn');SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';}}
+
+// ══════════════════════════════════════════════════════════
+//  SAVE PRODUCTION
+// ══════════════════════════════════════════════════════════
+async function saveProd(){var product=gv('e-product'),sku=gv('e-sku'),batch=gv('e-batch');if(!product||!sku||!batch){toast('Fill in Product Name, SKU and Batch Number.','ter');return;}var prodqty=ni(gv('e-prodqty')),s1=ni(gv('e-stamps')),s2=ni(gv('e-stamps2')),sr=ni(gv('e-stamps-ret')),snet=s1+s2-sr;var entry={id:Date.now(),type:'prod',date:gv('e-date'),product:product,sku:sku,batch:batch,prodqty:prodqty,reelno:gv('e-reelno'),stamps1:s1,stamps2:s2,stampsRet:sr,stampsNet:snet,stampby:gv('e-stampby'),personnel:gv('e-personnel'),supervisor:gv('e-supervisor'),notes:gv('e-notes'),var_stamp:snet-prodqty,var_reason:''};if(SV_MODE){var r=await sPost('/api/production',entry);if(r&&r.ok)await serverLoad();}else{P.push(entry);sprod();}if(sku&&!LISTS.skus.includes(sku)){LISTS.skus.push(sku);slists();}if(product&&!LISTS.products.includes(product)){LISTS.products.push(product);slists();}toast('✓ Production entry saved — Batch: '+batch);['e-product','e-sku','e-batch','e-prodqty','e-stamps','e-stamps2','e-stamps-ret','e-reelno','e-stampby','e-supervisor','e-notes'].forEach(function(id){sv2(id,'');});PT=[];rpt();document.getElementById('e-pers-inp').value='';sv2('e-date',today());updateHdr();}
+
+// ══════════════════════════════════════════════════════════
+//  SAVE PACKAGING
+// ══════════════════════════════════════════════════════════
+async function savePack(){var batch=gv('p-batch'),sku=gv('p-sku');if(!batch||!sku){toast('Fill in Batch Number and SKU.','ter');return;}var i1=ni(gv('p-issued')),i2=ni(gv('p-issued2')),ret=ni(gv('p-returned')),dam=ni(gv('p-damaged')),net=Math.max(0,i1+i2-ret-dam);var linked=P.find(function(x){return x.batch===batch&&x.sku===sku;});var entry={id:Date.now(),type:'pack',date:gv('p-date'),batch:batch,sku:sku,packmat:gv('p-packmat'),supplier:gv('p-supplier'),packref:gv('p-packref'),packIssued:i1,packIssued2:i2,packReturned:ret,packDamaged:dam,packNet:net,packby:gv('p-packby'),personnel:gv('p-personnel'),notes:gv('p-notes'),packmat2:gv('p-packmat2'),supplier2:gv('p-supplier2'),packby2:gv('p-packby2'),packIssued_m2:ni(gv('p-issued-m2')),packReturned_m2:ni(gv('p-returned-m2')),packDamaged_m2:ni(gv('p-damaged-m2')),linkedProdId:linked?linked.id:null,var_pack:linked?net-linked.prodqty:null,var_reason:''};if(SV_MODE){var r=await sPost('/api/packaging',entry);if(r&&r.ok)await serverLoad();}else{K.push(entry);spack();}toast(linked?'✓ Packaging entry saved — linked to Batch: '+batch:'✓ Packaging entry saved — ⚠ no production entry found for Batch: '+batch,linked?'ttl':'twn');['p-batch','p-sku','p-packmat','p-supplier','p-packref','p-issued','p-issued2','p-returned','p-damaged','p-net','p-packby','p-notes','p-packmat2','p-supplier2','p-packby2','p-issued-m2','p-returned-m2','p-damaged-m2'].forEach(function(id){sv2(id,'');});KT=[];rkt();document.getElementById('p-pers-inp').value='';sv2('p-date',today());updateHdr();}
+
+// ══════════════════════════════════════════════════════════
+//  EDIT MODAL
+// ══════════════════════════════════════════════════════════
+var EDIT_ID=null,EDIT_DB=null;
+function openEditProd(id){
+  var e=P.find(function(x){return x.id===id;});if(!e)return;
+  EDIT_ID=id;EDIT_DB='prod';
+  document.getElementById('modal-title-text').textContent='✏ Edit Production Entry — Batch: '+esc(e.batch);
+  document.getElementById('modal-body').innerHTML=
+    '<div class="r3"><div class="fg"><label>Date</label><input id="m-date" class="si" style="width:100%" value="'+esc(e.date||'')+'"></div>'
+    +'<div class="fg"><label>Product</label><input id="m-product" class="si" style="width:100%" value="'+esc(e.product||'')+'"></div>'
+    +'<div class="fg"><label>SKU</label><input id="m-sku" class="si" style="width:100%" value="'+esc(e.sku||'')+'"></div></div>'
+    +'<div class="r2"><div class="fg"><label>Batch</label><input id="m-batch" class="si" style="width:100%" value="'+esc(e.batch||'')+'"></div>'
+    +'<div class="fg"><label>Production Quantity</label><input id="m-prodqty" type="number" class="si" style="width:100%" value="'+(e.prodqty||0)+'"></div></div>'
+    +'<div class="r5"><div class="fg"><label>Reel No.</label><input id="m-reelno" class="si" style="width:100%" value="'+esc(e.reelno||'')+'"></div>'
+    +'<div class="fg"><label>Stamps 1</label><input id="m-s1" type="number" class="si" style="width:100%" value="'+(e.stamps1||0)+'"></div>'
+    +'<div class="fg"><label>Stamps 2</label><input id="m-s2" type="number" class="si" style="width:100%" value="'+(e.stamps2||0)+'"></div>'
+    +'<div class="fg"><label>Stamps Ret.</label><input id="m-sr" type="number" class="si" style="width:100%" value="'+(e.stampsRet||0)+'"></div>'
+    +'<div class="fg"><label>Stamp Issued By</label><input id="m-stampby" class="si" style="width:100%" value="'+esc(e.stampby||'')+'"></div></div>'
+    +'<div class="r2"><div class="fg"><label>Supervisor</label><input id="m-supervisor" class="si" style="width:100%" value="'+esc(e.supervisor||'')+'"></div>'
+    +'<div class="fg"><label>Personnel</label><input id="m-personnel" class="si" style="width:100%" value="'+esc(e.personnel||'')+'"></div></div>'
+    +'<div class="fg" style="margin-bottom:12px"><label>Variance Reason</label><input id="m-reason" class="si" style="width:100%" value="'+esc(e.var_reason||'')+'" placeholder="Explain any variance (e.g. 3 stamps damaged)"></div>'
+    +'<div class="fg"><label>Notes</label><textarea id="m-notes" class="si" style="width:100%;height:60px;resize:vertical">'+esc(e.notes||'')+'</textarea></div>';
+  document.getElementById('edit-modal').classList.add('open');
+}
+function openEditPack(id){
+  var e=K.find(function(x){return x.id===id;});if(!e)return;
+  EDIT_ID=id;EDIT_DB='pack';
+  document.getElementById('modal-title-text').textContent='✏ Edit Packaging Entry — Batch: '+esc(e.batch);
+  document.getElementById('modal-body').innerHTML=
+    '<div class="r3"><div class="fg"><label>Date</label><input id="m-date" class="si" style="width:100%" value="'+esc(e.date||'')+'"></div>'
+    +'<div class="fg"><label>Batch</label><input id="m-batch" class="si" style="width:100%" value="'+esc(e.batch||'')+'"></div>'
+    +'<div class="fg"><label>SKU</label><input id="m-sku" class="si" style="width:100%" value="'+esc(e.sku||'')+'"></div></div>'
+    +'<div class="r2"><div class="fg"><label>Packaging Material</label><input id="m-packmat" class="si" style="width:100%" value="'+esc(e.packmat||'')+'"></div>'
+    +'<div class="fg"><label>Supplier</label><input id="m-supplier" class="si" style="width:100%" value="'+esc(e.supplier||'')+'"></div></div>'
+    +'<div class="r4"><div class="fg"><label>Issued 1</label><input id="m-i1" type="number" class="si" style="width:100%" value="'+(e.packIssued||0)+'"></div>'
+    +'<div class="fg"><label>Issued 2</label><input id="m-i2" type="number" class="si" style="width:100%" value="'+(e.packIssued2||0)+'"></div>'
+    +'<div class="fg"><label>Returned</label><input id="m-ret" type="number" class="si" style="width:100%" value="'+(e.packReturned||0)+'"></div>'
+    +'<div class="fg"><label>Damaged</label><input id="m-dam" type="number" class="si" style="width:100%" value="'+(e.packDamaged||0)+'"></div></div>'
+    +'<div class="r2"><div class="fg"><label>Issued By</label><input id="m-packby" class="si" style="width:100%" value="'+esc(e.packby||'')+'"></div>'
+    +'<div class="fg"><label>Personnel</label><input id="m-personnel" class="si" style="width:100%" value="'+esc(e.personnel||'')+'"></div></div>'
+    +'<hr style="margin:10px 0"><div style="font-size:11px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Secondary Material (Material 2)</div>'
+    +'<div class="r3"><div class="fg"><label>Packaging Material 2</label><input id="m-packmat2" class="si" style="width:100%" value="'+esc(e.packmat2||'')+'"></div>'
+    +'<div class="fg"><label>Supplier 2</label><input id="m-supplier2" class="si" style="width:100%" value="'+esc(e.supplier2||'')+'"></div>'
+    +'<div class="fg"><label>Issued By M2</label><input id="m-packby2" class="si" style="width:100%" value="'+esc(e.packby2||'')+'"></div></div>'
+    +'<div class="r3"><div class="fg"><label>Issued M2</label><input id="m-issued-m2" type="number" class="si" style="width:100%" value="'+(e.packIssued_m2||0)+'"></div>'
+    +'<div class="fg"><label>Returned M2</label><input id="m-returned-m2" type="number" class="si" style="width:100%" value="'+(e.packReturned_m2||0)+'"></div>'
+    +'<div class="fg"><label>Damaged M2</label><input id="m-damaged-m2" type="number" class="si" style="width:100%" value="'+(e.packDamaged_m2||0)+'"></div></div>'
+    +'<div class="fg" style="margin-bottom:12px"><label>Variance Reason</label><input id="m-reason" class="si" style="width:100%" value="'+esc(e.var_reason||'')+'" placeholder="Explain any variance (e.g. 5 tins damaged)"></div>'
+    +'<div class="fg"><label>Notes</label><textarea id="m-notes" class="si" style="width:100%;height:60px;resize:vertical">'+esc(e.notes||'')+'</textarea></div>';
+  document.getElementById('edit-modal').classList.add('open');
+}
+function gmi(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+async function saveModal(){
+  if(EDIT_DB==='prod'){
+    var e=P.find(function(x){return x.id===EDIT_ID;});if(!e)return;
+    var s1=ni(gmi('m-s1')),s2=ni(gmi('m-s2')),sr=ni(gmi('m-sr'));
+    var snet=s1+s2-sr,prodqty=ni(gmi('m-prodqty'));
+    e.date=gmi('m-date');e.product=gmi('m-product');e.sku=gmi('m-sku');e.batch=gmi('m-batch');
+    e.prodqty=prodqty;e.reelno=gmi('m-reelno');e.stamps1=s1;e.stamps2=s2;e.stampsRet=sr;e.stampsNet=snet;
+    e.stampby=gmi('m-stampby');e.supervisor=gmi('m-supervisor');e.personnel=gmi('m-personnel');
+    e.notes=gmi('m-notes');e.var_reason=gmi('m-reason');e.var_stamp=snet-prodqty;
+    sprod();if(SV_MODE)await sPatch('/api/production/'+EDIT_ID+'/reason',{reason:e.var_reason});
+  } else {
+    var ke=K.find(function(x){return x.id===EDIT_ID;});if(!ke)return;
+    var i1=ni(gmi('m-i1')),i2=ni(gmi('m-i2')),ret=ni(gmi('m-ret')),dam=ni(gmi('m-dam'));
+    var net=Math.max(0,i1+i2-ret-dam);
+    ke.date=gmi('m-date');ke.batch=gmi('m-batch');ke.sku=gmi('m-sku');
+    ke.packmat=gmi('m-packmat');ke.supplier=gmi('m-supplier');
+    ke.packIssued=i1;ke.packIssued2=i2;ke.packReturned=ret;ke.packDamaged=dam;ke.packNet=net;
+    ke.packby=gmi('m-packby');ke.personnel=gmi('m-personnel');ke.notes=gmi('m-notes');ke.var_reason=gmi('m-reason');
+    ke.packmat2=gmi('m-packmat2');ke.supplier2=gmi('m-supplier2');ke.packby2=gmi('m-packby2');
+    ke.packIssued_m2=ni(gmi('m-issued-m2'));ke.packReturned_m2=ni(gmi('m-returned-m2'));ke.packDamaged_m2=ni(gmi('m-damaged-m2'));
+    var linked=P.find(function(x){return x.batch===ke.batch&&x.sku===ke.sku;});
+    ke.var_pack=linked?net-linked.prodqty:null;
+    spack();
+  }
+  closeModal();renderRec();renderVar();updateHdr();toast('✓ Entry updated.','tgn');
+}
+function closeModal(){document.getElementById('edit-modal').classList.remove('open');EDIT_ID=null;EDIT_DB=null;}
+// Close modal on backdrop click
+document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ══════════════════════════════════════════════════════════
+//  RECORDS
+// ══════════════════════════════════════════════════════════
+function clearF(){['r-search','r-from','r-to'].forEach(function(id){sv2(id,'');});renderRec();}
+function gfp(){var f=gv('r-from'),t=gv('r-to'),q=gv('r-search').toLowerCase();return P.filter(function(e){return(!f||e.date>=f)&&(!t||e.date<=t)&&(!q||e.product.toLowerCase().includes(q)||e.sku.toLowerCase().includes(q)||(e.batch||'').toLowerCase().includes(q));});}
+function gfk(){var f=gv('r-from'),t=gv('r-to'),q=gv('r-search').toLowerCase();return K.filter(function(e){return(!f||e.date>=f)&&(!t||e.date<=t)&&(!q||e.sku.toLowerCase().includes(q)||(e.batch||'').toLowerCase().includes(q)||(e.packmat||'').toLowerCase().includes(q));});}
+
+function renderRec(){
+  var prods=gfp(),packs=gfk();
+  document.getElementById('rm-tot').textContent=prods.length+packs.length;
+  document.getElementById('rm-prod').textContent=prods.reduce(function(s,e){return s+e.prodqty;},0).toLocaleString();
+  var tn=prods.reduce(function(s,e){return s+e.stampsNet;},0);
+  document.getElementById('rm-stamps').textContent=tn.toLocaleString();
+  document.getElementById('rm-stamps-s').textContent='Iss1:'+prods.reduce(function(s,e){return s+(e.stamps1||0);},0);
+  var pn=packs.reduce(function(s,e){return s+e.packNet;},0);
+  document.getElementById('rm-pack').textContent=pn.toLocaleString();
+  document.getElementById('rm-pack-s').textContent='Ret:'+packs.reduce(function(s,e){return s+e.packReturned;},0);
+  document.getElementById('rm-dmg').textContent=packs.reduce(function(s,e){return s+e.packDamaged;},0);
+  document.getElementById('rc-pc').textContent=prods.length;
+  document.getElementById('rc-kc').textContent=packs.length;
+
+  var pt=document.getElementById('rec-prod');
+  if(!prods.length){pt.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No production entries match.</div>';}
+  else{var rows=[...prods].reverse().map(function(e){var lk=K.find(function(p){return p.batch===e.batch&&p.sku===e.sku;});return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td><strong>'+esc(e.product)+'</strong></td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td>'+e.stampsNet+'</td><td>'+vb(e.var_stamp)+'</td><td>'+esc(e.supervisor||'—')+'</td><td>'+(lk?'<span class="lkok">⛓ Linked</span>':'<span class="lkno">⚠ No pack entry</span>')+'</td><td style="white-space:nowrap"><button class="btn-amber" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="openEditProd('+e.id+')">✏ Edit</button><button class="btn-d" onclick="delRec(\'prod\','+e.id+')">Del</button></td></tr>';}).join('');pt.innerHTML='<table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Produced</th><th>Net Stamps</th><th>Stamp Var.</th><th>Supervisor</th><th>Pack Link</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';}
+
+  var kt=document.getElementById('rec-pack');
+  if(!packs.length){kt.innerHTML='<div class="empty"><span class="empty-icon">📦</span>No packaging entries match.</div>';}
+  else{var krows=[...packs].reverse().map(function(e){return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+esc(e.packmat||'—')+'</td><td>'+esc(e.supplier||'—')+'</td><td>'+( e.packIssued||0)+'</td><td>'+(e.packIssued2||0)+'</td><td style="color:var(--tl)">'+e.packReturned+'</td><td style="color:var(--rd)">'+e.packDamaged+'</td><td><strong>'+e.packNet+'</strong></td><td>'+(e.var_pack!==null?vb(e.var_pack):'<span class="b bgr">—</span>')+'</td><td>'+esc(e.packby||'—')+'</td>'+(e.packmat2?'<td style="color:var(--tl-d);font-size:11px">'+esc(e.packmat2)+'</td><td style="font-size:11px">'+(e.packIssued_m2||0)+'</td><td style="color:var(--tl);font-size:11px">'+(e.packReturned_m2||0)+'</td><td style="color:var(--rd);font-size:11px">'+(e.packDamaged_m2||0)+'</td>':'<td colspan="4" style="color:var(--mu);font-size:10px;font-style:italic">—</td>')+'<td style="white-space:nowrap"><button class="btn-amber" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="openEditPack('+e.id+')">✏ Edit</button><button class="btn-d" onclick="delRec(\'pack\','+e.id+')">Del</button></td></tr>';}).join('');kt.innerHTML='<table><thead><tr><th>Date</th><th>SKU</th><th>Batch</th><th>Material 1</th><th>Supplier 1</th><th>Iss 1</th><th>Iss 2</th><th>Ret.</th><th>Dmg.</th><th>Net Used</th><th>Variance</th><th>Issued By</th><th>Material 2</th><th>Iss M2</th><th>Ret M2</th><th>Dmg M2</th><th></th></tr></thead><tbody>'+krows+'</tbody></table>';}
+}
+async function delRec(db,id){if(!confirm('Delete this entry? Cannot be undone.'))return;if(db==='prod'){P=P.filter(function(e){return e.id!==id;});sprod();if(SV_MODE)await sDel('/api/production/'+id);}else{K=K.filter(function(e){return e.id!==id;});spack();if(SV_MODE)await sDel('/api/packaging/'+id);}renderRec();toast('Entry deleted.');}
+
+// ══════════════════════════════════════════════════════════
+//  VARIANCE
+// ══════════════════════════════════════════════════════════
+function renderVar(){
+  var vf=document.getElementById('v-filter').value,vq=document.getElementById('v-q').value.toLowerCase();
+  var rows=P.map(function(prod){return{prod:prod,pack:K.find(function(p){return p.batch===prod.batch&&p.sku===prod.sku;})||null};}).filter(function(row){var qOk=!vq||row.prod.sku.toLowerCase().includes(vq)||row.prod.product.toLowerCase().includes(vq)||(row.prod.batch||'').toLowerCase().includes(vq);if(!qOk)return false;if(vf==='var')return row.prod.var_stamp!==0||(row.pack&&row.pack.var_pack!==null&&row.pack.var_pack!==0);if(vf==='nolink')return!row.pack;if(vf==='noreason')return(row.prod.var_stamp!==0||(row.pack&&row.pack.var_pack!==null&&row.pack.var_pack!==0))&&!row.prod.var_reason;return true;});
+  var el=document.getElementById('var-list');
+  if(!rows.length){el.innerHTML='<div class="empty"><span class="empty-icon">✅</span>No entries match.</div>';return;}
+  el.innerHTML=[...rows].reverse().map(function(row){
+    var prod=row.prod,pack=row.pack,sv=prod.var_stamp,pv=pack?pack.var_pack:null;
+    var hasVar=sv!==0||(pv!==null&&pv!==undefined&&pv!==0);
+    return'<div class="vc"><div class="vc-top"><div><div class="vc-name">'+esc(prod.product)+' <span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--mu)">'+esc(prod.sku)+'</span></div><div class="vc-meta">'+esc(prod.date||'—')+' · Batch: '+esc(prod.batch)+' · Supervisor: '+esc(prod.supervisor||'—')+'</div></div><div class="vc-pills"><span class="vpill">Produced: '+prod.prodqty+'</span><span class="vpill">Net Stamps: '+prod.stampsNet+'</span>'+(pack?'<span class="vpill">Pack Net: '+pack.packNet+'</span>':'<span class="b bw">No pack entry</span>')+'</div></div><div class="vg"><div class="vbox"><div class="vbox-lbl">Stamps</div><div style="font-size:12px">Iss1: <strong>'+(prod.stamps1||0)+'</strong> · Iss2: <strong>'+(prod.stamps2||0)+'</strong> · Ret: <strong>'+(prod.stampsRet||0)+'</strong> · Net: <strong>'+prod.stampsNet+'</strong></div></div><div class="vbox"><div class="vbox-lbl">Stamp Variance</div>'+vb(sv)+' <span style="font-size:11px;color:var(--mu)">'+(sv===0?'Exact match':Math.abs(sv)+' '+(sv>0?'more':'fewer')+' than produced')+'</span></div><div class="vbox"><div class="vbox-lbl">Pack Variance</div>'+(pack?vb(pv)+' <span style="font-size:11px;color:var(--mu)">Iss1: '+pack.packIssued+' · Iss2: '+(pack.packIssued2||0)+' · Ret: '+pack.packReturned+' · Dmg: '+pack.packDamaged+(pack.packmat2?' <span style="color:var(--tl-d);font-weight:600">· Mat2: '+esc(pack.packmat2)+'('+(pack.packIssued_m2||0)+')</span>':'')+'</span>':'<span style="font-size:11px;color:var(--mu)">No packaging entry</span>')+'</div></div>'+(hasVar?'<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--am)">Reason for Variance</label><input class="ri" type="text" value="'+esc(prod.var_reason||'')+'" placeholder="e.g. 3 tins damaged, machine waste, 5 returned…" onchange="saveReason('+prod.id+',this.value)"></div>':'')+'<div style="margin-top:8px"><button class="btn-amber" style="font-size:11px;padding:4px 12px" onclick="openEditProd('+prod.id+')">✏ Edit Production Entry</button>'+(pack?'&nbsp;<button class="btn-amber" style="font-size:11px;padding:4px 12px" onclick="openEditPack('+pack.id+')">✏ Edit Pack Entry</button>':'')+'</div></div>';
+  }).join('');
+}
+async function saveReason(id,reason){var e=P.find(function(x){return x.id===id;});if(e){e.var_reason=reason;sprod();if(SV_MODE)await sPatch('/api/production/'+id+'/reason',{reason:reason});toast('Reason saved.','tgn');}}
+
+// ══════════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+//  LITREAGE ENGINE
+//  Parses SKU names to extract litre multipliers
+//  Classifies products into categories
+//  Supports custom overrides stored in localStorage
+// ══════════════════════════════════════════════════════════
+
+// Load/save overrides — [{sku:'keyword', cat:'Acrylics', mult:4}, ...]
+var LT_OV = [];
+try{var _ov=localStorage.getItem('spt_ltov');if(_ov)LT_OV=JSON.parse(_ov);}catch(e){}
+function saveLtOv(){try{localStorage.setItem('spt_ltov',JSON.stringify(LT_OV));}catch(e){}}
+
+// Extract litre size from SKU string
+// Handles: 4Ltr, 4Litres, 1Ltr, 1/2Ltr, 0.5Ltr, 20Ltr, 5Ltr, 200Ltr, 250ml, 500ml, 60ml, 1000ml
+function getLitreSize(sku){
+  var s = (sku||'').toLowerCase();
+  // Check overrides first
+  for(var i=0;i<LT_OV.length;i++){
+    if(LT_OV[i].mult && s.includes(LT_OV[i].sku.toLowerCase()))
+      return parseFloat(LT_OV[i].mult);
+  }
+  // 1/2 litre patterns
+  if(s.includes('1/2ltr')||s.includes('1/2 ltr')||s.includes('1/2litre')||s.includes('0.5ltr'))return 0.5;
+  // 1/4 litre
+  if(s.includes('1/4ltr')||s.includes('1/4 ltr')||s.includes('0.25ltr'))return 0.25;
+  // Millilitres → convert to litres
+  var ml = s.match(/(\d+(?:\.\d+)?)\s*ml/);
+  if(ml){var mlv=parseFloat(ml[1]);return mlv/1000;}
+  // Named fractions in packaging: 500ml=0.5, 250ml=0.25, 60ml=0.06
+  // Litres — look for number then Ltr/Litre/Litres
+  var lt = s.match(/(\d+(?:[\./]\d+)?)\s*(?:ltr|litre|litres|l\b)/);
+  if(lt){
+    var raw=lt[1];
+    if(raw.includes('/')){{var parts=raw.split('/');return parseFloat(parts[0])/parseFloat(parts[1]);}}
+    return parseFloat(raw)||1;
+  }
+  // Plain number at end (e.g. "White AC - 4")
+  var plain=s.match(/[-–\s](\d+)\s*$/);
+  if(plain)return parseFloat(plain[1])||1;
+  return 1; // default 1 litre
+}
+
+// Classify SKU + product name into a category
+function getCategory(sku, product){
+  var s=(sku||'').toLowerCase()+' '+(product||'').toLowerCase();
+  // Check overrides first
+  for(var i=0;i<LT_OV.length;i++){
+    if(LT_OV[i].cat && s.includes(LT_OV[i].sku.toLowerCase()))
+      return LT_OV[i].cat;
+  }
+  if(s.includes('thinner')||s.includes('spirit'))return 'Thinners';
+  if(s.includes('fast dry')||s.includes('fastdry')||s.includes('fast maroon'))return 'Fast Drys';
+  if(s.includes('nitrocellulose')||s.includes(' nc ')||s.includes('nc -')||s.match(/\bnc\b/))return 'Nitrocellulose';
+  if(s.includes('wood')||s.includes('sanding sealer')||s.includes('wood glue')||s.includes('wood seal')||s.includes('wood finish'))return 'Wood Finishes';
+  if(s.includes('super gloss')||s.includes('gloss'))return 'Glosses';
+  if(s.includes('marine')||s.includes('autofouling'))return 'Marine';
+  if(s.includes(' ac')||s.includes('acrylic')||s.includes('covermatt')||s.includes('silkvinyl')||s.includes('vinylmatt')||s.includes('weatherguard')||s.includes('undercoat'))return 'Acrylics';
+  if(s.includes('fibre resin')||s.includes('2pack')||s.includes('2 pack')||s.includes('raptor')||s.includes('hardener'))return 'Specialty';
+  return 'Other';
+}
+
+// Compute total litres for a production entry
+function getEntryLitres(e){return (e.prodqty||0) * getLitreSize(e.sku);}
+
+// All known categories in display order
+var CAT_ORDER=['Acrylics','Fast Drys','Glosses','Nitrocellulose','Wood Finishes','Thinners','Marine','Specialty','Other'];
+var CAT_COLORS={'Acrylics':'#1a56db','Fast Drys':'#ea580c','Glosses':'#d97706','Nitrocellulose':'#7c3aed','Wood Finishes':'#16a34a','Thinners':'#0d9488','Marine':'#0c4a6e','Specialty':'#be185d','Other':'#64748b'};
+
+// Aggregate litreage from production entries
+function aggLitre(entries){
+  var total=0, cats={};
+  CAT_ORDER.forEach(function(c){cats[c]=0;});
+  entries.forEach(function(e){
+    var l=getEntryLitres(e);
+    total+=l;
+    var cat=getCategory(e.sku,e.product);
+    cats[cat]=(cats[cat]||0)+l;
+  });
+  return{total:total,cats:cats};
+}
+
+// Filter entries for litreage page
+function gfLt(){
+  var f=gv('lt-from'),t=gv('lt-to'),q=gv('lt-q').toLowerCase();
+  return P.filter(function(e){
+    return(!f||e.date>=f)&&(!t||e.date<=t)
+      &&(!q||e.product.toLowerCase().includes(q)||e.sku.toLowerCase().includes(q));
+  });
+}
+function clearLF(){['lt-from','lt-to','lt-q'].forEach(function(id){sv2(id,'');});renderLitre();}
+
+function renderLitre(){
+  var entries=gfLt();
+  var agg=aggLitre(entries);
+  var totalLt=agg.total;
+
+  // ── Metrics ──────────────────────────────────────────
+  var activeCats=CAT_ORDER.filter(function(c){return agg.cats[c]>0;});
+  var mhtml='<div class="met" style="border-top-color:var(--co)">'
+    +'<div class="lbl">Total Litreage</div>'
+    +'<div class="val">'+(totalLt>=1000?(totalLt/1000).toFixed(1)+'K':totalLt.toFixed(1))+'</div>'
+    +'<div class="sub">litres · '+entries.length+' entries</div></div>'
+    +'<div class="met" style="border-top-color:var(--tl)">'
+    +'<div class="lbl">Total Units Produced</div>'
+    +'<div class="val">'+entries.reduce(function(s,e){return s+e.prodqty;},0).toLocaleString()+'</div>'
+    +'<div class="sub">production runs</div></div>'
+    +'<div class="met" style="border-top-color:var(--am)">'
+    +'<div class="lbl">Active Categories</div>'
+    +'<div class="val">'+activeCats.length+'</div>'
+    +'<div class="sub">product types</div></div>'
+    +'<div class="met" style="border-top-color:var(--pu)">'
+    +'<div class="lbl">Avg Litres / Entry</div>'
+    +'<div class="val">'+(entries.length?Math.round(totalLt/entries.length):'0')+'</div>'
+    +'<div class="sub">per production run</div></div>';
+  document.getElementById('lt-mets').innerHTML=mhtml;
+
+  // ── Category cards ────────────────────────────────────
+  if(!activeCats.length){
+    document.getElementById('lt-cats').innerHTML='<div class="card" style="grid-column:span 2"><div class="empty"><span class="empty-icon">🧪</span>No production data yet. Add production entries to see litreage breakdown.</div></div>';
+  } else {
+    document.getElementById('lt-cats').innerHTML=activeCats.map(function(cat){
+      var litres=agg.cats[cat]||0;
+      var pct=totalLt>0?Math.round((litres/totalLt)*100):0;
+      var col=CAT_COLORS[cat]||'#64748b';
+      return'<div class="card" style="border-top:3px solid '+col+'">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+        +'<div style="font-family:\'Fraunces\',serif;font-size:16px;font-weight:700;color:var(--ink)">'+esc(cat)+'</div>'
+        +'<span class="b" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'44">'+pct+'% of output</span></div>'
+        +'<div style="font-size:28px;font-weight:800;font-family:\'Fraunces\',serif;color:'+col+';letter-spacing:-.02em">'+litres.toFixed(1)+'<span style="font-size:14px;font-weight:600"> L</span></div>'
+        +'<div style="margin-top:8px;background:var(--bg2);border-radius:6px;height:6px;overflow:hidden">'
+        +'<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:6px;transition:width .4s ease"></div></div>'
+        +'<div style="font-size:11px;color:var(--mu);margin-top:5px;font-family:\'DM Mono\',monospace">'
+        +entries.filter(function(e){return getCategory(e.sku,e.product)===cat;}).length+' entries · avg '
+        +Math.round(litres/(entries.filter(function(e){return getCategory(e.sku,e.product)===cat;}).length||1))+' L each</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // ── Monthly chart ────────────────────────────────────
+  var pm={};
+  entries.forEach(function(e){if(e.date){var m=e.date.slice(0,7);pm[m]=(pm[m]||0)+getEntryLitres(e);}});
+  var pmk=Object.keys(pm).sort().slice(-8);
+  document.getElementById('lt-chart-monthly').innerHTML=barChart(
+    pmk.map(function(m){return{label:m.slice(5),val:Math.round(pm[m]||0)};},),300,120,'#1a56db'
+  );
+
+  // ── Category chart ────────────────────────────────────
+  var catData=activeCats.map(function(c){return{label:c.split(' ')[0],val:Math.round(agg.cats[c]||0),col:CAT_COLORS[c]||'#64748b'};});
+  document.getElementById('lt-chart-cats').innerHTML=multiBarChart(catData,300,120);
+
+  // ── Note ──────────────────────────────────────────────
+  document.getElementById('lt-tbl-note').innerHTML=
+    '<strong>How multipliers work:</strong> The system reads each SKU name to detect the container size — e.g. <strong>"White AC - 4Ltr"</strong> → ×4, <strong>"Black AC - 1/2Ltr"</strong> → ×0.5, <strong>"Fibre Resin - 20 Ltr"</strong> → ×20. '
+    +'Total litres = Production Qty × Multiplier. SKUs not matching any size pattern default to ×1. '
+    +'Use the override rules below to fix any SKU that is not being read correctly.';
+
+  // ── Detail table ──────────────────────────────────────
+  var tbl=document.getElementById('lt-tbl');
+  if(!entries.length){tbl.innerHTML='<div class="empty"><span class="empty-icon">🧪</span>No entries match.</div>';return;}
+  var rows=[...entries].reverse().map(function(e){
+    var mult=getLitreSize(e.sku);
+    var litres=getEntryLitres(e);
+    var cat=getCategory(e.sku,e.product);
+    var col=CAT_COLORS[cat]||'#64748b';
+    return'<tr>'
+      +'<td class="mono">'+esc(e.date||'—')+'</td>'
+      +'<td><strong>'+esc(e.product)+'</strong></td>'
+      +'<td class="mono">'+esc(e.sku)+'</td>'
+      +'<td class="mono">'+esc(e.batch)+'</td>'
+      +'<td>'+e.prodqty+'</td>'
+      +'<td class="mono" style="color:var(--mu)">× '+mult+'</td>'
+      +'<td style="font-weight:700;color:'+col+'">'+litres.toFixed(2)+' L</td>'
+      +'<td><span class="b" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'33">'+esc(cat)+'</span></td>'
+      +'<td>'+esc(e.supervisor||'—')+'</td>'
+      +'<td style="font-size:11px;color:var(--ink2)">'+esc(e.personnel||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+  tbl.innerHTML='<table><thead><tr>'
+    +'<th>Date</th><th>Product</th><th>SKU</th><th>Batch</th>'
+    +'<th>Units Produced</th><th>× Multiplier</th><th>Total Litres</th><th>Category</th>'
+    +'<th>Supervisor</th><th>Personnel</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  // ── Override list ─────────────────────────────────────
+  renderOvList();
+}
+
+// Multi-colour bar chart for categories
+function multiBarChart(data,W,H){
+  if(!data.length)return'<div style="color:var(--mu);font-size:12px;padding:20px;text-align:center">No data</div>';
+  var max=Math.max.apply(null,data.map(function(d){return d.val||0;}))||1;
+  var bw=Math.floor((W-30)/data.length)-5,pad=15;
+  var bars=data.map(function(d,i){
+    var bh=Math.max(2,Math.round((d.val/max)*(H-28)));
+    var x=pad+i*(bw+5),y=H-18-bh,col=d.col||'#1a56db';
+    return'<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" fill="'+col+'" rx="3" opacity=".85"/>'
+      +'<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="var(--mu)">'+esc(d.label)+'</text>'
+      +(d.val?'<text x="'+(x+bw/2)+'" y="'+(y-3)+'" text-anchor="middle" font-size="8" fill="var(--ink3)" font-weight="600">'+d.val+'</text>':'');
+  }).join('');
+  return'<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:'+H+'px">'+bars+'</svg>';
+}
+
+// Override management
+function addOverride(){
+  var sku=gv('ov-sku'),cat=gv('ov-cat'),mult=gv('ov-mult');
+  if(!sku){toast('Enter a SKU keyword to match.','twn');return;}
+  // Remove existing rule for same sku
+  LT_OV=LT_OV.filter(function(o){return o.sku.toLowerCase()!==sku.toLowerCase();});
+  LT_OV.push({sku:sku,cat:cat||'',mult:mult?parseFloat(mult):''});
+  saveLtOv();sv2('ov-sku','');sv2('ov-cat','');sv2('ov-mult','');
+  renderOvList();renderLitre();toast('Override rule added.','tgn');
+}
+function removeOv(idx){LT_OV.splice(idx,1);saveLtOv();renderOvList();renderLitre();toast('Override removed.');}
+function renderOvList(){
+  var el=document.getElementById('ov-list');if(!el)return;
+  if(!LT_OV.length){el.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">No overrides yet. All categories and multipliers are auto-detected.</div>';return;}
+  el.innerHTML='<table style="font-size:12px;width:100%;min-width:unset"><thead><tr><th>SKU keyword</th><th>Category override</th><th>Multiplier override</th><th></th></tr></thead><tbody>'
+    +LT_OV.map(function(o,i){return'<tr><td class="mono">'+esc(o.sku)+'</td><td>'+esc(o.cat||'—')+'</td><td class="mono">'+(o.mult||'—')+'</td><td><button class="btn-d" onclick="removeOv('+i+')">Remove</button></td></tr>';}).join('')
+    +'</tbody></table>';
+}
+
+// Print litreage
+function printLitre(){
+  document.getElementById('ph-litre-meta').textContent='Generated: '+new Date().toLocaleDateString('en-UG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('ph-litre').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('ph-litre').style.display='none';},1500);
+}
+
+// Export litreage as CSV
+function exportLitreCSV(){
+  var entries=gfLt();
+  if(!entries.length){toast('No data to export.','ter');return;}
+  var hdr=['Date','Product','SKU','Batch','Units Produced','Multiplier (L)','Total Litres','Category','Supervisor','Personnel'];
+  var rows=entries.map(function(e){
+    return[e.date,e.product,e.sku,e.batch,e.prodqty,getLitreSize(e.sku),getEntryLitres(e).toFixed(2),getCategory(e.sku,e.product),e.supervisor,e.personnel];
+  }).map(function(r){return r.map(function(v){return'"'+String(v===undefined||v===null?'':v).replace(/"/g,'""')+'"';}).join(',');});
+  var csv='SEWECO Industrial Coatings Limited\nLitreage Production Analysis\n\n'+[hdr.join(',')].concat(rows).join('\n');
+  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download='SEWECO_litreage_'+today()+'.csv';a.click();toast('Litreage CSV downloaded.');
+}
+
+// ── Add total litres to dashboard ─────────────────────────
+// Called at end of renderDash to inject litreage into dashboard
+function addDashLitreage(){
+  var agg=aggLitre(P);
+  // Update the d-units-s element to show litres too
+  var unitEl=document.getElementById('d-units-s');
+  if(unitEl)unitEl.textContent=(agg.total>0?(agg.total>=1000?(agg.total/1000).toFixed(1)+'K':agg.total.toFixed(1))+' total litres':'all batches');
+  // Inject litreage summary row below the dashboard charts if not already there
+  var ltsum=document.getElementById('dash-lt-summary');
+  if(!ltsum){
+    var after=document.getElementById('d-unlinked');
+    if(after&&after.parentNode){
+      var div=document.createElement('div');
+      div.id='dash-lt-summary';
+      div.className='card';
+      div.style.marginTop='0';
+      after.parentNode.parentNode.insertBefore(div,after.parentNode.nextSibling);
+    }
+  }
+  var el2=document.getElementById('dash-lt-summary');
+  if(!el2)return;
+  var activeCats=CAT_ORDER.filter(function(c){return agg.cats[c]>0;});
+  if(!activeCats.length){el2.innerHTML='<div class="card-title">🧪 Litreage Summary</div><div class="empty"><span class="empty-icon">🧪</span>No production data yet.</div>';return;}
+  el2.innerHTML='<div class="card-title">🧪 Total Litreage by Category <button class="btn-ol" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="go(\'litreage\')">Full Litreage Analysis →</button></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:4px">'
+    +activeCats.map(function(cat){
+      var litres=agg.cats[cat]||0;
+      var pct=agg.total>0?Math.round((litres/agg.total)*100):0;
+      var col=CAT_COLORS[cat]||'#64748b';
+      return'<div style="background:'+col+'11;border:1px solid '+col+'33;border-radius:var(--rs);padding:10px 12px;border-top:3px solid '+col+'">'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:'+col+';margin-bottom:4px">'+esc(cat)+'</div>'
+        +'<div style="font-size:20px;font-weight:800;font-family:\'Fraunces\',serif;color:var(--ink);letter-spacing:-.02em">'+litres.toFixed(1)+'<span style="font-size:11px;font-weight:600"> L</span></div>'
+        +'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+pct+'% of total output</div>'
+        +'</div>';
+    }).join('')
+    +'</div>'
+    +'<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">'
+    +'<span style="font-size:13px;font-weight:700;color:var(--ink)">Grand Total: <span style="color:var(--co)">'+(agg.total>=1000?(agg.total/1000).toFixed(2)+'K':agg.total.toFixed(2))+'</span> litres</span>'
+    +'<span style="font-size:11px;color:var(--mu);font-family:\'DM Mono\',monospace">'+P.length+' production runs</span></div>';
+}
+
+// ══════════════════════════════════════════════════════════
+function renderDash(){
+  document.getElementById('d-prod').textContent=P.length;document.getElementById('d-pack').textContent=K.length;
+  document.getElementById('d-prod-s').textContent=P.length?'latest: '+(P[P.length-1].date||'—'):'no entries';
+  document.getElementById('d-pack-s').textContent=K.length?'latest: '+(K[K.length-1].date||'—'):'no entries';
+  document.getElementById('d-units').textContent=P.reduce(function(s,e){return s+e.prodqty;},0).toLocaleString();
+  var unres=P.filter(function(e){return e.var_stamp!==0&&!e.var_reason;}).length;
+  document.getElementById('d-var').textContent=unres;
+  document.getElementById('d-var-s').textContent=unres?'without explanation':'all clear';
+  var pm={};P.forEach(function(e){if(e.date){var m=e.date.slice(0,7);pm[m]=(pm[m]||0)+e.prodqty;}});
+  var pmk=Object.keys(pm).sort().slice(-8);
+  document.getElementById('ch-monthly').innerHTML=barChart(pmk.map(function(m){return{label:m.slice(5),val:pm[m]};}),300,110,'#1a56db');
+  var cm=today().slice(0,7),cmK=K.filter(function(e){return e.date&&e.date.startsWith(cm);});
+  var ti=cmK.reduce(function(s,e){return s+(e.packIssued||0)+(e.packIssued2||0);},0),tn=cmK.reduce(function(s,e){return s+e.packNet;},0),tr=cmK.reduce(function(s,e){return s+e.packReturned;},0),td=cmK.reduce(function(s,e){return s+e.packDamaged;},0);
+  document.getElementById('ch-eff').innerHTML=barChart([{label:'Issued',val:ti},{label:'Used',val:tn},{label:'Ret.',val:tr},{label:'Dmg.',val:td}],260,110,'#0d9488');
+  var vb2=P.filter(function(e){return e.var_stamp!==0;}).sort(function(a,b){return Math.abs(b.var_stamp)-Math.abs(a.var_stamp);}).slice(0,5);
+  document.getElementById('d-varlist').innerHTML=vb2.length?vb2.map(function(e){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg);border-radius:var(--rx);margin-bottom:5px;border:1px solid var(--bd)"><span style="font-size:12px"><strong>'+esc(e.batch)+'</strong> · '+esc(e.product)+'</span>'+vb(e.var_stamp)+'</div>';}).join(''):'<div class="empty"><span class="empty-icon">✅</span>No stamp variances</div>';
+  var sm={};K.forEach(function(e){var s=e.supplier||'(Unknown)';if(!sm[s])sm[s]={n:0,net:0,dmg:0};sm[s].n++;sm[s].net+=e.packNet;sm[s].dmg+=e.packDamaged;});
+  document.getElementById('d-suplist').innerHTML=Object.keys(sm).sort().map(function(s){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg);border-radius:var(--rx);margin-bottom:5px;border:1px solid var(--bd)"><span style="font-size:12px"><strong>'+esc(s)+'</strong> · '+sm[s].n+' entries</span><span style="font-size:11px;color:var(--mu);font-family:monospace">Net: '+sm[s].net+' · Dmg: <span style="color:var(--rd)">'+sm[s].dmg+'</span></span></div>';}).join('')||'<div class="empty"><span class="empty-icon">🏢</span>No supplier data</div>';
+  var unl=P.filter(function(e){return!K.find(function(p){return p.batch===e.batch&&p.sku===e.sku;});}).slice(-6);
+  document.getElementById('d-unlinked').innerHTML=unl.length?unl.map(function(e){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--or-xl);border-radius:var(--rx);margin-bottom:5px;border:1px solid rgba(234,88,12,.15)"><span style="font-size:12px"><strong>'+esc(e.batch)+'</strong> · '+esc(e.product)+' · '+esc(e.date||'—')+'</span><span class="lkno">⚠ No pack entry</span></div>';}).join(''):'<div class="empty"><span class="empty-icon">✅</span>All entries linked</div>';
+  addDashLitreage();
+}
+function barChart(data,W,H,color){if(!data.length)return'<div style="color:var(--mu);font-size:12px;padding:20px;text-align:center">No data</div>';var max=Math.max.apply(null,data.map(function(d){return d.val||0;}))||1;var bw=Math.floor((W-30)/data.length)-5,pad=15;var bars=data.map(function(d,i){var bh=Math.max(2,Math.round((d.val/max)*(H-28)));var x=pad+i*(bw+5),y=H-18-bh;return'<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" fill="'+color+'" rx="3" opacity=".85"/><text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="var(--mu)">'+esc(d.label)+'</text>'+(d.val?'<text x="'+(x+bw/2)+'" y="'+(y-3)+'" text-anchor="middle" font-size="9" fill="var(--ink3)" font-weight="600">'+d.val+'</text>':'');}).join('');return'<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:'+H+'px">'+bars+'</svg>';}
+
+// ══════════════════════════════════════════════════════════
+//  REPORTS — including TRIPLE ANALYSIS
+// ══════════════════════════════════════════════════════════
+var CRT='triple';
+function setRT(btn){document.querySelectorAll('.rt').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');CRT=btn.getAttribute('data-rt');}
+function grp(){var f=gv('rp-from'),t=gv('rp-to'),s=gv('rp-sku').toLowerCase();return P.filter(function(e){return(!f||e.date>=f)&&(!t||e.date<=t)&&(!s||e.sku.toLowerCase().includes(s)||e.product.toLowerCase().includes(s));});}
+function grk(){var f=gv('rp-from'),t=gv('rp-to'),s=gv('rp-sku').toLowerCase();return K.filter(function(e){return(!f||e.date>=f)&&(!t||e.date<=t)&&(!s||e.sku.toLowerCase().includes(s));});}
+
+// Generate an auto-comment for a batch based on variances
+function tripComment(prod,pack){
+  var issues=[],goods=[];
+  var sv=prod.var_stamp,pv=pack?pack.var_pack:null;
+  if(sv===0)goods.push('stamps match production exactly');else if(sv>0)issues.push(sv+' more stamps issued than produced — possible waste or miscount');else issues.push(Math.abs(sv)+' fewer stamps than produced — possible undercount or shortage');
+  if(!pack){issues.push('no packaging entry found — cannot evaluate pack variance');}
+  else if(pv===0)goods.push('packaging net usage matches production exactly');
+  else if(pv!==null&&pv>0)issues.push(pv+' more packs used than produced — check returns/damages');
+  else if(pv!==null&&pv<0)issues.push(Math.abs(pv)+' fewer packs used than produced — possible undercount');
+  if(pack&&pack.packDamaged>0)issues.push(pack.packDamaged+' units damaged during packaging ('+((pack.packDamaged/((pack.packIssued||0)+(pack.packIssued2||0))*100)||0).toFixed(1)+'% of issued)');
+  if(pack&&pack.packReturned>0)goods.push(pack.packReturned+' units returned to store (efficient)');
+  var status=issues.length===0?'good':issues.length<=1?'warn':'bad';
+  var txt=issues.length===0?'✅ All three criteria balanced — no issues detected.':'⚠ '+issues.join('. ')+'.';
+  if(goods.length&&issues.length)txt+=' ✓ '+goods.join('. ')+'.';
+  return{status:status,text:txt,issues:issues.length,goods:goods.length};
+}
+
+function buildReport(){
+  var prods=grp(),packs=grk();
+  var el=document.getElementById('report-out');
+  if(!prods.length&&!packs.length){el.innerHTML='<div class="empty">No records match the filters.</div>';return;}
+  var from=gv('rp-from'),to=gv('rp-to'),skuf=gv('rp-sku');
+  var now=new Date().toLocaleDateString('en-UG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  // Update print meta
+  document.getElementById('ph-rep-type').textContent={triple:'Triple Analysis Report',full:'Full Report',production:'Production Report',stamps:'Stamps Report',packaging:'Packaging Report',variance:'Variance Report',supplier:'Supplier Analysis',damage:'Damage Analysis',litreage:'Litreage Analysis'}[CRT]||'Report';
+  document.getElementById('ph-rep-meta').textContent=(from||'All dates')+' → '+(to||'present')+(skuf?' · '+skuf:'')+' · Generated: '+now;
+
+  var html='<div class="card print-card" id="rpt-content">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--co-xl)">'
+    +'<div><div style="font-family:\'Fraunces\',serif;font-size:20px;font-weight:800;color:var(--co);letter-spacing:-.02em">'+(document.getElementById('ph-rep-type').textContent)+'</div>'
+    +'<div style="font-size:11px;color:var(--mu);font-family:\'DM Mono\',monospace;margin-top:3px">SEWECO Industrial Coatings Limited · '+(from||'All dates')+(to?' → '+to:'')+(skuf?' · '+skuf:'')+'</div>'
+    +'<div style="font-size:11px;color:var(--mu2);font-family:\'DM Mono\',monospace">'+prods.length+' production · '+packs.length+' packaging entries</div></div>'
+    +'<div style="font-size:10px;color:var(--mu);font-family:\'DM Mono\',monospace;text-align:right">'+now+'</div></div>';
+
+  // ── TRIPLE ANALYSIS ──────────────────────────────
+  if(CRT==='triple'){
+    var tp=prods.reduce(function(s,e){return s+e.prodqty;},0);
+    var tn=prods.reduce(function(s,e){return s+e.stampsNet;},0);
+    var pn=packs.reduce(function(s,e){return s+e.packNet;},0);
+    var pi=packs.reduce(function(s,e){return s+(e.packIssued||0)+(e.packIssued2||0);},0);
+    var pd=packs.reduce(function(s,e){return s+e.packDamaged;},0);
+    var overallMatch=tp>0&&Math.abs(tn-tp)<=2&&Math.abs(pn-tp)<=2;
+    html+='<div class="rsec">Triple Analysis — Production vs Stamps vs Packaging</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">'
+      +'<div class="trip-col"><div class="trip-col-head c">⚡ Production</div><div class="trip-row"><span>Units Produced</span><span>'+tp+'</span></div><div class="trip-row"><span>Entries</span><span>'+prods.length+'</span></div><div class="trip-row"><span>Linked to Pack</span><span>'+prods.filter(function(e){return packs.some(function(p){return p.batch===e.batch&&p.sku===e.sku;});}).length+'</span></div></div>'
+      +'<div class="trip-col"><div class="trip-col-head s">🏷 Stamps</div><div class="trip-row"><span>Net Stamps</span><span>'+tn+'</span></div><div class="trip-row"><span>vs Produced</span><span style="color:'+(tn===tp?'var(--gn)':'var(--rd)');'">'+(tn===tp?'✓ Match':(tn>tp?'+':'')+(tn-tp))+'</span></div><div class="trip-row"><span>Total Issued</span><span>'+prods.reduce(function(s,e){return s+(e.stamps1||0)+(e.stamps2||0);},0)+'</span></div></div>'
+      +'<div class="trip-col"><div class="trip-col-head p">📦 Packaging</div><div class="trip-row"><span>Net Pack Used</span><span>'+pn+'</span></div><div class="trip-row"><span>vs Produced</span><span style="color:'+(pn===tp?'var(--gn)':'var(--rd)');'">'+(pn===tp?'✓ Match':(pn>tp?'+':'')+(pn-tp))+'</span></div><div class="trip-row"><span>Damaged</span><span style="color:var(--rd)">'+pd+'</span></div></div>'
+      +'</div>'
+      +'<div style="background:'+(overallMatch?'var(--gn-xl)':'var(--or-xl)')+';border:1px solid '+(overallMatch?'rgba(22,163,74,.2)':'rgba(234,88,12,.2)')+';border-radius:var(--rs);padding:10px 14px;font-size:12px;color:'+(overallMatch?'var(--gn)':'var(--or)')+';margin-bottom:14px;line-height:1.7">'
+      +(overallMatch?'<strong>✅ Overall Balance:</strong> Production, stamps and packaging are all within tolerance across this period.'
+        :'<strong>⚠ Overall Balance:</strong> There are discrepancies between production, stamps and/or packaging in this period. Review individual batch cards below for details.')
+      +'</div>';
+    // Per-batch cards
+    html+='<div class="rsec">Per-Batch Breakdown</div>';
+    var batchMap={};
+    prods.forEach(function(prod){
+      var k=prod.batch+'||'+prod.sku;
+      if(!batchMap[k])batchMap[k]={prod:prod,pack:null};
+      else batchMap[k].prod=prod;
+    });
+    packs.forEach(function(pack){
+      var k=pack.batch+'||'+pack.sku;
+      if(!batchMap[k])batchMap[k]={prod:null,pack:pack};
+      else batchMap[k].pack=pack;
+    });
+    Object.values(batchMap).forEach(function(row){
+      if(!row.prod)return; // skip orphan packs
+      var prod=row.prod,pack=row.pack;
+      var com=tripComment(prod,pack);
+      html+='<div class="trip-card '+com.status+'">'
+        +'<div class="trip-head"><div><div class="trip-name">'+esc(prod.product)+'</div><div class="trip-batch">Batch: '+esc(prod.batch)+' · SKU: '+esc(prod.sku)+' · Date: '+esc(prod.date||'—')+'</div></div>'
+        +'<div style="display:flex;gap:6px;flex-wrap:wrap">'+(pack?'<span class="b btl">⛓ Linked</span>':'<span class="b bw">⚠ No pack entry</span>')+'<span class="b bbl">Produced: '+prod.prodqty+'</span></div></div>'
+        +'<div class="trip-grid">'
+        // Production column
+        +'<div class="trip-col"><div class="trip-col-head c">⚡ Production</div>'
+        +'<div class="trip-row"><span>Qty Produced</span><span>'+prod.prodqty+'</span></div>'
+        +'<div class="trip-row"><span>Supervisor</span><span style="font-size:11px">'+esc(prod.supervisor||'—')+'</span></div>'
+        +'<div class="trip-row"><span>Date</span><span>'+esc(prod.date||'—')+'</span></div></div>'
+        // Stamps column
+        +'<div class="trip-col"><div class="trip-col-head s">🏷 Stamps</div>'
+        +'<div class="trip-row"><span>Issued 1</span><span>'+(prod.stamps1||0)+'</span></div>'
+        +'<div class="trip-row"><span>Issued 2</span><span>'+(prod.stamps2||0)+'</span></div>'
+        +'<div class="trip-row"><span>Returned</span><span>'+(prod.stampsRet||0)+'</span></div>'
+        +'<div class="trip-row"><span>Net Stamps</span><span><strong>'+prod.stampsNet+'</strong></span></div>'
+        +'<div class="trip-row"><span>Variance</span><span>'+vb(prod.var_stamp)+'</span></div></div>'
+        // Packaging column
+        +'<div class="trip-col"><div class="trip-col-head p">📦 Packaging</div>'
+        +(pack
+          ?'<div class="trip-row"><span>Issued 1</span><span>'+(pack.packIssued||0)+'</span></div>'
+           +'<div class="trip-row"><span>Issued 2</span><span>'+(pack.packIssued2||0)+'</span></div>'
+           +'<div class="trip-row"><span>Returned</span><span style="color:var(--tl)">'+(pack.packReturned||0)+'</span></div>'
+           +'<div class="trip-row"><span>Damaged</span><span style="color:var(--rd)">'+(pack.packDamaged||0)+'</span></div>'
+           +'<div class="trip-row"><span>Net Used</span><span><strong>'+pack.packNet+'</strong></span></div>'
+           +'<div class="trip-row"><span>Supplier</span><span style="font-size:10px">'+esc(pack.supplier||'—')+'</span></div>'
+           +(pack.packmat2?'<div class="trip-row" style="color:var(--tl-d)"><span>Mat 2</span><span style="font-size:10px">'+esc(pack.packmat2)+'</span></div>':'')
+           +(pack.packmat2?'<div class="trip-row"><span>Iss M2</span><span>'+(pack.packIssued_m2||0)+'</span></div>':'')
+           +'<div class="trip-row"><span>Variance</span><span>'+vb(pack.var_pack)+'</span></div>'
+          :'<div style="font-size:11px;color:var(--mu);padding:4px 0">No packaging entry found for this batch.</div>')
+        +'</div></div>'
+        +'<div class="trip-comment '+(com.status==='good'?'good':com.status==='bad'?'bad':'')+'">'
+        +'<strong>Analysis:</strong> '+com.text
+        +(prod.var_reason?'<br><strong>Recorded reason:</strong> '+esc(prod.var_reason):'')
+        +'</div></div>';
+    });
+  }
+
+  // ── FULL + other types ────────────────────────────────
+  if(CRT==='full'||CRT==='production'){
+    var tp2=prods.reduce(function(s,e){return s+e.prodqty;},0);
+    html+='<div class="rsec">Production Summary</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px"><div class="rm"><div class="lbl">Total Produced</div><div class="val">'+tp2.toLocaleString()+'</div></div><div class="rm"><div class="lbl">Entries</div><div class="val">'+prods.length+'</div></div><div class="rm"><div class="lbl">Linked to Pack</div><div class="val">'+prods.filter(function(e){return packs.some(function(p){return p.batch===e.batch&&p.sku===e.sku;});}).length+'</div></div><div class="rm"><div class="lbl">With Variances</div><div class="val" style="color:var(--rd)">'+prods.filter(function(e){return e.var_stamp!==0;}).length+'</div></div></div>'+rtProd(prods);
+  }
+  if(CRT==='full'||CRT==='stamps'){
+    var t1=prods.reduce(function(s,e){return s+(e.stamps1||0);},0),t2=prods.reduce(function(s,e){return s+(e.stamps2||0);},0),tr=prods.reduce(function(s,e){return s+(e.stampsRet||0);},0),tsn=prods.reduce(function(s,e){return s+e.stampsNet;},0);
+    html+='<div class="rsec">Stamps Summary</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px"><div class="rm"><div class="lbl">Issued 1</div><div class="val">'+t1+'</div></div><div class="rm"><div class="lbl">Issued 2</div><div class="val">'+t2+'</div></div><div class="rm"><div class="lbl">Returned</div><div class="val">'+tr+'</div></div><div class="rm"><div class="lbl">Net Stamps</div><div class="val">'+tsn+'</div></div></div>';
+    if(CRT==='stamps')html+=rtStamps(prods);
+  }
+  if(CRT==='full'||CRT==='packaging'){
+    var pi2=packs.reduce(function(s,e){return s+(e.packIssued||0);},0),pi22=packs.reduce(function(s,e){return s+(e.packIssued2||0);},0),pr2=packs.reduce(function(s,e){return s+e.packReturned;},0),pd2=packs.reduce(function(s,e){return s+e.packDamaged;},0),pn2=packs.reduce(function(s,e){return s+e.packNet;},0);
+    html+='<div class="rsec">Packaging Summary</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px"><div class="rm"><div class="lbl">Issued 1</div><div class="val">'+pi2+'</div></div><div class="rm"><div class="lbl">Issued 2</div><div class="val">'+pi22+'</div></div><div class="rm"><div class="lbl" style="color:var(--tl)">Returned</div><div class="val" style="color:var(--tl)">'+pr2+'</div></div><div class="rm"><div class="lbl" style="color:var(--rd)">Damaged</div><div class="val" style="color:var(--rd)">'+pd2+'</div></div><div class="rm"><div class="lbl">Net Used</div><div class="val">'+pn2+'</div></div></div>';
+    if(CRT==='packaging')html+=rtPack(packs);
+  }
+  if(CRT==='full')html+=rtPack(packs);
+  if(CRT==='variance'){var vi=prods.filter(function(e){return e.var_stamp!==0;});html+=rtVar(vi,packs);}
+  if(CRT==='supplier'){
+    var sup={};
+    packs.forEach(function(e){
+      // Primary material supplier
+      var s=e.supplier||'(Unknown)';
+      if(!sup[s])sup[s]={iss:0,iss2:0,ret:0,dmg:0,net:0,n:0,mats:[]};
+      sup[s].iss+=e.packIssued||0;sup[s].iss2+=e.packIssued2||0;sup[s].ret+=e.packReturned;sup[s].dmg+=e.packDamaged;sup[s].net+=e.packNet;sup[s].n++;
+      if(e.packmat&&!sup[s].mats.includes(e.packmat))sup[s].mats.push(e.packmat);
+      // Secondary material supplier
+      if(e.packmat2){
+        var s2=e.supplier2||'(Unknown — Mat2)';
+        if(!sup[s2])sup[s2]={iss:0,iss2:0,ret:0,dmg:0,net:0,n:0,mats:[]};
+        sup[s2].iss+=e.packIssued_m2||0;sup[s2].ret+=e.packReturned_m2||0;sup[s2].dmg+=e.packDamaged_m2||0;sup[s2].net+=(e.packIssued_m2||0)-(e.packReturned_m2||0)-(e.packDamaged_m2||0);sup[s2].n++;
+        if(!sup[s2].mats.includes(e.packmat2))sup[s2].mats.push(e.packmat2);
+      }
+    });
+    var sr=Object.keys(sup).sort().map(function(s){return'<tr><td><strong>'+esc(s)+'</strong></td><td>'+sup[s].n+'</td><td>'+sup[s].iss+'</td><td>'+sup[s].iss2+'</td><td style="color:var(--tl)">'+sup[s].ret+'</td><td style="color:var(--rd)">'+sup[s].dmg+'</td><td><strong>'+sup[s].net+'</strong></td><td style="font-size:11px;color:var(--mu)">'+esc(sup[s].mats.slice(0,3).join(', '))+'</td></tr>';}).join('');
+    html+='<div class="rsec">Supplier Analysis</div><div class="tws"><table><thead><tr><th>Supplier</th><th>Entries</th><th>Issued 1</th><th>Issued 2</th><th>Returned</th><th>Damaged</th><th>Net Used</th><th>Materials</th></tr></thead><tbody>'+sr+'</tbody></table></div>';
+  }
+  if(CRT==='damage'){
+    var ti2=packs.reduce(function(s,e){return s+(e.packIssued||0)+(e.packIssued2||0);},0),td2=packs.reduce(function(s,e){return s+e.packDamaged;},0);
+    var dr=ti2>0?((td2/ti2)*100).toFixed(2):0;
+    html+='<div class="rsec">Damage Analysis</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px"><div class="rm"><div class="lbl">Total Issued</div><div class="val">'+ti2+'</div></div><div class="rm"><div class="lbl" style="color:var(--rd)">Total Damaged</div><div class="val" style="color:var(--rd)">'+td2+'</div></div><div class="rm"><div class="lbl">Damage Rate</div><div class="val" style="color:'+(parseFloat(dr)>2?'var(--rd)':'var(--gn)')+'">'+dr+'%</div></div></div>';
+    var mat={};packs.filter(function(e){return e.packDamaged>0;}).forEach(function(e){var m=e.packmat||'(Unknown)';if(!mat[m])mat[m]={dmg:0,iss:0};mat[m].dmg+=e.packDamaged;mat[m].iss+=(e.packIssued||0)+(e.packIssued2||0);});
+    var mr=Object.keys(mat).sort(function(a,b){return mat[b].dmg-mat[a].dmg;}).map(function(m){var rate=mat[m].iss>0?((mat[m].dmg/mat[m].iss)*100).toFixed(1):'—';return'<tr><td>'+esc(m)+'</td><td>'+mat[m].iss+'</td><td style="color:var(--rd)"><strong>'+mat[m].dmg+'</strong></td><td style="color:'+(parseFloat(rate)>2?'var(--rd)':'var(--gn)')+'"><strong>'+rate+'%</strong></td></tr>';}).join('');
+    if(mr)html+='<div class="tws"><table><thead><tr><th>Material</th><th>Total Issued</th><th>Total Damaged</th><th>Damage Rate</th></tr></thead><tbody>'+mr+'</tbody></table></div>';
+  }
+
+  if(CRT==='litreage'){
+    var ltEntries=prods; // already filtered
+    var ltAgg=aggLitre(ltEntries);
+    var totalL=ltAgg.total;
+    var activeCatsR=CAT_ORDER.filter(function(c){return ltAgg.cats[c]>0;});
+    html+='<div class="rsec">Litreage Summary</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">'
+      +'<div class="rm"><div class="lbl">Total Litreage</div><div class="val">'+(totalL>=1000?(totalL/1000).toFixed(2)+'K':totalL.toFixed(2))+'<span style="font-size:12px;font-weight:500"> L</span></div></div>'
+      +'<div class="rm"><div class="lbl">Total Units Produced</div><div class="val">'+ltEntries.reduce(function(s,e){return s+e.prodqty;},0).toLocaleString()+'</div></div>'
+      +'<div class="rm"><div class="lbl">Active Categories</div><div class="val">'+activeCatsR.length+'</div></div>'
+      +'</div>';
+    // Category breakdown
+    html+='<div class="rsec">Litreage by Category</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px">'
+      +activeCatsR.map(function(cat){
+        var litres=ltAgg.cats[cat]||0;
+        var pct=totalL>0?Math.round((litres/totalL)*100):0;
+        var col=CAT_COLORS[cat]||'#64748b';
+        return'<div class="rm" style="border-top:2px solid '+col+'">'
+          +'<div class="lbl" style="color:'+col+'">'+esc(cat)+'</div>'
+          +'<div class="val" style="color:'+col+'">'+litres.toFixed(1)+'<span style="font-size:12px;font-weight:500"> L</span></div>'
+          +'<div style="font-size:10px;color:var(--mu)">'+pct+'% · '+ltEntries.filter(function(e){return getCategory(e.sku,e.product)===cat;}).length+' entries</div>'
+          +'</div>';
+      }).join('')
+      +'</div>';
+    // Detail table
+    html+='<div class="rsec">Litreage Detail</div><div class="tws"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Units</th><th>× Mult.</th><th>Total Litres</th><th>Category</th><th>Supervisor</th><th>Personnel</th></tr></thead><tbody>'
+      +ltEntries.map(function(e){var col=CAT_COLORS[getCategory(e.sku,e.product)]||'#64748b';return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td><strong>'+esc(e.product)+'</strong></td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td class="mono">×'+getLitreSize(e.sku)+'</td><td style="font-weight:700;color:'+col+'">'+getEntryLitres(e).toFixed(2)+' L</td><td><span style="font-size:10px;padding:2px 7px;border-radius:12px;background:'+col+'22;color:'+col+';font-weight:700">'+esc(getCategory(e.sku,e.product))+'</span></td><td>'+esc(e.supervisor||'—')+'</td><td style="font-size:11px">'+esc(e.personnel||'—')+'</td></tr>';}).join('')
+      +'</tbody></table></div>';
+  }
+
+  html+='</div>';el.innerHTML=html;
+  // Append signature footer (only visible when printing)
+  var sigHTML='<div class="print-sig" id="print-sig-block">'
+    +'<div class="print-sig-side">'
+    +'<span class="print-sig-label">Compiled By:</span>'
+    +'<span class="print-sig-line"></span>'
+    +'<span class="print-sig-name">Name &amp; Designation</span>'
+    +'<div style="margin-top:18pt">'
+    +'<span class="print-sig-label">Signature:</span>'
+    +'<span class="print-sig-line"></span>'
+    +'<span class="print-sig-name">Sign &amp; Date</span>'
+    +'</div></div>'
+    +'<div class="print-sig-side" style="text-align:right">'
+    +'<span class="print-sig-label">Received By:</span>'
+    +'<span class="print-sig-line"></span>'
+    +'<span class="print-sig-name">Name &amp; Designation</span>'
+    +'<div style="margin-top:18pt">'
+    +'<span class="print-sig-label">Signature:</span>'
+    +'<span class="print-sig-line"></span>'
+    +'<span class="print-sig-name">Sign &amp; Date</span>'
+    +'</div></div></div>';
+  el.insertAdjacentHTML('beforeend',sigHTML);
+}
+
+function rtProd(items){var r=items.map(function(e){return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td><strong>'+esc(e.product)+'</strong></td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td>'+e.stampsNet+'</td><td>'+vb(e.var_stamp)+'</td><td>'+esc(e.supervisor||'—')+'</td><td style="font-size:11px;color:var(--ink2)">'+esc(e.personnel||'—')+'</td><td style="font-size:11px;color:var(--mu)">'+esc(e.var_reason||'—')+'</td></tr>';}).join('');return'<div class="rsec">Production Detail</div><div class="tws"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Produced</th><th>Net Stamps</th><th>Stamp Var.</th><th>Supervisor</th><th>Personnel on Run</th><th>Variance Reason</th></tr></thead><tbody>'+r+'</tbody></table></div>';}
+function rtStamps(items){var r=items.map(function(e){return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+esc(e.reelno||'—')+'</td><td>'+(e.stamps1||0)+'</td><td>'+(e.stamps2||0)+'</td><td>'+(e.stampsRet||0)+'</td><td><strong>'+e.stampsNet+'</strong></td><td>'+vb(e.var_stamp)+'</td></tr>';}).join('');return'<div class="rsec">Stamps Detail</div><div class="tws"><table><thead><tr><th>Date</th><th>Product</th><th>SKU</th><th>Batch</th><th>Reel No.</th><th>Stamps 1</th><th>Stamps 2</th><th>Returned</th><th>Net</th><th>Variance</th></tr></thead><tbody>'+r+'</tbody></table></div>';}
+function rtPack(items){var r=items.map(function(e){return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+esc(e.packmat||'—')+'</td><td>'+esc(e.supplier||'—')+'</td><td>'+(e.packIssued||0)+'</td><td>'+(e.packIssued2||0)+'</td><td style="color:var(--tl)">'+e.packReturned+'</td><td style="color:var(--rd)">'+e.packDamaged+'</td><td><strong>'+e.packNet+'</strong></td><td>'+(e.var_pack!==null?vb(e.var_pack):'<span class="b bgr">—</span>')+'</td><td>'+esc(e.packby||'—')+'</td><td style="font-size:11px;color:var(--ink2)">'+esc(e.personnel||'—')+'</td>'+(e.packmat2?'<td style="color:var(--tl-d)">'+esc(e.packmat2)+'</td><td>'+esc(e.supplier2||'—')+'</td><td>'+(e.packIssued_m2||0)+'</td><td style="color:var(--tl)">'+(e.packReturned_m2||0)+'</td><td style="color:var(--rd)">'+(e.packDamaged_m2||0)+'</td><td>'+esc(e.packby2||'—')+'</td>':'<td colspan="6" style="color:var(--mu);font-style:italic;font-size:11px">—</td>')+'</tr>';}).join('');return'<div class="rsec">Packaging Detail</div><div class="tws"><table><thead><tr><th>Date</th><th>SKU</th><th>Batch</th><th>Material 1</th><th>Supplier 1</th><th>Iss 1</th><th>Iss 2</th><th>Ret.</th><th>Dmg.</th><th>Net Used</th><th>Variance</th><th>Issued By</th><th>Personnel Using</th><th>Material 2</th><th>Supplier 2</th><th>Iss M2</th><th>Ret M2</th><th>Dmg M2</th><th>Issued By M2</th></tr></thead><tbody>'+r+'</tbody></table></div>';}
+function rtVar(prods,packs){var r=prods.map(function(e){var pk=packs.find(function(p){return p.batch===e.batch&&p.sku===e.sku;});return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td>'+esc(e.product)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+e.prodqty+'</td><td>'+vb(e.var_stamp)+'</td><td>'+(pk?vb(pk.var_pack):'<span class="b bgr">No pack</span>')+'</td><td style="font-size:11px;color:var(--mu)">'+esc(e.var_reason||'—')+'</td></tr>';}).join('');return'<div class="tws"><table><thead><tr><th>Date</th><th>Product</th><th>Batch</th><th>Produced</th><th>Stamp Var.</th><th>Pack Var.</th><th>Reason</th></tr></thead><tbody>'+r+'</tbody></table></div>';}
+
+function printRep(){
+  if(!document.getElementById('report-out').innerHTML.trim()){toast('Generate a report first then print.','twn');return;}
+  document.getElementById('ph-rep').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('ph-rep').style.display='none';},1500);
+}
+function printDash(){
+  document.getElementById('ph-dash-meta').textContent='Generated: '+new Date().toLocaleDateString('en-UG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('ph-dash').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('ph-dash').style.display='none';},1500);
+}
+
+// ══════════════════════════════════════════════════════════
+//  CSV / JSON
+// ══════════════════════════════════════════════════════════
+function cr(arr){return arr.map(function(v){return'"'+String(v===undefined||v===null?'':v).replace(/"/g,'""')+'"';}).join(',');}
+function dlCSV(csv,fname){var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=fname;a.click();toast('CSV downloaded.');}
+function exportCSV(){var prods=grp(),packs=grk();if(!prods.length&&!packs.length){toast('No records.','ter');return;}var h1=['Date','Product','SKU','Batch','Produced','Stamps1','Stamps2','StampsRet','StampsNet','ReelNo','StampBy','StampVar','Supervisor','Personnel','Notes','VarReason'],r1=prods.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stamps1,e.stamps2,e.stampsRet,e.stampsNet,e.reelno,e.stampby,e.var_stamp,e.supervisor,e.personnel,e.notes,e.var_reason]);});var h2=['Date','SKU','Batch','Material1','Supplier1','Issued1','Issued2','Returned','Damaged','NetUsed','PackRef','IssuedBy','PackVar','Personnel','Notes','Material2','Supplier2','IssuedM2','ReturnedM2','DamagedM2','IssuedByM2'],r2=packs.map(function(e){return cr([e.date,e.sku,e.batch,e.packmat,e.supplier,e.packIssued,e.packIssued2||0,e.packReturned,e.packDamaged,e.packNet,e.packref,e.packby,e.var_pack,e.personnel,e.notes,e.packmat2||'',e.supplier2||'',e.packIssued_m2||0,e.packReturned_m2||0,e.packDamaged_m2||0,e.packby2||'']);});dlCSV('SEWECO Industrial Coatings Limited\n\nPRODUCTION ENTRIES\n'+[h1.join(',')].concat(r1).join('\n')+'\n\nPACKAGING ENTRIES\n'+[h2.join(',')].concat(r2).join('\n'),'SEWECO_report_'+today()+'.csv');}
+function exportAll(){if(!P.length&&!K.length){toast('No data.','ter');return;}var h1=['Date','Product','SKU','Batch','Produced','Stamps1','Stamps2','StampsRet','StampsNet','ReelNo','StampBy','StampVar','Supervisor','Personnel','Notes','VarReason'],r1=P.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stamps1||0,e.stamps2||0,e.stampsRet||0,e.stampsNet,e.reelno,e.stampby,e.var_stamp,e.supervisor,e.personnel,e.notes,e.var_reason]);});var h2=['Date','SKU','Batch','Material1','Supplier1','Issued1','Issued2','Returned','Damaged','NetUsed','PackRef','IssuedBy','PackVar','Personnel','Notes','Material2','Supplier2','IssuedM2','ReturnedM2','DamagedM2','IssuedByM2'],r2=K.map(function(e){return cr([e.date,e.sku,e.batch,e.packmat,e.supplier,e.packIssued,e.packIssued2||0,e.packReturned,e.packDamaged,e.packNet,e.packref,e.packby,e.var_pack,e.personnel,e.notes,e.packmat2||'',e.supplier2||'',e.packIssued_m2||0,e.packReturned_m2||0,e.packDamaged_m2||0,e.packby2||'']);});dlCSV('SEWECO Industrial Coatings Limited\nFull Data Export\n\nPRODUCTION ENTRIES\n'+[h1.join(',')].concat(r1).join('\n')+'\n\nPACKAGING ENTRIES\n'+[h2.join(',')].concat(r2).join('\n'),'SEWECO_all_'+today()+'.csv');}
+function exportJSON(){var a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({company:'SEWECO Industrial Coatings Limited',exported:new Date().toISOString(),version:'3.1',DB_PROD:P,DB_PACK:K,LISTS:LISTS,LT_OV:LT_OV},null,2));a.download='SEWECO_backup_'+today()+'.json';a.click();toast('Backup downloaded.');}
+
+// ── IMPORT with drag-and-drop support
+function importData(){var inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=function(ev){processImport(ev.target.files[0]);};inp.click();}
+function processImport(file){if(!file)return;if(!confirm('Import this backup? This will replace all current data with the data in the file. This cannot be undone.'))return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.DB_PROD)P=d.DB_PROD;if(d.DB_PACK)K=d.DB_PACK;if(d.DB&&!d.DB_PROD)P=d.DB;if(d.LT_OV)LT_OV=d.LT_OV;['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS&&d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];else LISTS[k]=DL[k].slice();});sprod();spack();slists();renderAllLists();updateHdr();toast('✓ Data imported successfully — '+P.length+' prod, '+K.length+' pack entries.','tgn');}catch(ex){console.error(ex);toast('Error reading file. Check it is a valid SEWECO backup.','ter');}};reader.readAsText(file);}
+function dzOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('drag');}
+function dzLeave(){document.getElementById('dropzone').classList.remove('drag');}
+function dzDrop(e){e.preventDefault();dzLeave();var files=e.dataTransfer.files;if(files[0])processImport(files[0]);}
+
+function clearAll(){if(!confirm('Delete ALL data for SEWECO Production Tracker? This cannot be undone.'))return;P=[];K=[];sprod();spack();updateHdr();toast('All data cleared.','twn');}
+
+// ── SETTINGS LISTS ──────────────────────────────────────
+function addL(key,iid,eid){var v=document.getElementById(iid).value.trim();if(!v)return;if(LISTS[key].includes(v)){toast('Already in list.');return;}LISTS[key].push(v);slists();document.getElementById(iid).value='';renderAllLists();toast('Added.');}
+function removeL(key,val){LISTS[key]=LISTS[key].filter(function(x){return x!==val;});slists();renderAllLists();toast('Removed.');}
+function renderAllLists(){var map={personnel:'lst-person',packaging:'lst-pack',skus:'lst-sku',products:'lst-product',suppliers:'lst-supplier'};['personnel','packaging','skus','products','suppliers'].forEach(function(k){var el=document.getElementById(map[k]);if(!el)return;if(!LISTS[k].length){el.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">No items yet.</div>';return;}el.innerHTML=LISTS[k].map(function(x){return'<div class="li"><span>'+esc(x)+'</span><button class="btn-d" onclick="removeL(\''+k+'\',\''+esc(x)+'\')">Remove</button></div>';}).join('');});}
+
+// ── HEADER ──────────────────────────────────────────────
+function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textContent=P.length+' prod · '+K.length+' pack';if(SV_MODE){document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';}}
+
+// ══════════════════════════════════════════════════════════
+//  INIT — password check on load
+// ══════════════════════════════════════════════════════════
+(function init(){
+  sv2('e-date',today());sv2('p-date',today());
+  document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-UG',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  updateHdr();renderAllLists();
+  // Password check
+  var stored=getPwHash();
+  if(!stored){
+    document.getElementById('login-first-msg').style.display='block';
+    document.getElementById('login-btn-text').textContent='Set Password & Enter';
+  } else {
+    document.getElementById('login-first-msg').style.display='none';
+    document.getElementById('login-btn-text').textContent='Unlock Application';
+  }
+  document.getElementById('pw-input').focus();
+  // Server mode reconnect
+  if(SV_MODE){serverLoad().then(function(ok){if(ok){renderAllLists();document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';document.getElementById('sv-url').value=SV_URL;}});}
+  go('dashboard');
+})();
+</script>
+</body>
+</html>
