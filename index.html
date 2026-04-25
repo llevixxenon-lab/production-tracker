@@ -2212,34 +2212,73 @@ function calcNet(){sv2('p-net',Math.max(0,ni(gv('p-issued'))+ni(gv('p-issued2'))
 // ══════════════════════════════════════════════════════════
 //  SERVER
 // ══════════════════════════════════════════════════════════
-async function serverLoad(){try{var r=await fetch(SV_URL+'/api/data');if(!r.ok)throw'err';var d=await r.json();P=d.DB_PROD||[];K=d.DB_PACK||[];if(d.LISTS)['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];});slists();updateHdr();document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';document.getElementById('sv-full-status').textContent='Connected: '+SV_URL;return true;}catch(e){SV_MODE=false;SV_URL='';document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';return false;}}
+async function serverLoad(){try{var r=await fetch(SV_URL+'/api/data',{cache:'no-store'});if(!r.ok)throw'err';var d=await r.json();P=d.DB_PROD||[];K=d.DB_PACK||[];if(d.LISTS)['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];});slists();updateHdr();document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';document.getElementById('sv-full-status').textContent='Connected: '+SV_URL;document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';return true;}catch(e){/* Do NOT wipe SV_URL or SV_MODE here — caller decides what to do */document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';return false;}}
 async function sPost(path,data){if(!SV_MODE)return null;try{var r=await fetch(SV_URL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return await r.json();}catch(e){return null;}}
 async function sDel(path){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'DELETE'});}catch(e){}}
 async function sPatch(path,data){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}}
 async function autoConnect(){
-  // Auto-detect server URL from current page origin, or use stored URL
-  var stored=localStorage.getItem('spt_svurl');
-  SV_URL = stored || window.location.origin;
-  // If running from file:// (local file open), use localhost:3000
-  if(SV_URL.startsWith('file://')||SV_URL==='null'||!SV_URL){SV_URL='http://localhost:3000';}
-  SV_MODE=true;
-  localStorage.setItem('spt_svurl',SV_URL);
-  document.getElementById('sv-url').value=SV_URL;
+  // Always derive server URL from how the page was actually opened
+  // This is the most reliable method — if you opened via http://192.168.x.x:3000
+  // then window.location.origin IS the server address, no guessing needed
+  var origin = window.location.origin;
+  if(origin && !origin.startsWith('file://')){
+    SV_URL = origin;
+  } else {
+    // Fallback: page opened as a local file — try stored URL or localhost
+    var stored = localStorage.getItem('spt_svurl');
+    SV_URL = (stored && stored !== 'null') ? stored : 'http://localhost:3000';
+  }
+  SV_MODE = true;
+  localStorage.setItem('spt_svurl', SV_URL);
+  document.getElementById('sv-url').value = SV_URL;
+  var ok = await serverLoad();
+  if(ok){
+    document.getElementById('sv-toggle-btn').textContent = '🔌 Disconnect from Server';
+    toast('✓ Connected to server','tgn');
+    renderAllLists();
+  } else {
+    SV_MODE = false;
+    document.getElementById('sv-status').textContent = '● Local';
+    document.getElementById('sv-status').className = 'sv-pill sv-l';
+    document.getElementById('sv-full-status').textContent = '⚠ Server not reachable — check that node server.js is running';
+    document.getElementById('sv-toggle-btn').textContent = '🔌 Connect to Server';
+    toast('⚠ Server not reachable','ter');
+  }
+}
+window.addEventListener('load', autoConnect);
+
+async function toggleServer(){
+  if(SV_MODE){
+    // Disconnect
+    SV_MODE=false; SV_URL='';
+    localStorage.removeItem('spt_svurl');
+    document.getElementById('sv-status').textContent='● Local';
+    document.getElementById('sv-status').className='sv-pill sv-l';
+    document.getElementById('sv-full-status').textContent='Disconnected — using local mode';
+    document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';
+    toast('Disconnected from server');
+    return;
+  }
+  // Connect — use the URL in the input box, or fall back to page origin
+  var url=document.getElementById('sv-url').value.trim().replace(/\/$/,'');
+  if(!url) url = window.location.origin;
+  SV_URL = url;
+  SV_MODE = true;
+  localStorage.setItem('spt_svurl', SV_URL);
+  document.getElementById('sv-full-status').textContent='Connecting to '+SV_URL+' ...';
   var ok=await serverLoad();
   if(ok){
     document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';
     toast('✓ Connected to server','tgn');
+    renderAllLists();
   } else {
     SV_MODE=false;
-    document.getElementById('sv-status').textContent='● Local';
-    document.getElementById('sv-status').className='sv-pill sv-l';
-    document.getElementById('sv-full-status').textContent='⚠ Server not reachable — data will not be saved until server is running';
-    toast('⚠ Server not reachable — start server.js','ter');
+    // Keep SV_URL in the box so user can see what failed
+    document.getElementById('sv-full-status').textContent='⚠ Cannot reach: '+SV_URL+' — is node server.js running?';
+    document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';
+    toast('⚠ Cannot reach server — check URL and that server.js is running','ter');
   }
 }
-window.addEventListener('load',autoConnect);
-
-async function toggleServer(){var url=document.getElementById('sv-url').value.trim().replace(/\/$/,'');if(SV_MODE){SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';document.getElementById('sv-full-status').textContent='Using browser localStorage (local mode)';document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';toast('Disconnected — local mode');return;}SV_URL=url;SV_MODE=true;localStorage.setItem('spt_svurl',SV_URL);document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';var ok=await serverLoad();if(ok){toast('✓ Connected to server','ttl');renderAllLists();}else{toast('⚠ Cannot reach server','twn');SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';}}
 
 // ══════════════════════════════════════════════════════════
 //  SAVE PRODUCTION
@@ -2991,11 +3030,20 @@ function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textC
     document.getElementById('login-btn-text').textContent='Unlock Application';
   }
   document.getElementById('pw-input').focus();
-  // Auto-sync every 5 seconds to keep data fresh across all connected devices
+  // Auto-sync every 5 seconds — silently re-connects if server comes back
   setInterval(async function(){
     if(SV_MODE){
       var ok=await serverLoad();
-      if(!ok){SV_MODE=false;updateHdr();document.getElementById('sv-full-status').textContent='⚠ Server connection lost — trying to reconnect...';}
+      if(!ok){updateHdr();document.getElementById('sv-full-status').textContent='⚠ Server connection lost — retrying...';}
+    } else {
+      // If not in server mode but page was opened via http, try to reconnect quietly
+      var origin=window.location.origin;
+      if(origin && !origin.startsWith('file://')){
+        SV_URL=origin; SV_MODE=true;
+        var ok=await serverLoad();
+        if(ok){document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';renderAllLists();}
+        else{SV_MODE=false;}
+      }
     }
   },5000);
   go('dashboard');
