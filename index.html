@@ -866,7 +866,7 @@ tr:hover td{background:#fafcff}
 
   <div class="card">
     <div class="card-title">💾 Data Management</div>
-    <div class="wb">Data is stored in <strong>this browser only</strong> in local mode. Export backups regularly.</div>
+    <div class="wb">Data is stored <strong>on the server</strong> (data.json). All computers connected to the same server share the same data in real-time. Export backups regularly.</div>
     <div class="btn-row" style="flex-direction:column;align-items:flex-start;gap:10px">
       <button class="btn-ol" onclick="exportAll()">📥 Export ALL records to CSV</button>
       <button class="btn-ol" onclick="exportJSON()">💾 Export full backup (JSON)</button>
@@ -2085,13 +2085,12 @@ var DL={
 var P=[],K=[],LISTS={personnel:[],packaging:[],skus:[],products:[],suppliers:[]};
 var SV_URL='',SV_MODE=false;
 
-try{var _p=localStorage.getItem('spt_prod');if(_p)P=JSON.parse(_p);}catch(e){}
-try{var _k=localStorage.getItem('spt_pack');if(_k)K=JSON.parse(_k);}catch(e){}
+// Production and packaging data always loaded from server — no localStorage fallback for data
 try{var _u=localStorage.getItem('spt_svurl');if(_u){SV_URL=_u;SV_MODE=!!_u;}}catch(e){}
 try{var _l=localStorage.getItem('spt_lists');if(_l){var sl=JSON.parse(_l);['personnel','packaging','skus','products','suppliers'].forEach(function(k){LISTS[k]=(sl[k]&&sl[k].length)?sl[k]:DL[k].slice();});}else{['personnel','packaging','skus','products','suppliers'].forEach(function(k){LISTS[k]=DL[k].slice();});localStorage.setItem('spt_lists',JSON.stringify(LISTS));}}catch(e){['personnel','packaging','skus','products','suppliers'].forEach(function(k){LISTS[k]=DL[k].slice();});}
 
-function sprod(){if(!SV_MODE)try{localStorage.setItem('spt_prod',JSON.stringify(P));}catch(e){}}
-function spack(){if(!SV_MODE)try{localStorage.setItem('spt_pack',JSON.stringify(K));}catch(e){}}
+function sprod(){/* data saved server-side only — no localStorage fallback */}
+function spack(){/* data saved server-side only — no localStorage fallback */}
 function slists(){try{localStorage.setItem('spt_lists',JSON.stringify(LISTS));}catch(e){}}
 
 // ══════════════════════════════════════════════════════════
@@ -2217,17 +2216,62 @@ async function serverLoad(){try{var r=await fetch(SV_URL+'/api/data');if(!r.ok)t
 async function sPost(path,data){if(!SV_MODE)return null;try{var r=await fetch(SV_URL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return await r.json();}catch(e){return null;}}
 async function sDel(path){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'DELETE'});}catch(e){}}
 async function sPatch(path,data){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}}
+async function autoConnect(){
+  // Auto-detect server URL from current page origin, or use stored URL
+  var stored=localStorage.getItem('spt_svurl');
+  SV_URL = stored || window.location.origin;
+  // If running from file:// (local file open), use localhost:3000
+  if(SV_URL.startsWith('file://')||SV_URL==='null'||!SV_URL){SV_URL='http://localhost:3000';}
+  SV_MODE=true;
+  localStorage.setItem('spt_svurl',SV_URL);
+  document.getElementById('sv-url').value=SV_URL;
+  var ok=await serverLoad();
+  if(ok){
+    document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';
+    toast('✓ Connected to server','tgn');
+  } else {
+    SV_MODE=false;
+    document.getElementById('sv-status').textContent='● Local';
+    document.getElementById('sv-status').className='sv-pill sv-l';
+    document.getElementById('sv-full-status').textContent='⚠ Server not reachable — data will not be saved until server is running';
+    toast('⚠ Server not reachable — start server.js','ter');
+  }
+}
+window.addEventListener('load',autoConnect);
+
 async function toggleServer(){var url=document.getElementById('sv-url').value.trim().replace(/\/$/,'');if(SV_MODE){SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';document.getElementById('sv-full-status').textContent='Using browser localStorage (local mode)';document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';toast('Disconnected — local mode');return;}SV_URL=url;SV_MODE=true;localStorage.setItem('spt_svurl',SV_URL);document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';var ok=await serverLoad();if(ok){toast('✓ Connected to server','ttl');renderAllLists();}else{toast('⚠ Cannot reach server','twn');SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';}}
 
 // ══════════════════════════════════════════════════════════
 //  SAVE PRODUCTION
 // ══════════════════════════════════════════════════════════
-async function saveProd(){var product=gv('e-product'),sku=gv('e-sku'),batch=gv('e-batch');if(!product||!sku||!batch){toast('Fill in Product Name, SKU and Batch Number.','ter');return;}var prodqty=ni(gv('e-prodqty')),s1=ni(gv('e-stamps')),s2=ni(gv('e-stamps2')),sr=ni(gv('e-stamps-ret')),snet=s1+s2-sr;var entry={id:Date.now(),type:'prod',date:gv('e-date'),product:product,sku:sku,batch:batch,prodqty:prodqty,reelno:gv('e-reelno'),stamps1:s1,stamps2:s2,stampsRet:sr,stampsNet:snet,stampby:gv('e-stampby'),personnel:gv('e-personnel'),supervisor:gv('e-supervisor'),notes:gv('e-notes'),var_stamp:snet-prodqty,var_reason:''};if(SV_MODE){var r=await sPost('/api/production',entry);if(r&&r.ok)await serverLoad();}else{P.push(entry);sprod();}if(sku&&!LISTS.skus.includes(sku)){LISTS.skus.push(sku);slists();}if(product&&!LISTS.products.includes(product)){LISTS.products.push(product);slists();}toast('✓ Production entry saved — Batch: '+batch);['e-product','e-sku','e-batch','e-prodqty','e-stamps','e-stamps2','e-stamps-ret','e-reelno','e-stampby','e-supervisor','e-notes'].forEach(function(id){sv2(id,'');});PT=[];rpt();document.getElementById('e-pers-inp').value='';sv2('e-date',today());updateHdr();}
+async function saveProd(){var product=gv('e-product'),sku=gv('e-sku'),batch=gv('e-batch');if(!product||!sku||!batch){toast('Fill in Product Name, SKU and Batch Number.','ter');return;}var prodqty=ni(gv('e-prodqty')),s1=ni(gv('e-stamps')),s2=ni(gv('e-stamps2')),sr=ni(gv('e-stamps-ret')),snet=s1+s2-sr;var entry={id:Date.now(),type:'prod',date:gv('e-date'),product:product,sku:sku,batch:batch,prodqty:prodqty,reelno:gv('e-reelno'),stamps1:s1,stamps2:s2,stampsRet:sr,stampsNet:snet,stampby:gv('e-stampby'),personnel:gv('e-personnel'),supervisor:gv('e-supervisor'),notes:gv('e-notes'),var_stamp:snet-prodqty,var_reason:''};
+  if(SV_MODE){
+    var r=await sPost('/api/production',entry);
+    if(r&&r.ok){await serverLoad();toast('✓ Production entry saved — Batch: '+batch);}
+    else{toast('❌ Failed to save to server — is server.js running?','ter');return;}
+  } else {
+    toast('⚠ Not connected to server — data not saved. Start server.js first.','ter');
+    return;
+  }
+  if(sku&&!LISTS.skus.includes(sku)){LISTS.skus.push(sku);slists();}
+  if(product&&!LISTS.products.includes(product)){LISTS.products.push(product);slists();}
+  ['e-product','e-sku','e-batch','e-prodqty','e-stamps','e-stamps2','e-stamps-ret','e-reelno','e-stampby','e-supervisor','e-notes'].forEach(function(id){sv2(id,'');});PT=[];rpt();document.getElementById('e-pers-inp').value='';sv2('e-date',today());updateHdr();
+}
 
 // ══════════════════════════════════════════════════════════
 //  SAVE PACKAGING
 // ══════════════════════════════════════════════════════════
-async function savePack(){var batch=gv('p-batch'),sku=gv('p-sku');if(!batch||!sku){toast('Fill in Batch Number and SKU.','ter');return;}var i1=ni(gv('p-issued')),i2=ni(gv('p-issued2')),ret=ni(gv('p-returned')),dam=ni(gv('p-damaged')),net=Math.max(0,i1+i2-ret-dam);var linked=P.find(function(x){return x.batch===batch&&x.sku===sku;});var entry={id:Date.now(),type:'pack',date:gv('p-date'),batch:batch,sku:sku,packmat:gv('p-packmat'),supplier:gv('p-supplier'),packref:gv('p-packref'),packIssued:i1,packIssued2:i2,packReturned:ret,packDamaged:dam,packNet:net,packby:gv('p-packby'),personnel:gv('p-personnel'),notes:gv('p-notes'),packmat2:gv('p-packmat2'),supplier2:gv('p-supplier2'),packby2:gv('p-packby2'),packIssued_m2:ni(gv('p-issued-m2')),packReturned_m2:ni(gv('p-returned-m2')),packDamaged_m2:ni(gv('p-damaged-m2')),linkedProdId:linked?linked.id:null,var_pack:linked?net-linked.prodqty:null,var_reason:''};if(SV_MODE){var r=await sPost('/api/packaging',entry);if(r&&r.ok)await serverLoad();}else{K.push(entry);spack();}toast(linked?'✓ Packaging entry saved — linked to Batch: '+batch:'✓ Packaging entry saved — ⚠ no production entry found for Batch: '+batch,linked?'ttl':'twn');['p-batch','p-sku','p-packmat','p-supplier','p-packref','p-issued','p-issued2','p-returned','p-damaged','p-net','p-packby','p-notes','p-packmat2','p-supplier2','p-packby2','p-issued-m2','p-returned-m2','p-damaged-m2'].forEach(function(id){sv2(id,'');});KT=[];rkt();document.getElementById('p-pers-inp').value='';sv2('p-date',today());updateHdr();}
+async function savePack(){var batch=gv('p-batch'),sku=gv('p-sku');if(!batch||!sku){toast('Fill in Batch Number and SKU.','ter');return;}var i1=ni(gv('p-issued')),i2=ni(gv('p-issued2')),ret=ni(gv('p-returned')),dam=ni(gv('p-damaged')),net=Math.max(0,i1+i2-ret-dam);var linked=P.find(function(x){return x.batch===batch&&x.sku===sku;});var entry={id:Date.now(),type:'pack',date:gv('p-date'),batch:batch,sku:sku,packmat:gv('p-packmat'),supplier:gv('p-supplier'),packref:gv('p-packref'),packIssued:i1,packIssued2:i2,packReturned:ret,packDamaged:dam,packNet:net,packby:gv('p-packby'),personnel:gv('p-personnel'),notes:gv('p-notes'),packmat2:gv('p-packmat2'),supplier2:gv('p-supplier2'),packby2:gv('p-packby2'),packIssued_m2:ni(gv('p-issued-m2')),packReturned_m2:ni(gv('p-returned-m2')),packDamaged_m2:ni(gv('p-damaged-m2')),linkedProdId:linked?linked.id:null,var_pack:linked?net-linked.prodqty:null,var_reason:''};
+  if(SV_MODE){
+    var r=await sPost('/api/packaging',entry);
+    if(r&&r.ok){await serverLoad();toast(linked?'✓ Packaging entry saved — linked to Batch: '+batch:'✓ Packaging entry saved — ⚠ no production entry found for Batch: '+batch,linked?'ttl':'twn');}
+    else{toast('❌ Failed to save packaging to server — is server.js running?','ter');return;}
+  } else {
+    toast('⚠ Not connected to server — data not saved. Start server.js first.','ter');
+    return;
+  }
+  ['p-batch','p-sku','p-packmat','p-supplier','p-packref','p-issued','p-issued2','p-returned','p-damaged','p-net','p-packby','p-notes','p-packmat2','p-supplier2','p-packby2','p-issued-m2','p-returned-m2','p-damaged-m2'].forEach(function(id){sv2(id,'');});KT=[];rkt();document.getElementById('p-pers-inp').value='';sv2('p-date',today());updateHdr();
+}
 
 // ══════════════════════════════════════════════════════════
 //  EDIT MODAL
@@ -2283,6 +2327,7 @@ function openEditPack(id){
 }
 function gmi(id){var e=document.getElementById(id);return e?e.value.trim():'';}
 async function saveModal(){
+  if(!SV_MODE){toast('⚠ Not connected to server — changes not saved.','ter');closeModal();return;}
   if(EDIT_DB==='prod'){
     var e=P.find(function(x){return x.id===EDIT_ID;});if(!e)return;
     var s1=ni(gmi('m-s1')),s2=ni(gmi('m-s2')),sr=ni(gmi('m-sr'));
@@ -2291,7 +2336,8 @@ async function saveModal(){
     e.prodqty=prodqty;e.reelno=gmi('m-reelno');e.stamps1=s1;e.stamps2=s2;e.stampsRet=sr;e.stampsNet=snet;
     e.stampby=gmi('m-stampby');e.supervisor=gmi('m-supervisor');e.personnel=gmi('m-personnel');
     e.notes=gmi('m-notes');e.var_reason=gmi('m-reason');e.var_stamp=snet-prodqty;
-    sprod();if(SV_MODE)await sPatch('/api/production/'+EDIT_ID+'/reason',{reason:e.var_reason});
+    await sPatch('/api/production/'+EDIT_ID+'/reason',{reason:e.var_reason});
+    await serverLoad();
   } else {
     var ke=K.find(function(x){return x.id===EDIT_ID;});if(!ke)return;
     var i1=ni(gmi('m-i1')),i2=ni(gmi('m-i2')),ret=ni(gmi('m-ret')),dam=ni(gmi('m-dam'));
@@ -2304,7 +2350,6 @@ async function saveModal(){
     ke.packIssued_m2=ni(gmi('m-issued-m2'));ke.packReturned_m2=ni(gmi('m-returned-m2'));ke.packDamaged_m2=ni(gmi('m-damaged-m2'));
     var linked=P.find(function(x){return x.batch===ke.batch&&x.sku===ke.sku;});
     ke.var_pack=linked?net-linked.prodqty:null;
-    spack();
   }
   closeModal();renderRec();renderVar();updateHdr();toast('✓ Entry updated.','tgn');
 }
@@ -2341,7 +2386,7 @@ function renderRec(){
   if(!packs.length){kt.innerHTML='<div class="empty"><span class="empty-icon">📦</span>No packaging entries match.</div>';}
   else{var krows=[...packs].reverse().map(function(e){return'<tr><td class="mono">'+esc(e.date||'—')+'</td><td class="mono">'+esc(e.sku)+'</td><td class="mono">'+esc(e.batch)+'</td><td>'+esc(e.packmat||'—')+'</td><td>'+esc(e.supplier||'—')+'</td><td>'+( e.packIssued||0)+'</td><td>'+(e.packIssued2||0)+'</td><td style="color:var(--tl)">'+e.packReturned+'</td><td style="color:var(--rd)">'+e.packDamaged+'</td><td><strong>'+e.packNet+'</strong></td><td>'+(e.var_pack!==null?vb(e.var_pack):'<span class="b bgr">—</span>')+'</td><td>'+esc(e.packby||'—')+'</td>'+(e.packmat2?'<td style="color:var(--tl-d);font-size:11px">'+esc(e.packmat2)+'</td><td style="font-size:11px">'+(e.packIssued_m2||0)+'</td><td style="color:var(--tl);font-size:11px">'+(e.packReturned_m2||0)+'</td><td style="color:var(--rd);font-size:11px">'+(e.packDamaged_m2||0)+'</td>':'<td colspan="4" style="color:var(--mu);font-size:10px;font-style:italic">—</td>')+'<td style="white-space:nowrap"><button class="btn-amber" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="openEditPack('+e.id+')">✏ Edit</button><button class="btn-d" onclick="delRec(\'pack\','+e.id+')">Del</button></td></tr>';}).join('');kt.innerHTML='<table><thead><tr><th>Date</th><th>SKU</th><th>Batch</th><th>Material 1</th><th>Supplier 1</th><th>Iss 1</th><th>Iss 2</th><th>Ret.</th><th>Dmg.</th><th>Net Used</th><th>Variance</th><th>Issued By</th><th>Material 2</th><th>Iss M2</th><th>Ret M2</th><th>Dmg M2</th><th></th></tr></thead><tbody>'+krows+'</tbody></table>';}
 }
-async function delRec(db,id){if(!confirm('Delete this entry? Cannot be undone.'))return;if(db==='prod'){P=P.filter(function(e){return e.id!==id;});sprod();if(SV_MODE)await sDel('/api/production/'+id);}else{K=K.filter(function(e){return e.id!==id;});spack();if(SV_MODE)await sDel('/api/packaging/'+id);}renderRec();toast('Entry deleted.');}
+async function delRec(db,id){if(!confirm('Delete this entry? Cannot be undone.'))return;if(!SV_MODE){toast('⚠ Not connected to server — cannot delete.','ter');return;}if(db==='prod'){await sDel('/api/production/'+id);}else{await sDel('/api/packaging/'+id);}await serverLoad();renderRec();toast('Entry deleted.');}
 
 // ══════════════════════════════════════════════════════════
 //  VARIANCE
@@ -2357,7 +2402,7 @@ function renderVar(){
     return'<div class="vc"><div class="vc-top"><div><div class="vc-name">'+esc(prod.product)+' <span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--mu)">'+esc(prod.sku)+'</span></div><div class="vc-meta">'+esc(prod.date||'—')+' · Batch: '+esc(prod.batch)+' · Supervisor: '+esc(prod.supervisor||'—')+'</div></div><div class="vc-pills"><span class="vpill">Produced: '+prod.prodqty+'</span><span class="vpill">Net Stamps: '+prod.stampsNet+'</span>'+(pack?'<span class="vpill">Pack Net: '+pack.packNet+'</span>':'<span class="b bw">No pack entry</span>')+'</div></div><div class="vg"><div class="vbox"><div class="vbox-lbl">Stamps</div><div style="font-size:12px">Iss1: <strong>'+(prod.stamps1||0)+'</strong> · Iss2: <strong>'+(prod.stamps2||0)+'</strong> · Ret: <strong>'+(prod.stampsRet||0)+'</strong> · Net: <strong>'+prod.stampsNet+'</strong></div></div><div class="vbox"><div class="vbox-lbl">Stamp Variance</div>'+vb(sv)+' <span style="font-size:11px;color:var(--mu)">'+(sv===0?'Exact match':Math.abs(sv)+' '+(sv>0?'more':'fewer')+' than produced')+'</span></div><div class="vbox"><div class="vbox-lbl">Pack Variance</div>'+(pack?vb(pv)+' <span style="font-size:11px;color:var(--mu)">Iss1: '+pack.packIssued+' · Iss2: '+(pack.packIssued2||0)+' · Ret: '+pack.packReturned+' · Dmg: '+pack.packDamaged+(pack.packmat2?' <span style="color:var(--tl-d);font-weight:600">· Mat2: '+esc(pack.packmat2)+'('+(pack.packIssued_m2||0)+')</span>':'')+'</span>':'<span style="font-size:11px;color:var(--mu)">No packaging entry</span>')+'</div></div>'+(hasVar?'<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--am)">Reason for Variance</label><input class="ri" type="text" value="'+esc(prod.var_reason||'')+'" placeholder="e.g. 3 tins damaged, machine waste, 5 returned…" onchange="saveReason('+prod.id+',this.value)"></div>':'')+'<div style="margin-top:8px"><button class="btn-amber" style="font-size:11px;padding:4px 12px" onclick="openEditProd('+prod.id+')">✏ Edit Production Entry</button>'+(pack?'&nbsp;<button class="btn-amber" style="font-size:11px;padding:4px 12px" onclick="openEditPack('+pack.id+')">✏ Edit Pack Entry</button>':'')+'</div></div>';
   }).join('');
 }
-async function saveReason(id,reason){var e=P.find(function(x){return x.id===id;});if(e){e.var_reason=reason;sprod();if(SV_MODE)await sPatch('/api/production/'+id+'/reason',{reason:reason});toast('Reason saved.','tgn');}}
+async function saveReason(id,reason){var e=P.find(function(x){return x.id===id;});if(e){e.var_reason=reason;if(SV_MODE)await sPatch('/api/production/'+id+'/reason',{reason:reason});toast('Reason saved.','tgn');}}
 
 // ══════════════════════════════════════════════════════════
 //  DASHBOARD
@@ -2914,12 +2959,12 @@ function exportJSON(){var a=document.createElement('a');a.href='data:application
 
 // ── IMPORT with drag-and-drop support
 function importData(){var inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=function(ev){processImport(ev.target.files[0]);};inp.click();}
-function processImport(file){if(!file)return;if(!confirm('Import this backup? This will replace all current data with the data in the file. This cannot be undone.'))return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.DB_PROD)P=d.DB_PROD;if(d.DB_PACK)K=d.DB_PACK;if(d.DB&&!d.DB_PROD)P=d.DB;if(d.LT_OV)LT_OV=d.LT_OV;['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS&&d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];else LISTS[k]=DL[k].slice();});sprod();spack();slists();renderAllLists();updateHdr();toast('✓ Data imported successfully — '+P.length+' prod, '+K.length+' pack entries.','tgn');}catch(ex){console.error(ex);toast('Error reading file. Check it is a valid SEWECO backup.','ter');}};reader.readAsText(file);}
+function processImport(file){if(!file)return;if(!confirm('Import this backup? This will replace all current data with the data in the file. This cannot be undone.'))return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.DB_PROD)P=d.DB_PROD;if(d.DB_PACK)K=d.DB_PACK;if(d.DB&&!d.DB_PROD)P=d.DB;if(d.LT_OV)LT_OV=d.LT_OV;['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS&&d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];else LISTS[k]=DL[k].slice();});slists();renderAllLists();updateHdr();toast('✓ Data imported successfully — '+P.length+' prod, '+K.length+' pack entries.','tgn');}catch(ex){console.error(ex);toast('Error reading file. Check it is a valid SEWECO backup.','ter');}};reader.readAsText(file);}
 function dzOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('drag');}
 function dzLeave(){document.getElementById('dropzone').classList.remove('drag');}
 function dzDrop(e){e.preventDefault();dzLeave();var files=e.dataTransfer.files;if(files[0])processImport(files[0]);}
 
-function clearAll(){if(!confirm('Delete ALL data for SEWECO Production Tracker? This cannot be undone.'))return;P=[];K=[];sprod();spack();updateHdr();toast('All data cleared.','twn');}
+function clearAll(){if(!confirm('Delete ALL data for SEWECO Production Tracker? This cannot be undone.'))return;if(!SV_MODE){toast('⚠ Not connected to server.','ter');return;}P=[];K=[];updateHdr();toast('All data cleared.','twn');}
 
 // ── SETTINGS LISTS ──────────────────────────────────────
 function addL(key,iid,eid){var v=document.getElementById(iid).value.trim();if(!v)return;if(LISTS[key].includes(v)){toast('Already in list.');return;}LISTS[key].push(v);slists();document.getElementById(iid).value='';renderAllLists();toast('Added.');}
@@ -2927,7 +2972,7 @@ function removeL(key,val){LISTS[key]=LISTS[key].filter(function(x){return x!==va
 function renderAllLists(){var map={personnel:'lst-person',packaging:'lst-pack',skus:'lst-sku',products:'lst-product',suppliers:'lst-supplier'};['personnel','packaging','skus','products','suppliers'].forEach(function(k){var el=document.getElementById(map[k]);if(!el)return;if(!LISTS[k].length){el.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">No items yet.</div>';return;}el.innerHTML=LISTS[k].map(function(x){return'<div class="li"><span>'+esc(x)+'</span><button class="btn-d" onclick="removeL(\''+k+'\',\''+esc(x)+'\')">Remove</button></div>';}).join('');});}
 
 // ── HEADER ──────────────────────────────────────────────
-function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textContent=P.length+' prod · '+K.length+' pack';if(SV_MODE){document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';}}
+function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textContent=P.length+' prod · '+K.length+' pack';var pill=document.getElementById('sv-status');if(!pill)return;if(SV_MODE){pill.textContent='● Server';pill.className='sv-pill sv-s';}else{pill.textContent='● Local';pill.className='sv-pill sv-l';}}
 
 // ══════════════════════════════════════════════════════════
 //  INIT — password check on load
@@ -2946,8 +2991,13 @@ function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textC
     document.getElementById('login-btn-text').textContent='Unlock Application';
   }
   document.getElementById('pw-input').focus();
-  // Server mode reconnect
-  if(SV_MODE){serverLoad().then(function(ok){if(ok){renderAllLists();document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';document.getElementById('sv-url').value=SV_URL;}});}
+  // Auto-sync every 5 seconds to keep data fresh across all connected devices
+  setInterval(async function(){
+    if(SV_MODE){
+      var ok=await serverLoad();
+      if(!ok){SV_MODE=false;updateHdr();document.getElementById('sv-full-status').textContent='⚠ Server connection lost — trying to reconnect...';}
+    }
+  },5000);
   go('dashboard');
 })();
 </script>
