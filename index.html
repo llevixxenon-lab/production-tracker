@@ -83,6 +83,55 @@ a,button,input,select,textarea{font-family:'DM Sans',sans-serif}
 .sv-s{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
 .hdr-logout{cursor:pointer;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.85);font-weight:600;transition:all .15s}
 .hdr-logout:hover{background:rgba(220,38,38,.3);border-color:rgba(220,38,38,.4)}
+.sync-btn{cursor:pointer;background:rgba(74,222,128,.18);border:1px solid rgba(74,222,128,.35);border-radius:20px;padding:5px 13px;font-size:11px;color:#4ade80;font-weight:700;transition:all .18s;font-family:'DM Mono',monospace;letter-spacing:.02em}
+.sync-btn:hover{background:rgba(74,222,128,.3);border-color:rgba(74,222,128,.6);transform:scale(1.04)}
+.sync-btn.syncing{animation:syncpulse .7s ease-in-out infinite;color:#fbbf24;border-color:rgba(251,191,36,.4)}
+@keyframes syncpulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* ── STOCK PAGE ── */
+.stk-tabs{display:flex;gap:5px;margin-bottom:1.2rem;flex-wrap:wrap}
+.stk-tab{padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--bd2);background:var(--wh);color:var(--mu);border-radius:var(--rs);letter-spacing:.03em;text-transform:uppercase;transition:all .18s}
+.stk-tab.on{background:var(--pu);color:#fff;border-color:var(--pu);box-shadow:0 2px 10px rgba(124,58,237,.3)}
+.stk-tab.on.st{background:var(--am);border-color:var(--am);box-shadow:0 2px 10px rgba(217,119,6,.3)}
+.stk-panel{display:none}.stk-panel.on{display:block}
+.sbal{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.4rem}
+@media(max-width:700px){.sbal{grid-template-columns:1fr 1fr}}
+.sbc{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:1.1rem 1.3rem;box-shadow:var(--sh);position:relative;overflow:hidden}
+.sbc::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;background:var(--cbg,rgba(124,58,237,.06))}
+.sbc .lbl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.sbc .val{font-size:28px;font-weight:800;font-family:'Fraunces',serif;color:var(--cval,var(--pu));letter-spacing:-.04em}
+.sbc .sub{font-size:11px;color:var(--mu);margin-top:2px}
+.sbc.green{--cbg:rgba(22,163,74,.06);--cval:var(--gn)}
+.sbc.amber{--cbg:rgba(217,119,6,.06);--cval:var(--am)}
+.sbc.red{--cbg:rgba(220,38,38,.06);--cval:var(--rd)}
+.sup-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd);gap:12px;flex-wrap:wrap}
+.sup-row:last-child{border-bottom:none}
+.sup-name{font-weight:700;font-size:13px;color:var(--ink2);flex:1;min-width:120px}
+.sup-qty{font-family:'DM Mono',monospace;font-size:13px;color:var(--gn);font-weight:600;min-width:80px;text-align:right}
+.sup-qty.low{color:var(--rd)}
+.sup-dmg{font-family:'DM Mono',monospace;font-size:12px;color:var(--rd);min-width:70px;text-align:right}
+.mat-row{background:var(--bg2);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mat-name{font-weight:600;font-size:13px;color:var(--ink2);flex:2;min-width:150px}
+.mat-sup{font-size:11px;color:var(--mu);flex:1;min-width:100px}
+.mat-qty{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--pu);min-width:60px;text-align:right}
+.mat-qty.low{color:var(--rd)}
+.mat-dmg{font-size:11px;color:var(--rd);min-width:60px;text-align:right;font-family:'DM Mono',monospace}
+.stk-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.stk-ok{background:var(--gn-xl);color:var(--gn)}
+.stk-low{background:var(--am-xl);color:var(--am)}
+.stk-out{background:var(--rd-xl);color:var(--rd)}
+.grp-hd{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pu);padding:10px 0 6px;border-bottom:2px solid var(--pu-xl);margin-bottom:8px}
+.grp-hd.am{color:var(--am);border-bottom-color:var(--am-xl)}
+/* ── RECONCILIATION ── */
+.recon-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--rs);margin-bottom:6px;border-left:3px solid #7c3aed}
+.recon-entry.tl{border-left-color:#0d9488}
+.recon-entry-icon{font-size:18px;margin-top:1px}
+.recon-entry-body{flex:1}
+.recon-entry-head{font-weight:700;font-size:12px;color:var(--ink2)}
+.recon-entry-meta{font-size:11px;color:var(--mu);margin-top:2px}
+.recon-adj{font-family:'DM Mono',monospace;font-weight:700;font-size:13px;padding:2px 8px;border-radius:12px;margin-left:6px}
+.recon-pos{background:rgba(22,163,74,.12);color:var(--gn)}
+.recon-neg{background:rgba(220,38,38,.12);color:var(--rd)}
+.recon-zero{background:var(--bg2);color:var(--mu)}
 
 /* ── NAV ── */
 .nav-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:5px;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:3px;box-shadow:var(--sh)}
@@ -494,6 +543,7 @@ tr:hover td{background:#fafcff}
     <span class="hdr-pill" id="hdr-date"></span>
     <span class="hdr-pill" id="hdr-counts"></span>
     <span class="sv-pill sv-l" id="sv-status">● Local</span>
+    <button class="sync-btn" id="sync-btn" onclick="manualSync()" title="Force sync all data from server now">⟳ Sync</button>
     <span class="hdr-logout" onclick="doLogout()">🔒 Lock</span>
   </div>
 </div>
@@ -506,7 +556,8 @@ tr:hover td{background:#fafcff}
   <button data-pg="prod-entry" onclick="go('prod-entry')">⚡ Production Entry</button>
   <button data-pg="pack-entry" class="nt" onclick="go('pack-entry')">📦 Packaging Entry</button>
   <div class="nav-sep"></div>
-  <button data-pg="records" onclick="go('records')">📋 Records</button>
+  <button data-pg="stock" onclick="go('stock')">📋 Stock Check</button>
+  <button data-pg="records" onclick="go('records')">🗂 Records</button>
   <button data-pg="variance" onclick="go('variance')">⚖ Variance</button>
   <button data-pg="reports" onclick="go('reports')">📄 Reports</button>
   <div class="nav-sep"></div>
@@ -695,42 +746,41 @@ tr:hover td{background:#fafcff}
     </div>
     <div class="card" style="border-top:3px solid var(--tl)">
       <div class="sec t">🏭 Material &amp; Supplier — Primary</div>
-      <div class="r3">
+      <div class="r4" style="align-items:end">
         <div class="fg tf"><label>Packaging Material</label><div class="acw"><input type="text" id="p-packmat" placeholder="e.g. Acrylic Tins x 1Litre" tabindex="104" autocomplete="off" oninput="acf('p-packmat','ac-pm','packaging')" onfocus="acf('p-packmat','ac-pm','packaging')" onblur="acc('ac-pm')" onkeydown="ack(event,'p-packmat','ac-pm','packaging',1)"><div class="acd tc" id="ac-pm"></div></div></div>
         <div class="fg tf"><label>Supplier / Company</label><div class="acw"><input type="text" id="p-supplier" placeholder="e.g. Nampak Uganda Ltd" tabindex="105" autocomplete="off" oninput="acf('p-supplier','ac-psp','suppliers')" onfocus="acf('p-supplier','ac-psp','suppliers')" onblur="acc('ac-psp')" onkeydown="ack(event,'p-supplier','ac-psp','suppliers',1)"><div class="acd tc" id="ac-psp"></div></div></div>
         <div class="fg"><label>Store Issue Reference</label><input type="text" id="p-packref" placeholder="Auto-fills from batch + SKU" tabindex="106"></div>
+        <div class="fg tf"><label>Issued By (Store Person)</label><div class="acw"><input type="text" id="p-packby" placeholder="Name" tabindex="107" autocomplete="off" oninput="acf('p-packby','ac-pby','personnel')" onfocus="acf('p-packby','ac-pby','personnel')" onblur="acc('ac-pby')" onkeydown="ack(event,'p-packby','ac-pby','personnel',1)"><div class="acd tc" id="ac-pby"></div></div></div>
+      </div>
+      <div class="r6" style="margin-top:12px">
+        <div class="fg tf"><label>Units Issued 1</label><input type="number" id="p-issued" placeholder="0" min="0" tabindex="108" oninput="calcNet()"><span class="hint">Initial from store</span></div>
+        <div class="fg tf"><label>Units Issued 2 <span style="font-weight:400;text-transform:none;font-size:9px">(additions)</span></label><input type="number" id="p-issued2" placeholder="0" min="0" tabindex="109" oninput="calcNet()"><span class="hint">Any top-up issued</span></div>
+        <div class="fg tf"><label>Units Returned</label><input type="number" id="p-returned" placeholder="0" min="0" tabindex="110" oninput="calcNet()"><span class="hint">Unused back to store</span></div>
+        <div class="fg tf"><label>Units Damaged</label><input type="number" id="p-damaged" placeholder="0" min="0" tabindex="111" oninput="calcNet()"><span class="hint">Damaged / rejected</span></div>
+        <div class="fg" style="grid-column:span 2"><label>Net Units Used <span style="font-weight:400;text-transform:none;font-size:9px">(auto)</span></label><input type="number" id="p-net" placeholder="0" readonly class="calc"><span class="hint">= (Issued 1 + Issued 2) − Returned − Damaged</span></div>
       </div>
     </div>
     <div class="card" style="border-top:3px solid var(--tl-l)">
-      <div class="sec t">📦 Material &amp; Supplier — Secondary (e.g. Cartons / Labels)</div>
+      <div class="sec t">📦 Material &amp; Supplier — Secondary <span style="font-size:11px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mu)">(e.g. Cartons / Labels — optional)</span></div>
       <div class="ib t" style="margin-bottom:10px;font-size:11px">Use this section for any accompanying packaging — cartons, labels, sleeves, wrapping film, etc. — issued from the same or a different supplier.</div>
-      <div class="r3">
+      <div class="r4" style="align-items:end">
         <div class="fg tf"><label>Packaging Material 2</label><div class="acw"><input type="text" id="p-packmat2" placeholder="e.g. Boxes 24 x 1Litre" tabindex="115" autocomplete="off" oninput="acf('p-packmat2','ac-pm2','packaging')" onfocus="acf('p-packmat2','ac-pm2','packaging')" onblur="acc('ac-pm2')" onkeydown="ack(event,'p-packmat2','ac-pm2','packaging',1)"><div class="acd tc" id="ac-pm2"></div></div><span class="hint">Leave blank if no secondary material</span></div>
         <div class="fg tf"><label>Supplier 2 / Company</label><div class="acw"><input type="text" id="p-supplier2" placeholder="e.g. East African Packaging" tabindex="116" autocomplete="off" oninput="acf('p-supplier2','ac-psp2','suppliers')" onfocus="acf('p-supplier2','ac-psp2','suppliers')" onblur="acc('ac-psp2')" onkeydown="ack(event,'p-supplier2','ac-psp2','suppliers',1)"><div class="acd tc" id="ac-psp2"></div></div></div>
-        <div class="fg tf"><label>Issued By (Store — Material 2)</label><div class="acw"><input type="text" id="p-packby2" placeholder="Name" tabindex="117" autocomplete="off" oninput="acf('p-packby2','ac-pby2','personnel')" onfocus="acf('p-packby2','ac-pby2','personnel')" onblur="acc('ac-pby2')" onkeydown="ack(event,'p-packby2','ac-pby2','personnel',1)"><div class="acd tc" id="ac-pby2"></div></div></div>
+        <div class="fg tf"><label>Issued By (Store — Mat 2)</label><div class="acw"><input type="text" id="p-packby2" placeholder="Name" tabindex="117" autocomplete="off" oninput="acf('p-packby2','ac-pby2','personnel')" onfocus="acf('p-packby2','ac-pby2','personnel')" onblur="acc('ac-pby2')" onkeydown="ack(event,'p-packby2','ac-pby2','personnel',1)"><div class="acd tc" id="ac-pby2"></div></div></div>
+        <div class="fg" style="visibility:hidden"><label>&nbsp;</label><input disabled></div>
       </div>
-      <div class="r3">
+      <div class="r3" style="margin-top:12px">
         <div class="fg tf"><label>Units Issued (Mat 2)</label><input type="number" id="p-issued-m2" placeholder="0" min="0" tabindex="118"></div>
         <div class="fg tf"><label>Units Returned (Mat 2)</label><input type="number" id="p-returned-m2" placeholder="0" min="0" tabindex="119"></div>
         <div class="fg tf"><label>Units Damaged (Mat 2)</label><input type="number" id="p-damaged-m2" placeholder="0" min="0" tabindex="120"></div>
       </div>
     </div>
     <div class="card" style="border-top:3px solid var(--tl)">
-      <div class="sec t">📊 Quantities</div>
-      <div class="r6">
-        <div class="fg tf"><label>Units Issued 1</label><input type="number" id="p-issued" placeholder="0" min="0" tabindex="107" oninput="calcNet()"><span class="hint">Initial from store</span></div>
-        <div class="fg tf"><label>Units Issued 2 <span style="font-weight:400;text-transform:none;font-size:9px">(additions)</span></label><input type="number" id="p-issued2" placeholder="0" min="0" tabindex="108" oninput="calcNet()"><span class="hint">Any top-up issued</span></div>
-        <div class="fg tf"><label>Units Returned</label><input type="number" id="p-returned" placeholder="0" min="0" tabindex="109" oninput="calcNet()"><span class="hint">Unused back to store</span></div>
-        <div class="fg tf"><label>Units Damaged</label><input type="number" id="p-damaged" placeholder="0" min="0" tabindex="110" oninput="calcNet()"><span class="hint">Damaged / rejected</span></div>
-        <div class="fg" style="grid-column:span 2"><label>Net Units Used <span style="font-weight:400;text-transform:none;font-size:9px">(auto)</span></label><input type="number" id="p-net" placeholder="0" readonly class="calc"><span class="hint">= (Issued 1 + Issued 2) − Returned − Damaged</span></div>
-      </div>
-    </div>
-    <div class="card" style="border-top:3px solid var(--tl)">
       <div class="sec t">👷 Personnel</div>
       <div class="r3">
-        <div class="fg"><label>Personnel Using Packaging</label><div class="acw"><input type="text" id="p-pers-inp" placeholder="Type name then Enter" tabindex="111" autocomplete="off" oninput="acf('p-pers-inp','ac-ppr','personnel')" onfocus="acf('p-pers-inp','ac-ppr','personnel')" onblur="acc('ac-ppr')" onkeydown="tagk(event,'p-pers-inp','ac-ppr','personnel','apkt')"><div class="acd tc" id="ac-ppr"></div></div><div class="tw" id="p-ptags"></div><input type="hidden" id="p-personnel"></div>
-        <div class="fg tf"><label>Issued By (Store Person)</label><div class="acw"><input type="text" id="p-packby" placeholder="Name" tabindex="112" autocomplete="off" oninput="acf('p-packby','ac-pby','personnel')" onfocus="acf('p-packby','ac-pby','personnel')" onblur="acc('ac-pby')" onkeydown="ack(event,'p-packby','ac-pby','personnel',1)"><div class="acd tc" id="ac-pby"></div></div></div>
+        <div class="fg"><label>Personnel Using Packaging</label><div class="acw"><input type="text" id="p-pers-inp" placeholder="Type name then Enter" tabindex="112" autocomplete="off" oninput="acf('p-pers-inp','ac-ppr','personnel')" onfocus="acf('p-pers-inp','ac-ppr','personnel')" onblur="acc('ac-ppr')" onkeydown="tagk(event,'p-pers-inp','ac-ppr','personnel','apkt')"><div class="acd tc" id="ac-ppr"></div></div><div class="tw" id="p-ptags"></div><input type="hidden" id="p-personnel"></div>
         <div class="fg"><label>Notes</label><textarea id="p-notes" placeholder="Any remarks..." tabindex="113" style="height:50px"></textarea></div>
+        <div class="fg" style="visibility:hidden"></div>
       </div>
       <div class="btn-row"><button class="btn t" onclick="savePack()" tabindex="114">✓ Save Packaging Entry</button></div>
     </div>
@@ -742,6 +792,262 @@ tr:hover td{background:#fafcff}
     <svg class="sdc" style="animation-duration:10s;animation-delay:2s" viewBox="0 0 40 40"><polygon points="20,3 38,34 2,34" fill="#1a56db" opacity=".12"/></svg>
   </div>
 </div>
+</div>
+
+<!-- ══════ STOCK CHECK ══════ -->
+<div class="pg" id="pg-stock">
+  <div class="fb-banner" style="background:linear-gradient(135deg,var(--pu) 0%,#6d28d9 100%);margin-bottom:1.2rem">
+    <div class="fb-icon">📋</div>
+    <div class="fb-txt">
+      <div class="fb-tag">Inventory · Balance Checks</div>
+      <div class="fb-title">Stock Check — Stamps &amp; Packaging Materials</div>
+      <div class="fb-sub">Opening balances, receipts, auto-deductions from usage, and live balance at hand — per supplier</div>
+    </div>
+  </div>
+
+  <!-- Print header for stock (hidden on screen) -->
+  <div class="print-hdr" id="ph-stock">
+    <h2>SEWECO Industrial Coatings Limited</h2>
+    <div class="ph-co">Stock Check Report</div>
+    <div class="ph-meta" id="ph-stock-meta"></div>
+  </div>
+
+  <div class="btn-row print-hide" style="margin-bottom:1rem;justify-content:flex-end">
+    <button class="btn-ol" onclick="printStock()">🖨 Print / Save PDF</button>
+    <button class="btn-ol" onclick="exportStockCSV()">⬇ Export Stock CSV</button>
+  </div>
+
+  <div class="stk-tabs print-hide">
+    <button class="stk-tab st on" onclick="stkTab('stamps')">🏷 Stamps</button>
+    <button class="stk-tab" onclick="stkTab('packmat')">📦 Packaging Materials</button>
+  </div>
+
+  <!-- ── STAMPS PANEL ── -->
+  <div class="stk-panel on" id="spanel-stamps">
+    <!-- Balance summary cards -->
+    <div class="sbal" id="stk-stamp-bals">
+      <div class="sbc amber"><div class="lbl">Total Received (all time)</div><div class="val" id="ss-in">0</div><div class="sub">stamps</div></div>
+      <div class="sbc green"><div class="lbl">Total Used (deducted)</div><div class="val" id="ss-used">0</div><div class="sub">from production entries</div></div>
+      <div class="sbc"><div class="lbl">Balance at Hand</div><div class="val" id="ss-bal">0</div><div class="sub">stamps</div></div>
+      <div class="sbc red"><div class="lbl">Stamps Damaged / Lost</div><div class="val" id="ss-dmg">0</div><div class="sub">from variance</div></div>
+    </div>
+
+    <!-- Add stock form -->
+    <div class="card print-hide" style="border-top:3px solid var(--am)">
+      <div class="card-title">➕ Add Stamp Stock (Opening Balance / Receipt)</div>
+      <div class="r4" style="align-items:end">
+        <div class="fg">
+          <label>Date</label>
+          <input type="date" id="ss-date">
+        </div>
+        <div class="fg">
+          <label>Entry Type</label>
+          <select id="ss-type">
+            <option value="opening">Opening Balance</option>
+            <option value="receipt">New Receipt / Delivery</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Vendor / Supplier</label>
+          <div class="acw"><input type="text" id="ss-vendor" placeholder="Vendor name" autocomplete="off" oninput="acf('ss-vendor','ac-ssv','suppliers')" onfocus="acf('ss-vendor','ac-ssv','suppliers')" onblur="acc('ac-ssv')"><div class="acd" id="ac-ssv"></div></div>
+        </div>
+        <div class="fg">
+          <label>Total Stamps (qty)</label>
+          <input type="number" id="ss-qty" placeholder="e.g. 48000" min="0">
+        </div>
+      </div>
+      <div class="r3" style="align-items:end">
+        <div class="fg">
+          <label>No. of Reels</label>
+          <input type="number" id="ss-reels" placeholder="e.g. 2" min="0" oninput="calcStampQty()">
+          <span class="hint">Standard reel = 24,000 stamps · Small reel = 6,000</span>
+        </div>
+        <div class="fg">
+          <label>Stamps per Reel</label>
+          <select id="ss-reel-size" onchange="calcStampQty()">
+            <option value="24000">24,000 (standard)</option>
+            <option value="6000">6,000 (small)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Notes</label>
+          <input type="text" id="ss-notes" placeholder="Optional remarks">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-amber" onclick="saveStampStock()">✓ Save Stamp Stock Entry</button>
+        <span style="font-size:11px;color:var(--mu);align-self:center" id="ss-calc-hint"></span>
+      </div>
+    </div>
+
+    <!-- Reconciliation -->
+    <div class="card print-hide" style="border-top:3px solid #8b5cf6">
+      <div class="card-title">⚖ Stock Reconciliation — Stamps
+        <span style="font-size:11px;font-weight:500;color:var(--mu);text-transform:none;letter-spacing:0">Adjust system stock to match physical count</span>
+      </div>
+      <div class="ib" style="margin-bottom:12px;font-size:12px;border-left:3px solid #8b5cf6;padding-left:10px">
+        Carry out a physical stock count, enter the actual stamps found on hand below. The system will calculate the variance (system balance vs physical count) and post a reconciliation entry to bring the system in line with reality. All reconciliation entries are logged with date, counted quantity, and reason for full audit trail.
+      </div>
+      <div class="r4" style="align-items:end">
+        <div class="fg">
+          <label>Reconciliation Date</label>
+          <input type="date" id="sr-date">
+        </div>
+        <div class="fg">
+          <label>Vendor / Supplier (optional)</label>
+          <div class="acw"><input type="text" id="sr-vendor" placeholder="Leave blank for all" autocomplete="off" oninput="acf('sr-vendor','ac-srv','suppliers')" onfocus="acf('sr-vendor','ac-srv','suppliers')" onblur="acc('ac-srv')"><div class="acd" id="ac-srv"></div></div>
+        </div>
+        <div class="fg">
+          <label>Physical Count (stamps actually on hand)</label>
+          <input type="number" id="sr-physical" placeholder="e.g. 42000" min="0" oninput="calcStampRecon()">
+        </div>
+        <div class="fg">
+          <label>Variance (auto)</label>
+          <input type="number" id="sr-variance" readonly class="calc" placeholder="Physical − System">
+          <span class="hint" id="sr-variance-hint"></span>
+        </div>
+      </div>
+      <div class="fg" style="max-width:500px;margin-top:8px">
+        <label>Reason / Notes <span style="font-weight:400;font-size:10px;color:var(--mu)">(required)</span></label>
+        <input type="text" id="sr-reason" placeholder="e.g. Quarterly stock take — 3 reels found damaged on shelf">
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;padding:9px 20px;border-radius:var(--rs);font-weight:700;font-size:13px;cursor:pointer" onclick="saveStampRecon()">⚖ Post Reconciliation Entry</button>
+        <span style="font-size:11px;color:var(--mu);align-self:center" id="sr-hint"></span>
+      </div>
+      <div id="sr-log" style="margin-top:14px"></div>
+    </div>
+
+    <!-- Per-vendor breakdown -->
+    <div class="card">
+      <div class="card-title">🏢 Balance by Vendor / Supplier</div>
+      <div id="stk-stamp-vendors"></div>
+    </div>
+
+    <!-- Stock ledger table -->
+    <div class="card">
+      <div class="card-title">📋 Stamp Stock Ledger
+        <span style="font-size:11px;font-weight:500;color:var(--mu);text-transform:none;letter-spacing:0">All receipts &amp; deductions</span>
+      </div>
+      <div class="tws" id="stk-stamp-ledger"></div>
+    </div>
+  </div>
+
+  <!-- ── PACKAGING MATERIALS PANEL ── -->
+  <div class="stk-panel" id="spanel-packmat">
+    <!-- Balance summary cards -->
+    <div class="sbal" id="stk-pack-bals">
+      <div class="sbc amber" style="--cval:var(--tl)"><div class="lbl">Total Materials In</div><div class="val" id="sp-in">0</div><div class="sub">units received</div></div>
+      <div class="sbc green"><div class="lbl">Total Used (auto)</div><div class="val" id="sp-used">0</div><div class="sub">from packaging entries</div></div>
+      <div class="sbc"><div class="lbl">Total Balance at Hand</div><div class="val" id="sp-bal">0</div><div class="sub">all materials</div></div>
+      <div class="sbc red"><div class="lbl">Total Damaged</div><div class="val" id="sp-dmg">0</div><div class="sub">from packaging entries</div></div>
+    </div>
+
+    <!-- Add stock form -->
+    <div class="card" style="border-top:3px solid var(--tl)">
+      <div class="card-title">➕ Add Packaging Material Stock</div>
+      <div class="r3" style="align-items:end">
+        <div class="fg">
+          <label>Date</label>
+          <input type="date" id="sp-date">
+        </div>
+        <div class="fg">
+          <label>Entry Type</label>
+          <select id="sp-type">
+            <option value="opening">Opening Balance</option>
+            <option value="receipt">New Receipt / Delivery</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Packaging Material <span class="lt">★</span></label>
+          <div class="acw"><input type="text" id="sp-material" placeholder="e.g. Acrylic Tins x 1Litre" autocomplete="off" oninput="acf('sp-material','ac-spm','packaging')" onfocus="acf('sp-material','ac-spm','packaging')" onblur="acc('ac-spm')"><div class="acd tc" id="ac-spm"></div></div>
+        </div>
+      </div>
+      <div class="r3" style="align-items:end">
+        <div class="fg">
+          <label>Vendor / Supplier <span class="lt">★</span></label>
+          <div class="acw"><input type="text" id="sp-vendor" placeholder="Supplier name" autocomplete="off" oninput="acf('sp-vendor','ac-spv','suppliers')" onfocus="acf('sp-vendor','ac-spv','suppliers')" onblur="acc('ac-spv')"><div class="acd tc" id="ac-spv"></div></div>
+        </div>
+        <div class="fg">
+          <label>Quantity (units) <span class="lt">★</span></label>
+          <input type="number" id="sp-qty" placeholder="e.g. 500" min="0">
+        </div>
+        <div class="fg">
+          <label>Notes</label>
+          <input type="text" id="sp-notes" placeholder="Optional remarks">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn t" onclick="savePackStock()">✓ Save Packaging Stock Entry</button>
+      </div>
+    </div>
+
+    <!-- Reconciliation -->
+    <div class="card print-hide" style="border-top:3px solid #0d9488">
+      <div class="card-title">⚖ Stock Reconciliation — Packaging Materials
+        <span style="font-size:11px;font-weight:500;color:var(--mu);text-transform:none;letter-spacing:0">Adjust system stock to match physical count</span>
+      </div>
+      <div class="ib t" style="margin-bottom:12px;font-size:12px;border-left:3px solid #0d9488;padding-left:10px">
+        Physically count a material, enter the count below. The system will compute the variance (system vs physical) and post an adjustment entry. The running balance will update immediately. Each reconciliation is logged with full details for audit purposes.
+      </div>
+      <div class="r4" style="align-items:end">
+        <div class="fg">
+          <label>Reconciliation Date</label>
+          <input type="date" id="pr-date">
+        </div>
+        <div class="fg">
+          <label>Packaging Material <span style="color:var(--rd)">★</span></label>
+          <div class="acw"><input type="text" id="pr-material" placeholder="Select or type material" autocomplete="off" oninput="acf('pr-material','ac-prm','packaging');calcPackRecon()" onfocus="acf('pr-material','ac-prm','packaging')" onblur="acc('ac-prm')"><div class="acd tc" id="ac-prm"></div></div>
+        </div>
+        <div class="fg">
+          <label>Vendor / Supplier <span style="color:var(--rd)">★</span></label>
+          <div class="acw"><input type="text" id="pr-vendor" placeholder="Supplier name" autocomplete="off" oninput="acf('pr-vendor','ac-prv','suppliers');calcPackRecon()" onfocus="acf('pr-vendor','ac-prv','suppliers')" onblur="acc('ac-prv')"><div class="acd tc" id="ac-prv"></div></div>
+        </div>
+        <div class="fg">
+          <label>Physical Count (units actually on hand)</label>
+          <input type="number" id="pr-physical" placeholder="e.g. 350" min="0" oninput="calcPackRecon()">
+        </div>
+      </div>
+      <div class="r3" style="margin-top:8px;align-items:end">
+        <div class="fg">
+          <label>System Balance (auto)</label>
+          <input type="number" id="pr-system" readonly class="calc" placeholder="Calculated from ledger">
+        </div>
+        <div class="fg">
+          <label>Variance (auto)</label>
+          <input type="number" id="pr-variance" readonly class="calc" placeholder="Physical − System">
+          <span class="hint" id="pr-variance-hint"></span>
+        </div>
+        <div class="fg">
+          <label>Reason / Notes <span style="font-weight:400;font-size:10px;color:var(--mu)">(required)</span></label>
+          <input type="text" id="pr-reason" placeholder="e.g. Quarterly stock take — some tins found dented">
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button style="background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;padding:9px 20px;border-radius:var(--rs);font-weight:700;font-size:13px;cursor:pointer" onclick="savePackRecon()">⚖ Post Reconciliation Entry</button>
+        <span style="font-size:11px;color:var(--mu);align-self:center" id="pr-hint"></span>
+      </div>
+      <div id="pr-log" style="margin-top:14px"></div>
+    </div>
+
+    <!-- Per-material per-vendor breakdown -->
+    <div class="card">
+      <div class="card-title">📦 Balance by Material &amp; Vendor</div>
+      <div class="ib t" style="margin-bottom:12px;font-size:11px">
+        Deductions are automatically calculated from Packaging Entries. Each material tracks stock per vendor so you can see which supplier's stock is running low and compare damage rates.
+      </div>
+      <div id="stk-pack-breakdown"></div>
+    </div>
+
+    <!-- Stock ledger table -->
+    <div class="card">
+      <div class="card-title">📋 Packaging Material Ledger
+        <span style="font-size:11px;font-weight:500;color:var(--mu);text-transform:none;letter-spacing:0">All receipts &amp; deductions per vendor</span>
+      </div>
+      <div class="tws" id="stk-pack-ledger"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══════ RECORDS ══════ -->
@@ -811,12 +1117,15 @@ tr:hover td{background:#fafcff}
         <button class="rt" data-rt="supplier" onclick="setRT(this)">By Supplier</button>
         <button class="rt" data-rt="damage" onclick="setRT(this)">Damage Analysis</button>
         <button class="rt" data-rt="litreage" onclick="setRT(this)">🧪 Litreage</button>
+        <button class="rt" data-rt="stock-stamps" onclick="setRT(this)">🏷 Stamp Stock</button>
+        <button class="rt" data-rt="stock-pack" onclick="setRT(this)">📦 Pack Material Stock</button>
       </div>
     </div>
     <div class="btn-row">
       <button class="btn" onclick="buildReport()">Generate Report</button>
       <button class="btn-ol" onclick="printRep()">🖨 Print / Save PDF</button>
-      <button class="btn-ol" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn-ol" onclick="exportReportCSV()">⬇ Export CSV</button>
+      <button class="btn-ol" onclick="exportCSV()">⬇ Export All Records CSV</button>
     </div>
   </div>
   <div id="report-out"></div>
@@ -2076,13 +2385,14 @@ var DL={
     "Marine Paint",
     "Anti-Fouling Green",
     ],
-  suppliers:["Nampak Uganda Ltd","Crown Paints Uganda","Kampala Paint Industries","East African Packaging Industries","Uganda Packaging Ltd","Poly Products Uganda","Container Industries Ltd","Metal Box Uganda","Plastic Packaging Co. Uganda"]
+  suppliers:["Nextgen Packaging Uganda Ltd","Crown Paints Uganda","Kampala Paint Industries","East African Packaging Industries","Uganda Packaging Ltd","Poly Products Uganda","Container Industries Ltd","Metal Box Uganda","Plastic Packaging Co. Uganda"]
 };
 
 // ══════════════════════════════════════════════════════════
 //  DATA STORES
 // ══════════════════════════════════════════════════════════
 var P=[],K=[],LISTS={personnel:[],packaging:[],skus:[],products:[],suppliers:[]};
+var STOCK_STAMPS=[],STOCK_PACK=[],STOCK_SETTINGS={};
 var SV_URL='',SV_MODE=false;
 
 // Production and packaging data always loaded from server — no localStorage fallback for data
@@ -2091,7 +2401,17 @@ try{var _l=localStorage.getItem('spt_lists');if(_l){var sl=JSON.parse(_l);['pers
 
 function sprod(){/* data saved server-side only — no localStorage fallback */}
 function spack(){/* data saved server-side only — no localStorage fallback */}
-function slists(){try{localStorage.setItem('spt_lists',JSON.stringify(LISTS));}catch(e){}}
+function slists(){try{localStorage.setItem('spt_lists',JSON.stringify(LISTS));}catch(e){}if(SV_MODE){sPatch('/api/lists',LISTS);}}
+
+async function manualSync(){
+  if(!SV_MODE){toast('⚠ Not connected to server — cannot sync.','ter');return;}
+  var btn=document.getElementById('sync-btn');
+  btn.classList.add('syncing');btn.textContent='⟳ Syncing…';
+  var ok=await serverLoad();
+  btn.classList.remove('syncing');btn.textContent='⟳ Sync';
+  if(ok){toast('✓ Synced — all data is up to date.','tgn');renderAllLists();}
+  else{toast('⚠ Sync failed — server not reachable.','ter');}
+}
 
 // ══════════════════════════════════════════════════════════
 //  PASSWORD SYSTEM — simple hash stored in localStorage
@@ -2161,8 +2481,8 @@ function toast(msg,cls){var t=document.getElementById('toast');t.textContent=msg
 // ══════════════════════════════════════════════════════════
 //  NAVIGATION
 // ══════════════════════════════════════════════════════════
-var PAGES=['dashboard','litreage','prod-entry','pack-entry','records','variance','reports','settings'];
-function go(name){PAGES.forEach(function(p){document.getElementById('pg-'+p).classList.toggle('on',p===name);});document.querySelectorAll('.nav-wrap button[data-pg]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-pg')===name);});if(name==='dashboard')renderDash();if(name==='litreage')renderLitre();if(name==='records')renderRec();if(name==='variance')renderVar();if(name==='reports')document.getElementById('report-out').innerHTML='';if(name==='settings')renderAllLists();}
+var PAGES=['dashboard','litreage','prod-entry','pack-entry','stock','records','variance','reports','settings'];
+function go(name){PAGES.forEach(function(p){document.getElementById('pg-'+p).classList.toggle('on',p===name);});document.querySelectorAll('.nav-wrap button[data-pg]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-pg')===name);});if(name==='dashboard')renderDash();if(name==='litreage')renderLitre();if(name==='stock')renderStock();if(name==='records')renderRec();if(name==='variance')renderVar();if(name==='reports')document.getElementById('report-out').innerHTML='';if(name==='settings')renderAllLists();}
 
 // ══════════════════════════════════════════════════════════
 //  HELPERS
@@ -2212,73 +2532,35 @@ function calcNet(){sv2('p-net',Math.max(0,ni(gv('p-issued'))+ni(gv('p-issued2'))
 // ══════════════════════════════════════════════════════════
 //  SERVER
 // ══════════════════════════════════════════════════════════
-async function serverLoad(){try{var r=await fetch(SV_URL+'/api/data',{cache:'no-store'});if(!r.ok)throw'err';var d=await r.json();P=d.DB_PROD||[];K=d.DB_PACK||[];if(d.LISTS)['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];});slists();updateHdr();document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';document.getElementById('sv-full-status').textContent='Connected: '+SV_URL;document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';return true;}catch(e){/* Do NOT wipe SV_URL or SV_MODE here — caller decides what to do */document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';return false;}}
+async function serverLoad(){try{var r=await fetch(SV_URL+'/api/data');if(!r.ok)throw'err';var d=await r.json();P=d.DB_PROD||[];K=d.DB_PACK||[];STOCK_STAMPS=d.STOCK_STAMPS||[];STOCK_PACK=d.STOCK_PACK||[];STOCK_SETTINGS=d.STOCK_SETTINGS||{};if(d.LISTS)['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];});slists();updateHdr();document.getElementById('sv-status').textContent='● Server';document.getElementById('sv-status').className='sv-pill sv-s';document.getElementById('sv-full-status').textContent='Connected: '+SV_URL;// refresh stock page if active
+var stockPg=document.getElementById('pg-stock');if(stockPg&&stockPg.classList.contains('on'))renderStock();return true;}catch(e){SV_MODE=false;SV_URL='';document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';return false;}}
 async function sPost(path,data){if(!SV_MODE)return null;try{var r=await fetch(SV_URL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return await r.json();}catch(e){return null;}}
 async function sDel(path){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'DELETE'});}catch(e){}}
 async function sPatch(path,data){if(!SV_MODE)return;try{await fetch(SV_URL+path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}}
 async function autoConnect(){
-  // Always derive server URL from how the page was actually opened
-  // This is the most reliable method — if you opened via http://192.168.x.x:3000
-  // then window.location.origin IS the server address, no guessing needed
-  var origin = window.location.origin;
-  if(origin && !origin.startsWith('file://')){
-    SV_URL = origin;
-  } else {
-    // Fallback: page opened as a local file — try stored URL or localhost
-    var stored = localStorage.getItem('spt_svurl');
-    SV_URL = (stored && stored !== 'null') ? stored : 'http://localhost:3000';
-  }
-  SV_MODE = true;
-  localStorage.setItem('spt_svurl', SV_URL);
-  document.getElementById('sv-url').value = SV_URL;
-  var ok = await serverLoad();
-  if(ok){
-    document.getElementById('sv-toggle-btn').textContent = '🔌 Disconnect from Server';
-    toast('✓ Connected to server','tgn');
-    renderAllLists();
-  } else {
-    SV_MODE = false;
-    document.getElementById('sv-status').textContent = '● Local';
-    document.getElementById('sv-status').className = 'sv-pill sv-l';
-    document.getElementById('sv-full-status').textContent = '⚠ Server not reachable — check that node server.js is running';
-    document.getElementById('sv-toggle-btn').textContent = '🔌 Connect to Server';
-    toast('⚠ Server not reachable','ter');
-  }
-}
-window.addEventListener('load', autoConnect);
-
-async function toggleServer(){
-  if(SV_MODE){
-    // Disconnect
-    SV_MODE=false; SV_URL='';
-    localStorage.removeItem('spt_svurl');
-    document.getElementById('sv-status').textContent='● Local';
-    document.getElementById('sv-status').className='sv-pill sv-l';
-    document.getElementById('sv-full-status').textContent='Disconnected — using local mode';
-    document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';
-    toast('Disconnected from server');
-    return;
-  }
-  // Connect — use the URL in the input box, or fall back to page origin
-  var url=document.getElementById('sv-url').value.trim().replace(/\/$/,'');
-  if(!url) url = window.location.origin;
-  SV_URL = url;
-  SV_MODE = true;
-  localStorage.setItem('spt_svurl', SV_URL);
-  document.getElementById('sv-full-status').textContent='Connecting to '+SV_URL+' ...';
+  // Auto-detect server URL from current page origin, or use stored URL
+  var stored=localStorage.getItem('spt_svurl');
+  SV_URL = stored || window.location.origin;
+  // If running from file:// (local file open), use localhost:3000
+  if(SV_URL.startsWith('file://')||SV_URL==='null'||!SV_URL){SV_URL='http://localhost:3000';}
+  SV_MODE=true;
+  localStorage.setItem('spt_svurl',SV_URL);
+  document.getElementById('sv-url').value=SV_URL;
   var ok=await serverLoad();
   if(ok){
     document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';
     toast('✓ Connected to server','tgn');
-    renderAllLists();
   } else {
     SV_MODE=false;
-    // Keep SV_URL in the box so user can see what failed
-    document.getElementById('sv-full-status').textContent='⚠ Cannot reach: '+SV_URL+' — is node server.js running?';
-    document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';
-    toast('⚠ Cannot reach server — check URL and that server.js is running','ter');
+    document.getElementById('sv-status').textContent='● Local';
+    document.getElementById('sv-status').className='sv-pill sv-l';
+    document.getElementById('sv-full-status').textContent='⚠ Server not reachable — data will not be saved until server is running';
+    toast('⚠ Server not reachable — start server.js','ter');
   }
 }
+window.addEventListener('load',autoConnect);
+
+async function toggleServer(){var url=document.getElementById('sv-url').value.trim().replace(/\/$/,'');if(SV_MODE){SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-status').textContent='● Local';document.getElementById('sv-status').className='sv-pill sv-l';document.getElementById('sv-full-status').textContent='Using browser localStorage (local mode)';document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';toast('Disconnected — local mode');return;}SV_URL=url;SV_MODE=true;localStorage.setItem('spt_svurl',SV_URL);document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';var ok=await serverLoad();if(ok){toast('✓ Connected to server','ttl');renderAllLists();}else{toast('⚠ Cannot reach server','twn');SV_MODE=false;SV_URL='';localStorage.removeItem('spt_svurl');document.getElementById('sv-toggle-btn').textContent='🔌 Connect to Server';}}
 
 // ══════════════════════════════════════════════════════════
 //  SAVE PRODUCTION
@@ -2994,11 +3276,11 @@ function cr(arr){return arr.map(function(v){return'"'+String(v===undefined||v===
 function dlCSV(csv,fname){var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=fname;a.click();toast('CSV downloaded.');}
 function exportCSV(){var prods=grp(),packs=grk();if(!prods.length&&!packs.length){toast('No records.','ter');return;}var h1=['Date','Product','SKU','Batch','Produced','Stamps1','Stamps2','StampsRet','StampsNet','ReelNo','StampBy','StampVar','Supervisor','Personnel','Notes','VarReason'],r1=prods.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stamps1,e.stamps2,e.stampsRet,e.stampsNet,e.reelno,e.stampby,e.var_stamp,e.supervisor,e.personnel,e.notes,e.var_reason]);});var h2=['Date','SKU','Batch','Material1','Supplier1','Issued1','Issued2','Returned','Damaged','NetUsed','PackRef','IssuedBy','PackVar','Personnel','Notes','Material2','Supplier2','IssuedM2','ReturnedM2','DamagedM2','IssuedByM2'],r2=packs.map(function(e){return cr([e.date,e.sku,e.batch,e.packmat,e.supplier,e.packIssued,e.packIssued2||0,e.packReturned,e.packDamaged,e.packNet,e.packref,e.packby,e.var_pack,e.personnel,e.notes,e.packmat2||'',e.supplier2||'',e.packIssued_m2||0,e.packReturned_m2||0,e.packDamaged_m2||0,e.packby2||'']);});dlCSV('SEWECO Industrial Coatings Limited\n\nPRODUCTION ENTRIES\n'+[h1.join(',')].concat(r1).join('\n')+'\n\nPACKAGING ENTRIES\n'+[h2.join(',')].concat(r2).join('\n'),'SEWECO_report_'+today()+'.csv');}
 function exportAll(){if(!P.length&&!K.length){toast('No data.','ter');return;}var h1=['Date','Product','SKU','Batch','Produced','Stamps1','Stamps2','StampsRet','StampsNet','ReelNo','StampBy','StampVar','Supervisor','Personnel','Notes','VarReason'],r1=P.map(function(e){return cr([e.date,e.product,e.sku,e.batch,e.prodqty,e.stamps1||0,e.stamps2||0,e.stampsRet||0,e.stampsNet,e.reelno,e.stampby,e.var_stamp,e.supervisor,e.personnel,e.notes,e.var_reason]);});var h2=['Date','SKU','Batch','Material1','Supplier1','Issued1','Issued2','Returned','Damaged','NetUsed','PackRef','IssuedBy','PackVar','Personnel','Notes','Material2','Supplier2','IssuedM2','ReturnedM2','DamagedM2','IssuedByM2'],r2=K.map(function(e){return cr([e.date,e.sku,e.batch,e.packmat,e.supplier,e.packIssued,e.packIssued2||0,e.packReturned,e.packDamaged,e.packNet,e.packref,e.packby,e.var_pack,e.personnel,e.notes,e.packmat2||'',e.supplier2||'',e.packIssued_m2||0,e.packReturned_m2||0,e.packDamaged_m2||0,e.packby2||'']);});dlCSV('SEWECO Industrial Coatings Limited\nFull Data Export\n\nPRODUCTION ENTRIES\n'+[h1.join(',')].concat(r1).join('\n')+'\n\nPACKAGING ENTRIES\n'+[h2.join(',')].concat(r2).join('\n'),'SEWECO_all_'+today()+'.csv');}
-function exportJSON(){var a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({company:'SEWECO Industrial Coatings Limited',exported:new Date().toISOString(),version:'3.1',DB_PROD:P,DB_PACK:K,LISTS:LISTS,LT_OV:LT_OV},null,2));a.download='SEWECO_backup_'+today()+'.json';a.click();toast('Backup downloaded.');}
+function exportJSON(){var a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({company:'SEWECO Industrial Coatings Limited',exported:new Date().toISOString(),version:'4.0',DB_PROD:P,DB_PACK:K,LISTS:LISTS,LT_OV:LT_OV,STOCK_STAMPS:STOCK_STAMPS,STOCK_PACK:STOCK_PACK,STOCK_SETTINGS:STOCK_SETTINGS},null,2));a.download='SEWECO_backup_'+today()+'.json';a.click();toast('Backup downloaded.');}
 
 // ── IMPORT with drag-and-drop support
 function importData(){var inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=function(ev){processImport(ev.target.files[0]);};inp.click();}
-function processImport(file){if(!file)return;if(!confirm('Import this backup? This will replace all current data with the data in the file. This cannot be undone.'))return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.DB_PROD)P=d.DB_PROD;if(d.DB_PACK)K=d.DB_PACK;if(d.DB&&!d.DB_PROD)P=d.DB;if(d.LT_OV)LT_OV=d.LT_OV;['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS&&d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];else LISTS[k]=DL[k].slice();});slists();renderAllLists();updateHdr();toast('✓ Data imported successfully — '+P.length+' prod, '+K.length+' pack entries.','tgn');}catch(ex){console.error(ex);toast('Error reading file. Check it is a valid SEWECO backup.','ter');}};reader.readAsText(file);}
+function processImport(file){if(!file)return;if(!confirm('Import this backup? This will replace all current data with the data in the file. This cannot be undone.'))return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.DB_PROD)P=d.DB_PROD;if(d.DB_PACK)K=d.DB_PACK;if(d.DB&&!d.DB_PROD)P=d.DB;if(d.LT_OV)LT_OV=d.LT_OV;if(d.STOCK_STAMPS)STOCK_STAMPS=d.STOCK_STAMPS;if(d.STOCK_PACK)STOCK_PACK=d.STOCK_PACK;if(d.STOCK_SETTINGS)STOCK_SETTINGS=d.STOCK_SETTINGS;['personnel','packaging','skus','products','suppliers'].forEach(function(k){if(d.LISTS&&d.LISTS[k]&&d.LISTS[k].length)LISTS[k]=d.LISTS[k];else LISTS[k]=DL[k].slice();});slists();renderAllLists();updateHdr();toast('✓ Data imported successfully — '+P.length+' prod, '+K.length+' pack entries.','tgn');}catch(ex){console.error(ex);toast('Error reading file. Check it is a valid SEWECO backup.','ter');}};reader.readAsText(file);}
 function dzOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('drag');}
 function dzLeave(){document.getElementById('dropzone').classList.remove('drag');}
 function dzDrop(e){e.preventDefault();dzLeave();var files=e.dataTransfer.files;if(files[0])processImport(files[0]);}
@@ -3010,6 +3292,581 @@ function addL(key,iid,eid){var v=document.getElementById(iid).value.trim();if(!v
 function removeL(key,val){LISTS[key]=LISTS[key].filter(function(x){return x!==val;});slists();renderAllLists();toast('Removed.');}
 function renderAllLists(){var map={personnel:'lst-person',packaging:'lst-pack',skus:'lst-sku',products:'lst-product',suppliers:'lst-supplier'};['personnel','packaging','skus','products','suppliers'].forEach(function(k){var el=document.getElementById(map[k]);if(!el)return;if(!LISTS[k].length){el.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">No items yet.</div>';return;}el.innerHTML=LISTS[k].map(function(x){return'<div class="li"><span>'+esc(x)+'</span><button class="btn-d" onclick="removeL(\''+k+'\',\''+esc(x)+'\')">Remove</button></div>';}).join('');});}
 
+// ══════════════════════════════════════════════════════════
+//  STOCK — STAMPS
+// ══════════════════════════════════════════════════════════
+function calcStampQty(){
+  var reels=parseInt(document.getElementById('ss-reels').value)||0;
+  var sel=document.getElementById('ss-reel-size').value;
+  if(sel==='custom'){document.getElementById('ss-calc-hint').textContent='';return;}
+  var sz=parseInt(sel);
+  var total=reels*sz;
+  if(total>0){
+    document.getElementById('ss-qty').value=total;
+    document.getElementById('ss-calc-hint').textContent='= '+total.toLocaleString()+' stamps';
+  } else {document.getElementById('ss-calc-hint').textContent='';}
+}
+
+async function saveStampStock(){
+  var qty=parseInt(document.getElementById('ss-qty').value)||0;
+  if(!qty){toast('Enter stamp quantity.','ter');return;}
+  var entry={
+    id:Date.now(),
+    date:document.getElementById('ss-date').value||today(),
+    type:document.getElementById('ss-type').value,
+    vendor:document.getElementById('ss-vendor').value.trim()||'Unknown',
+    qty:qty,
+    reel_count:parseInt(document.getElementById('ss-reels').value)||0,
+    reel_size:document.getElementById('ss-reel-size').value,
+    notes:document.getElementById('ss-notes').value.trim()
+  };
+  if(SV_MODE){
+    var r=await sPost('/api/stock/stamps',entry);
+    if(r&&r.ok){STOCK_STAMPS.push(entry);toast('✓ Stamp stock entry saved.','tgn');}
+    else{toast('❌ Failed to save — is server running?','ter');return;}
+  } else {toast('⚠ Not connected to server.','ter');return;}
+  ['ss-qty','ss-reels','ss-notes','ss-vendor'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('ss-date').value=today();
+  document.getElementById('ss-calc-hint').textContent='';
+  renderStock();
+}
+
+async function delStampStock(id){
+  if(!confirm('Delete this stamp stock entry?'))return;
+  if(!SV_MODE){toast('⚠ Not connected.','ter');return;}
+  await sDel('/api/stock/stamps/'+id);
+  STOCK_STAMPS=STOCK_STAMPS.filter(function(e){return e.id!==id;});
+  renderStock();toast('Deleted.');
+}
+
+// ══════════════════════════════════════════════════════════
+//  STOCK — PACKAGING MATERIALS
+// ══════════════════════════════════════════════════════════
+async function savePackStock(){
+  var material=document.getElementById('sp-material').value.trim();
+  var vendor=document.getElementById('sp-vendor').value.trim()||'Unknown';
+  var qty=parseInt(document.getElementById('sp-qty').value)||0;
+  if(!material){toast('Enter material name.','ter');return;}
+  if(!qty){toast('Enter quantity.','ter');return;}
+  var entry={
+    id:Date.now(),
+    date:document.getElementById('sp-date').value||today(),
+    type:document.getElementById('sp-type').value,
+    material:material,
+    vendor:vendor,
+    qty:qty,
+    notes:document.getElementById('sp-notes').value.trim()
+  };
+  if(SV_MODE){
+    var r=await sPost('/api/stock/packaging',entry);
+    if(r&&r.ok){STOCK_PACK.push(entry);toast('✓ Packaging stock entry saved.','tgn');}
+    else{toast('❌ Failed to save — is server running?','ter');return;}
+  } else {toast('⚠ Not connected to server.','ter');return;}
+  ['sp-material','sp-vendor','sp-qty','sp-notes'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('sp-date').value=today();
+  renderStock();
+}
+
+async function delPackStock(id){
+  if(!confirm('Delete this packaging stock entry?'))return;
+  if(!SV_MODE){toast('⚠ Not connected.','ter');return;}
+  await sDel('/api/stock/packaging/'+id);
+  STOCK_PACK=STOCK_PACK.filter(function(e){return e.id!==id;});
+  renderStock();toast('Deleted.');
+}
+
+// ══════════════════════════════════════════════════════════
+//  STOCK RENDER
+// ══════════════════════════════════════════════════════════
+var STK_TAB='stamps';
+function stkTab(t){
+  STK_TAB=t;
+  document.querySelectorAll('.stk-tab').forEach(function(b,i){b.classList.toggle('on',i===(t==='stamps'?0:1));b.classList.toggle('st',i===0);});
+  document.getElementById('spanel-stamps').classList.toggle('on',t==='stamps');
+  document.getElementById('spanel-packmat').classList.toggle('on',t==='packmat');
+  renderStock();
+}
+
+function renderStock(){
+  renderStampStock();
+  renderPackStock();
+}
+
+function renderStampStock(){
+  // Total received
+  var totalIn=STOCK_STAMPS.reduce(function(s,e){return s+e.qty;},0);
+  // Total used = sum of stampsNet from all production entries
+  var totalUsed=P.reduce(function(s,e){return s+((e.stampsNet||0));},0);
+  // Reconciliation adjustments
+  var stampRecons=STOCK_SETTINGS.stamp_recons||[];
+  var totalReconAdj=stampRecons.reduce(function(s,e){return s+(e.adjustment||0);},0);
+  // Damaged = negative variance sum (where more stamps were used than produced — counted as extra usage)
+  var totalRet=P.reduce(function(s,e){return s+(e.stampsRet||0);},0);
+  var totalBal=totalIn-totalUsed+totalReconAdj;
+  document.getElementById('ss-in').textContent=totalIn.toLocaleString();
+  document.getElementById('ss-used').textContent=totalUsed.toLocaleString();
+  document.getElementById('ss-bal').textContent=totalBal.toLocaleString();
+  document.getElementById('ss-dmg').textContent=totalRet.toLocaleString();
+
+  // Per-vendor breakdown
+  var vendors={};
+  STOCK_STAMPS.forEach(function(e){
+    if(!vendors[e.vendor])vendors[e.vendor]={in:0,entries:[]};
+    vendors[e.vendor].in+=e.qty;
+    vendors[e.vendor].entries.push(e);
+  });
+  var vKeys=Object.keys(vendors);
+  var vHtml='';
+  if(!vKeys.length){vHtml='<div style="color:var(--mu);font-size:12px;padding:8px 0">No stamp stock entries yet. Add an opening balance or receipt above.</div>';}
+  else{
+    // Distribute usage proportionally across vendors by entry order
+    var totalVendorIn=vKeys.reduce(function(s,v){return s+vendors[v].in;},0);
+    vHtml=vKeys.map(function(v){
+      var d=vendors[v];
+      var vendorShare=totalVendorIn>0?d.in/totalVendorIn:0;
+      var vendorUsed=Math.round(totalUsed*vendorShare);
+      var bal=d.in-vendorUsed;
+      var pct=d.in>0?Math.round(bal/d.in*100):0;
+      var cls=pct>30?'stk-ok':(pct>10?'stk-low':'stk-out');
+      return '<div class="sup-row"><div class="sup-name">🏢 '+esc(v)+'</div>'
+        +'<div style="flex:1;padding:0 12px"><div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.max(pct,0)+'%;background:var(--am);border-radius:3px;transition:width .4s"></div></div></div>'
+        +'<div style="font-size:11px;color:var(--mu);min-width:80px;text-align:right">In: <strong>'+d.in.toLocaleString()+'</strong></div>'
+        +'<div class="sup-qty'+(bal<0?' low':'')+'">Bal: '+bal.toLocaleString()+'</div>'
+        +'<span class="stk-badge '+cls+'">'+pct+'%</span>'
+        +'</div>';
+    }).join('');
+  }
+  document.getElementById('stk-stamp-vendors').innerHTML=vHtml;
+
+  // Ledger: combine receipts and deductions
+  var ledger=[];
+  STOCK_STAMPS.forEach(function(e){ledger.push({date:e.date,desc:(e.type==='opening'?'Opening Balance':'Receipt'),vendor:e.vendor,in:e.qty,out:0,id:e.id,isStock:true});});
+  P.forEach(function(e){ledger.push({date:e.date,desc:'Used — Batch: '+esc(e.batch)+' ('+esc(e.sku)+')',vendor:'—',in:0,out:e.stampsNet||0,id:e.id,isStock:false});});
+  ledger.sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+  // Running balance
+  var run=0;
+  var rows=ledger.map(function(r){
+    run+=r.in-r.out;
+    return '<tr>'
+      +'<td class="mono">'+esc(r.date||'—')+'</td>'
+      +'<td>'+esc(r.desc)+'</td>'
+      +'<td>'+esc(r.vendor)+'</td>'
+      +'<td style="color:var(--gn);font-weight:600">'+(r.in||'—')+'</td>'
+      +'<td style="color:var(--rd)">'+(r.out||'—')+'</td>'
+      +'<td style="font-weight:700;color:'+(run>=0?'var(--ink)':'var(--rd)')+'">'+run.toLocaleString()+'</td>'
+      +(r.isStock?'<td><button class="btn-d" onclick="delStampStock('+r.id+')">Del</button></td>':'<td style="color:var(--mu);font-size:10px">auto</td>')
+      +'</tr>';
+  }).join('');
+  // Add reconciliation rows to ledger
+  stampRecons.forEach(function(e){
+    ledger.push({date:e.date,desc:'⚖ Reconciliation ('+esc(e.reason)+')',vendor:e.vendor||'All',in:e.adjustment>0?e.adjustment:0,out:e.adjustment<0?Math.abs(e.adjustment):0,id:e.id,isStock:false,isRecon:true});
+  });
+  ledger.sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+  // Re-compute running balance with recons included
+  run=0;
+  rows=ledger.map(function(r){
+    run+=r.in-r.out;
+    var rowStyle=r.isRecon?'background:rgba(124,58,237,.06)':'';
+    return '<tr style="'+rowStyle+'">'
+      +'<td class="mono">'+esc(r.date||'—')+'</td>'
+      +'<td>'+(r.isRecon?'<span style="color:#7c3aed;font-weight:600">'+esc(r.desc)+'</span>':esc(r.desc))+'</td>'
+      +'<td>'+esc(r.vendor)+'</td>'
+      +'<td style="color:var(--gn);font-weight:600">'+(r.in||'—')+'</td>'
+      +'<td style="color:var(--rd)">'+(r.out||'—')+'</td>'
+      +'<td style="font-weight:700;color:'+(run>=0?'var(--ink)':'var(--rd)')+'">'+run.toLocaleString()+'</td>'
+      +(r.isStock?'<td><button class="btn-d" onclick="delStampStock('+r.id+')">Del</button></td>':'<td style="color:var(--mu);font-size:10px">'+(r.isRecon?'recon':'auto')+'</td>')
+      +'</tr>';
+  }).join('');
+  document.getElementById('stk-stamp-ledger').innerHTML=rows
+    ?'<table><thead><tr><th>Date</th><th>Description</th><th>Vendor</th><th>Stamps In</th><th>Stamps Out</th><th>Running Balance</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'
+    :'<div style="color:var(--mu);font-size:12px;padding:8px 0">No entries yet.</div>';
+  renderStampReconLog();
+}
+
+function renderPackStock(){
+  // Build map: material+vendor => {in, used, damaged}
+  var matVendor={};
+  STOCK_PACK.forEach(function(e){
+    var key=e.material+'||'+e.vendor;
+    if(!matVendor[key])matVendor[key]={material:e.material,vendor:e.vendor,in:0,used:0,damaged:0};
+    matVendor[key].in+=e.qty;
+  });
+  // Deduct from packaging entries — material 1
+  K.forEach(function(e){
+    var key=(e.packmat||'')+'||'+(e.supplier||'Unknown');
+    if(matVendor[key]){
+      matVendor[key].used+=(e.packNet||0);
+      matVendor[key].damaged+=(e.packDamaged||0);
+    }
+    // material 2
+    if(e.packmat2){
+      var key2=(e.packmat2||'')+'||'+(e.supplier2||'Unknown');
+      if(matVendor[key2]){
+        var net2=Math.max(0,(e.packIssued_m2||0)-(e.packReturned_m2||0)-(e.packDamaged_m2||0));
+        matVendor[key2].used+=net2;
+        matVendor[key2].damaged+=(e.packDamaged_m2||0);
+      }
+    }
+  });
+
+  // Apply packaging reconciliation adjustments per material+vendor
+  var packRecons=STOCK_SETTINGS.pack_recons||[];
+  packRecons.forEach(function(e){
+    var key=e.material+'||'+e.vendor;
+    if(!matVendor[key])matVendor[key]={material:e.material,vendor:e.vendor,in:0,used:0,damaged:0,reconAdj:0};
+    matVendor[key].reconAdj=(matVendor[key].reconAdj||0)+e.adjustment;
+  });
+  var allVals=Object.values(matVendor);
+  var totalIn=allVals.reduce(function(s,v){return s+v.in;},0);
+  var totalUsed=allVals.reduce(function(s,v){return s+v.used;},0);
+  var totalReconAdj=allVals.reduce(function(s,v){return s+(v.reconAdj||0);},0);
+  var totalBal=totalIn-totalUsed+totalReconAdj;
+  var totalDmg=allVals.reduce(function(s,v){return s+v.damaged;},0);
+  document.getElementById('sp-in').textContent=totalIn.toLocaleString();
+  document.getElementById('sp-used').textContent=totalUsed.toLocaleString();
+  document.getElementById('sp-bal').textContent=totalBal.toLocaleString();
+  document.getElementById('sp-dmg').textContent=totalDmg.toLocaleString();
+
+  // Group by material
+  var byMat={};
+  allVals.forEach(function(v){
+    if(!byMat[v.material])byMat[v.material]={vendors:[],totalIn:0,totalUsed:0,totalDmg:0};
+    byMat[v.material].vendors.push(v);
+    byMat[v.material].totalIn+=v.in;
+    byMat[v.material].totalUsed+=v.used;
+    byMat[v.material].totalDmg+=v.damaged;
+  });
+
+  var matKeys=Object.keys(byMat);
+  var bkHtml='';
+  if(!matKeys.length){bkHtml='<div style="color:var(--mu);font-size:12px;padding:8px">No packaging stock entries yet. Add opening balance or receipt above.</div>';}
+  else{
+    bkHtml=matKeys.map(function(mat){
+      var m=byMat[mat];
+      var matReconAdj=m.vendors.reduce(function(s,v){return s+(v.reconAdj||0);},0);
+      var matBal=m.totalIn-m.totalUsed+matReconAdj;
+      var pct=m.totalIn>0?Math.round(matBal/m.totalIn*100):0;
+      var cls=pct>30?'stk-ok':(pct>10?'stk-low':'stk-out');
+      var vendorRows=m.vendors.map(function(v){
+        var vBal=v.in-v.used+(v.reconAdj||0);
+        var dmgRate=v.in>0?((v.damaged/v.in*100).toFixed(1)):'0.0';
+        return '<div class="mat-row">'
+          +'<div class="mat-sup">🏢 '+esc(v.vendor)+'</div>'
+          +'<div style="flex:1;font-size:11px;color:var(--mu)">In: <strong style="color:var(--tl)">'+v.in.toLocaleString()+'</strong> · Used: '+v.used.toLocaleString()+' · Dmg: <span style="color:var(--rd)">'+v.damaged.toLocaleString()+'</span></div>'
+          +'<div class="mat-qty'+(vBal<0?' low':'')+'">'+vBal.toLocaleString()+'</div>'
+          +'<div class="mat-dmg">'+dmgRate+'% dmg</div>'
+          +'</div>';
+      }).join('');
+      return '<div style="margin-bottom:18px"><div class="grp-hd am">📦 '+esc(mat)
+        +' <span class="stk-badge '+cls+'">'+pct+'% left</span>'
+        +' <span style="font-size:11px;font-weight:400;color:var(--mu);text-transform:none;letter-spacing:0"> Total bal: <strong>'+matBal.toLocaleString()+'</strong></span>'
+        +'</div>'
+        +vendorRows
+        +'</div>';
+    }).join('');
+  }
+  document.getElementById('stk-pack-breakdown').innerHTML=bkHtml;
+
+  // Packaging material ledger: receipts + deductions from K
+  var ledger2=[];
+  STOCK_PACK.forEach(function(e){ledger2.push({date:e.date,material:e.material,vendor:e.vendor,desc:e.type==='opening'?'Opening Balance':'Receipt',in:e.qty,out:0,id:e.id,isStock:true});});
+  K.forEach(function(e){
+    if(e.packmat)ledger2.push({date:e.date,material:e.packmat,vendor:e.supplier||'—',desc:'Used — Batch: '+esc(e.batch),in:0,out:e.packNet||0,dmg:e.packDamaged||0,id:e.id,isStock:false});
+    if(e.packmat2){var net2=Math.max(0,(e.packIssued_m2||0)-(e.packReturned_m2||0)-(e.packDamaged_m2||0));ledger2.push({date:e.date,material:e.packmat2,vendor:e.supplier2||'—',desc:'Used (M2) — Batch: '+esc(e.batch),in:0,out:net2,dmg:e.packDamaged_m2||0,id:e.id,isStock:false});}
+  });
+  ledger2.sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+  // Running balance per material+vendor
+  var runMap={};
+  var rows2=ledger2.map(function(r){
+    var mk=(r.material||'')+'||'+(r.vendor||'');
+    if(!runMap[mk])runMap[mk]=0;
+    runMap[mk]+=r.in-r.out;
+    var bal=runMap[mk];
+    return '<tr>'
+      +'<td class="mono">'+esc(r.date||'—')+'</td>'
+      +'<td>'+esc(r.material||'—')+'</td>'
+      +'<td>'+esc(r.vendor||'—')+'</td>'
+      +'<td>'+esc(r.desc)+'</td>'
+      +'<td style="color:var(--tl);font-weight:600">'+(r.in||'—')+'</td>'
+      +'<td style="color:var(--rd)">'+(r.out||'—')+'</td>'
+      +'<td style="color:var(--rd)">'+(r.dmg||'—')+'</td>'
+      +'<td style="font-weight:700;color:'+(bal>=0?'var(--ink)':'var(--rd)')+'">'+bal.toLocaleString()+'</td>'
+      +(r.isStock?'<td><button class="btn-d" onclick="delPackStock('+r.id+')">Del</button></td>':'<td style="color:var(--mu);font-size:10px">auto</td>')
+      +'</tr>';
+  }).join('');
+  // Add packaging reconciliation rows
+  packRecons.forEach(function(e){
+    ledger2.push({date:e.date,material:e.material,vendor:e.vendor,desc:'⚖ Reconciliation ('+esc(e.reason)+')',in:e.adjustment>0?e.adjustment:0,out:e.adjustment<0?Math.abs(e.adjustment):0,dmg:0,id:e.id,isStock:false,isRecon:true});
+  });
+  ledger2.sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+  runMap={};
+  rows2=ledger2.map(function(r){
+    var mk=(r.material||'')+'||'+(r.vendor||'');
+    if(!runMap[mk])runMap[mk]=0;
+    runMap[mk]+=r.in-r.out;
+    var bal=runMap[mk];
+    var rowStyle=r.isRecon?'background:rgba(13,148,136,.06)':'';
+    return '<tr style="'+rowStyle+'">'
+      +'<td class="mono">'+esc(r.date||'—')+'</td>'
+      +'<td>'+esc(r.material||'—')+'</td>'
+      +'<td>'+esc(r.vendor||'—')+'</td>'
+      +'<td>'+(r.isRecon?'<span style="color:#0d9488;font-weight:600">'+esc(r.desc)+'</span>':esc(r.desc))+'</td>'
+      +'<td style="color:var(--tl);font-weight:600">'+(r.in||'—')+'</td>'
+      +'<td style="color:var(--rd)">'+(r.out||'—')+'</td>'
+      +'<td style="color:var(--rd)">'+(r.dmg||'—')+'</td>'
+      +'<td style="font-weight:700;color:'+(bal>=0?'var(--ink)':'var(--rd)')+'">'+bal.toLocaleString()+'</td>'
+      +(r.isStock?'<td><button class="btn-d" onclick="delPackStock('+r.id+')">Del</button></td>':'<td style="color:var(--mu);font-size:10px">'+(r.isRecon?'recon':'auto')+'</td>')
+      +'</tr>';
+  }).join('');
+  document.getElementById('stk-pack-ledger').innerHTML=rows2
+    ?'<table><thead><tr><th>Date</th><th>Material</th><th>Vendor</th><th>Description</th><th>In</th><th>Out</th><th>Damaged</th><th>Running Bal</th><th></th></tr></thead><tbody>'+rows2+'</tbody></table>'
+    :'<div style="color:var(--mu);font-size:12px;padding:8px 0">No entries yet.</div>';
+  renderPackReconLog();
+}
+
+// ══════════════════════════════════════════════════════════
+//  STOCK RECONCILIATION — STAMPS
+// ══════════════════════════════════════════════════════════
+function calcStampRecon(){
+  var physical=parseInt(document.getElementById('sr-physical').value);
+  if(isNaN(physical)){document.getElementById('sr-variance').value='';document.getElementById('sr-variance-hint').textContent='';return;}
+  var totalIn=STOCK_STAMPS.reduce(function(s,e){return s+e.qty;},0);
+  var totalUsed=P.reduce(function(s,e){return s+(e.stampsNet||0);},0);
+  // Add any previous reconciliation adjustments
+  var recons=(STOCK_SETTINGS.stamp_recons||[]);
+  var totalAdj=recons.reduce(function(s,e){return s+(e.adjustment||0);},0);
+  var systemBal=totalIn-totalUsed+totalAdj;
+  var variance=physical-systemBal;
+  document.getElementById('sr-variance').value=variance;
+  var hint=variance>0?'▲ Physical is '+variance.toLocaleString()+' MORE than system (will add to stock)'
+         :variance<0?'▼ Physical is '+Math.abs(variance).toLocaleString()+' FEWER than system (will deduct from stock)'
+         :'✓ Physical matches system exactly — no adjustment needed';
+  document.getElementById('sr-variance-hint').textContent=hint;
+  document.getElementById('sr-hint').textContent='System balance: '+systemBal.toLocaleString();
+}
+
+async function saveStampRecon(){
+  var physical=parseInt(document.getElementById('sr-physical').value);
+  if(isNaN(physical)||physical<0){toast('Enter a valid physical count.','ter');return;}
+  var reason=document.getElementById('sr-reason').value.trim();
+  if(!reason){toast('Enter a reason / notes for the reconciliation.','ter');return;}
+  var totalIn=STOCK_STAMPS.reduce(function(s,e){return s+e.qty;},0);
+  var totalUsed=P.reduce(function(s,e){return s+(e.stampsNet||0);},0);
+  var recons=(STOCK_SETTINGS.stamp_recons||[]);
+  var totalAdj=recons.reduce(function(s,e){return s+(e.adjustment||0);},0);
+  var systemBal=totalIn-totalUsed+totalAdj;
+  var variance=physical-systemBal;
+  if(variance===0){toast('No variance — system already matches physical count.','twn');return;}
+  var entry={
+    id:Date.now(),
+    date:document.getElementById('sr-date').value||today(),
+    vendor:document.getElementById('sr-vendor').value.trim()||'All',
+    physical:physical,
+    system_bal:systemBal,
+    adjustment:variance,
+    reason:reason
+  };
+  var newRecons=recons.concat([entry]);
+  if(!SV_MODE){toast('⚠ Not connected to server.','ter');return;}
+  var r=await sPatch('/api/stock/settings',{stamp_recons:newRecons});
+  if(r&&r.ok){
+    STOCK_SETTINGS.stamp_recons=newRecons;
+    toast((variance>0?'✓ +':'✓ ')+variance.toLocaleString()+' stamps reconciled.','tgn');
+    ['sr-physical','sr-reason','sr-vendor'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('sr-date').value=today();
+    document.getElementById('sr-variance').value='';
+    document.getElementById('sr-variance-hint').textContent='';
+    document.getElementById('sr-hint').textContent='';
+    renderStampStock();
+  } else {toast('❌ Failed to save reconciliation.','ter');}
+}
+
+async function delStampRecon(id){
+  if(!confirm('Delete this reconciliation entry? This will reverse the adjustment.'))return;
+  var recons=(STOCK_SETTINGS.stamp_recons||[]).filter(function(e){return e.id!==id;});
+  if(!SV_MODE){toast('⚠ Not connected.','ter');return;}
+  var r=await sPatch('/api/stock/settings',{stamp_recons:recons});
+  if(r&&r.ok){STOCK_SETTINGS.stamp_recons=recons;renderStampStock();toast('Reconciliation deleted.');}
+}
+
+function renderStampReconLog(){
+  var recons=STOCK_SETTINGS.stamp_recons||[];
+  var el=document.getElementById('sr-log');
+  if(!el)return;
+  if(!recons.length){el.innerHTML='<div style="font-size:11px;color:var(--mu);padding:4px 0">No reconciliation entries yet.</div>';return;}
+  el.innerHTML='<div style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Reconciliation History</div>'
+    +[...recons].reverse().map(function(e){
+      var cls=e.adjustment>0?'recon-pos':e.adjustment<0?'recon-neg':'recon-zero';
+      var arrow=e.adjustment>0?'▲':e.adjustment<0?'▼':'=';
+      return '<div class="recon-entry">'
+        +'<div class="recon-entry-icon">⚖</div>'
+        +'<div class="recon-entry-body">'
+        +'<div class="recon-entry-head">'+esc(e.date||'—')+' · Vendor: '+esc(e.vendor||'All')
+        +'<span class="recon-adj '+cls+'">'+arrow+' '+Math.abs(e.adjustment).toLocaleString()+'</span></div>'
+        +'<div class="recon-entry-meta">Physical: '+e.physical.toLocaleString()+' · System was: '+e.system_bal.toLocaleString()+' · Reason: '+esc(e.reason)+'</div>'
+        +'</div>'
+        +'<button class="btn-d" style="align-self:center" onclick="delStampRecon('+e.id+')">Del</button>'
+        +'</div>';
+    }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  STOCK RECONCILIATION — PACKAGING MATERIALS
+// ══════════════════════════════════════════════════════════
+function calcPackRecon(){
+  var material=document.getElementById('pr-material').value.trim();
+  var vendor=document.getElementById('pr-vendor').value.trim();
+  var physical=parseInt(document.getElementById('pr-physical').value);
+  // Compute system balance for this material+vendor
+  var key=material+'||'+vendor;
+  var inQty=STOCK_PACK.filter(function(e){return e.material===material&&e.vendor===vendor;}).reduce(function(s,e){return s+e.qty;},0);
+  var usedQty=0;
+  K.forEach(function(e){
+    if((e.packmat||'')===(material||'')&&(e.supplier||'Unknown')===vendor)usedQty+=(e.packNet||0);
+    if((e.packmat2||'')===(material||'')&&(e.supplier2||'Unknown')===vendor){usedQty+=Math.max(0,(e.packIssued_m2||0)-(e.packReturned_m2||0)-(e.packDamaged_m2||0));}
+  });
+  var recons=(STOCK_SETTINGS.pack_recons||[]).filter(function(e){return e.material===material&&e.vendor===vendor;});
+  var totalAdj=recons.reduce(function(s,e){return s+(e.adjustment||0);},0);
+  var systemBal=inQty-usedQty+totalAdj;
+  document.getElementById('pr-system').value=isNaN(systemBal)?'':systemBal;
+  if(!isNaN(physical)&&!isNaN(systemBal)){
+    var variance=physical-systemBal;
+    document.getElementById('pr-variance').value=variance;
+    var hint=variance>0?'▲ Physical is '+variance+' MORE than system'
+           :variance<0?'▼ Physical is '+Math.abs(variance)+' FEWER than system'
+           :'✓ Physical matches system — no adjustment needed';
+    document.getElementById('pr-variance-hint').textContent=hint;
+  }
+}
+
+async function savePackRecon(){
+  var material=document.getElementById('pr-material').value.trim();
+  var vendor=document.getElementById('pr-vendor').value.trim();
+  var physical=parseInt(document.getElementById('pr-physical').value);
+  var reason=document.getElementById('pr-reason').value.trim();
+  if(!material){toast('Select a packaging material.','ter');return;}
+  if(!vendor){toast('Enter a vendor/supplier.','ter');return;}
+  if(isNaN(physical)||physical<0){toast('Enter a valid physical count.','ter');return;}
+  if(!reason){toast('Enter a reason for the reconciliation.','ter');return;}
+  var systemBal=parseInt(document.getElementById('pr-system').value)||0;
+  var variance=physical-systemBal;
+  if(variance===0){toast('No variance — system already matches physical count.','twn');return;}
+  var entry={
+    id:Date.now(),
+    date:document.getElementById('pr-date').value||today(),
+    material:material,
+    vendor:vendor,
+    physical:physical,
+    system_bal:systemBal,
+    adjustment:variance,
+    reason:reason
+  };
+  var allRecons=(STOCK_SETTINGS.pack_recons||[]).concat([entry]);
+  if(!SV_MODE){toast('⚠ Not connected to server.','ter');return;}
+  var r=await sPatch('/api/stock/settings',{pack_recons:allRecons});
+  if(r&&r.ok){
+    STOCK_SETTINGS.pack_recons=allRecons;
+    toast((variance>0?'✓ +':'✓ ')+variance.toLocaleString()+' units reconciled for '+material+'.','tgn');
+    ['pr-material','pr-vendor','pr-physical','pr-reason','pr-system','pr-variance'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('pr-date').value=today();
+    document.getElementById('pr-variance-hint').textContent='';
+    renderPackStock();
+  } else {toast('❌ Failed to save reconciliation.','ter');}
+}
+
+async function delPackRecon(id){
+  if(!confirm('Delete this reconciliation entry? This will reverse the adjustment.'))return;
+  var allRecons=(STOCK_SETTINGS.pack_recons||[]).filter(function(e){return e.id!==id;});
+  if(!SV_MODE){toast('⚠ Not connected.','ter');return;}
+  var r=await sPatch('/api/stock/settings',{pack_recons:allRecons});
+  if(r&&r.ok){STOCK_SETTINGS.pack_recons=allRecons;renderPackStock();toast('Reconciliation deleted.');}
+}
+
+function renderPackReconLog(){
+  var allRecons=STOCK_SETTINGS.pack_recons||[];
+  var el=document.getElementById('pr-log');
+  if(!el)return;
+  if(!allRecons.length){el.innerHTML='<div style="font-size:11px;color:var(--mu);padding:4px 0">No reconciliation entries yet.</div>';return;}
+  el.innerHTML='<div style="font-size:11px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Reconciliation History</div>'
+    +[...allRecons].reverse().map(function(e){
+      var cls=e.adjustment>0?'recon-pos':e.adjustment<0?'recon-neg':'recon-zero';
+      var arrow=e.adjustment>0?'▲':e.adjustment<0?'▼':'=';
+      return '<div class="recon-entry tl">'
+        +'<div class="recon-entry-icon">⚖</div>'
+        +'<div class="recon-entry-body">'
+        +'<div class="recon-entry-head">'+esc(e.date||'—')+' · '+esc(e.material)+' · Vendor: '+esc(e.vendor)
+        +'<span class="recon-adj '+cls+'">'+arrow+' '+Math.abs(e.adjustment).toLocaleString()+'</span></div>'
+        +'<div class="recon-entry-meta">Physical: '+e.physical.toLocaleString()+' · System was: '+e.system_bal.toLocaleString()+' · Reason: '+esc(e.reason)+'</div>'
+        +'</div>'
+        +'<button class="btn-d" style="align-self:center" onclick="delPackRecon('+e.id+')">Del</button>'
+        +'</div>';
+    }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  STOCK PRINT & EXPORT
+// ══════════════════════════════════════════════════════════
+function printStock(){
+  var meta=document.getElementById('ph-stock-meta');
+  if(meta)meta.textContent='Generated: '+new Date().toLocaleDateString('en-UG',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' · Section: '+(STK_TAB==='stamps'?'Stamps':'Packaging Materials');
+  document.getElementById('ph-stock').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('ph-stock').style.display='none';},1500);
+}
+
+function exportStockCSV(){
+  var lines=['SEWECO Industrial Coatings Limited','Stock Check Export — '+new Date().toLocaleDateString('en-UG'),''];
+  // Stamps section
+  lines.push('STAMPS STOCK');
+  lines.push('Date,Type,Vendor,Qty,Reels,Notes');
+  STOCK_STAMPS.forEach(function(e){lines.push(cr([e.date,e.type,e.vendor,e.qty,e.reel_count||0,e.notes||'']));});
+  lines.push('');
+  lines.push('STAMP RECONCILIATIONS');
+  lines.push('Date,Vendor,Physical Count,System Balance,Adjustment,Reason');
+  (STOCK_SETTINGS.stamp_recons||[]).forEach(function(e){lines.push(cr([e.date,e.vendor,e.physical,e.system_bal,e.adjustment,e.reason]));});
+  lines.push('');
+  // Packaging section
+  lines.push('PACKAGING MATERIAL STOCK');
+  lines.push('Date,Type,Material,Vendor,Qty,Notes');
+  STOCK_PACK.forEach(function(e){lines.push(cr([e.date,e.type,e.material,e.vendor,e.qty,e.notes||'']));});
+  lines.push('');
+  lines.push('PACKAGING RECONCILIATIONS');
+  lines.push('Date,Material,Vendor,Physical Count,System Balance,Adjustment,Reason');
+  (STOCK_SETTINGS.pack_recons||[]).forEach(function(e){lines.push(cr([e.date,e.material,e.vendor,e.physical,e.system_bal,e.adjustment,e.reason]));});
+  dlCSV(lines.join('\n'),'SEWECO_stock_'+today()+'.csv');
+}
+
+// ══════════════════════════════════════════════════════════
+//  REPORT CSV EXPORT (for currently generated report)
+// ══════════════════════════════════════════════════════════
+function exportReportCSV(){
+  var prods=grp(),packs=grk();
+  if(CRT==='stock-stamps'){
+    var lines=['SEWECO Industrial Coatings Limited','Stamp Stock Report',''];
+    lines.push('RECEIPTS & OPENING BALANCES');
+    lines.push('Date,Type,Vendor,Qty,Reels,Notes');
+    STOCK_STAMPS.forEach(function(e){lines.push(cr([e.date,e.type,e.vendor,e.qty,e.reel_count||0,e.notes||'']));});
+    lines.push('');
+    lines.push('RECONCILIATIONS');
+    lines.push('Date,Vendor,Physical,System Balance,Adjustment,Reason');
+    (STOCK_SETTINGS.stamp_recons||[]).forEach(function(e){lines.push(cr([e.date,e.vendor,e.physical,e.system_bal,e.adjustment,e.reason]));});
+    dlCSV(lines.join('\n'),'SEWECO_stamp_stock_'+today()+'.csv');return;
+  }
+  if(CRT==='stock-pack'){
+    var lines2=['SEWECO Industrial Coatings Limited','Packaging Material Stock Report',''];
+    lines2.push('RECEIPTS & OPENING BALANCES');
+    lines2.push('Date,Type,Material,Vendor,Qty,Notes');
+    STOCK_PACK.forEach(function(e){lines2.push(cr([e.date,e.type,e.material,e.vendor,e.qty,e.notes||'']));});
+    lines2.push('');
+    lines2.push('RECONCILIATIONS');
+    lines2.push('Date,Material,Vendor,Physical,System Balance,Adjustment,Reason');
+    (STOCK_SETTINGS.pack_recons||[]).forEach(function(e){lines2.push(cr([e.date,e.material,e.vendor,e.physical,e.system_bal,e.adjustment,e.reason]));});
+    dlCSV(lines2.join('\n'),'SEWECO_pack_stock_'+today()+'.csv');return;
+  }
+  // Default: export filtered production+packaging
+  exportCSV();
+}
+
 // ── HEADER ──────────────────────────────────────────────
 function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textContent=P.length+' prod · '+K.length+' pack';var pill=document.getElementById('sv-status');if(!pill)return;if(SV_MODE){pill.textContent='● Server';pill.className='sv-pill sv-s';}else{pill.textContent='● Local';pill.className='sv-pill sv-l';}}
 
@@ -3018,6 +3875,12 @@ function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textC
 // ══════════════════════════════════════════════════════════
 (function init(){
   sv2('e-date',today());sv2('p-date',today());
+  // Stock date defaults
+  var ssDate=document.getElementById('ss-date');if(ssDate)ssDate.value=today();
+  var spDate=document.getElementById('sp-date');if(spDate)spDate.value=today();
+  // Reconciliation date defaults
+  var srDate=document.getElementById('sr-date');if(srDate)srDate.value=today();
+  var prDate=document.getElementById('pr-date');if(prDate)prDate.value=today();
   document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-UG',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
   updateHdr();renderAllLists();
   // Password check
@@ -3030,20 +3893,11 @@ function updateHdr(){var el=document.getElementById('hdr-counts');if(el)el.textC
     document.getElementById('login-btn-text').textContent='Unlock Application';
   }
   document.getElementById('pw-input').focus();
-  // Auto-sync every 5 seconds — silently re-connects if server comes back
+  // Auto-sync every 5 seconds to keep data fresh across all connected devices
   setInterval(async function(){
     if(SV_MODE){
       var ok=await serverLoad();
-      if(!ok){updateHdr();document.getElementById('sv-full-status').textContent='⚠ Server connection lost — retrying...';}
-    } else {
-      // If not in server mode but page was opened via http, try to reconnect quietly
-      var origin=window.location.origin;
-      if(origin && !origin.startsWith('file://')){
-        SV_URL=origin; SV_MODE=true;
-        var ok=await serverLoad();
-        if(ok){document.getElementById('sv-toggle-btn').textContent='🔌 Disconnect from Server';renderAllLists();}
-        else{SV_MODE=false;}
-      }
+      if(!ok){SV_MODE=false;updateHdr();document.getElementById('sv-full-status').textContent='⚠ Server connection lost — trying to reconnect...';}
     }
   },5000);
   go('dashboard');
